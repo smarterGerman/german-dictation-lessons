@@ -1,157 +1,4 @@
-function updateLiveFeedback() {
-            if (!userInput || !liveFeedback) return;
-            
-            const userText = userInput.value;
-            
-            if (userText.trim() === '') {
-                liveFeedback.innerHTML = 'Live Feedback';
-                return;
-            }
-            
-            const comparison = compareTexts(referenceText, userText);
-            
-            let feedbackHTML = '';
-            
-            comparison.chars.forEach(item => {
-                let char = item.char;
-                
-                if (char === ' ') {
-                    if (item.status === 'word-boundary') {
-                        char = '&nbsp;&nbsp;&nbsp;';
-                    } else if (item.status === 'char-space') {
-                        char = '&nbsp;';
-                    } else {
-                        char = '&nbsp;';
-                    }
-                } else if (char === '\n') {
-                    char = '<br>';
-                }
-                
-                feedbackHTML += `<span class="char-${item.status}">${char}</span>`;
-            });
-            
-            liveFeedback.innerHTML = feedbackHTML;
-        }
-
-        function updateProgress() {
-            if (!audioPlayer || !timeDisplay || !progressBar) return;
-            
-            const currentTime = audioPlayer.currentTime;
-            const duration = audioPlayer.duration;
-            
-            if (duration) {
-                const progress = (currentTime / duration) * 100;
-                progressBar.style.width = progress + '%';
-                
-                const formatTime = (time) => {
-                    const minutes = Math.floor(time / 60);
-                    const seconds = Math.floor(time % 60);
-                    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                };
-                
-                timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-            }
-        }
-
-        function calculateWordStats(comparison) {
-            const ignoreCase = ignoreCaseActive;
-            const ignorePunctuation = true;
-            
-            let refNormalized = referenceText;
-            let userNormalized = userInput.value;
-            
-            if (ignorePunctuation) {
-                refNormalized = refNormalized.replace(/[.,!?;:""''()]/g, '');
-                userNormalized = userNormalized.replace(/[.,!?;:""''()]/g, '');
-            }
-            
-            if (ignoreCase) {
-                refNormalized = refNormalized.toLowerCase();
-                userNormalized = userNormalized.toLowerCase();
-            }
-            
-            userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
-            
-            const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
-            const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
-            
-            const alignment = alignSequencesWithGaps(refWords, userWords);
-            
-            let correctWords = 0;
-            let wrongWords = 0;
-            let totalWords = refWords.length;
-            
-            alignment.forEach(item => {
-                if (item.type === 'match') {
-                    correctWords++;
-                } else if (item.type === 'substitute' || item.type === 'delete') {
-                    wrongWords++;
-                }
-            });
-            
-            return {
-                correctWords,
-                wrongWords,
-                totalWords
-            };
-        }
-
-        function showFinalResult() {
-            if (!userInput) return;
-            
-            if (userInput.value.trim() && sessionResults.length === currentCueIndex) {
-                let sentenceTime = 0;
-                if (hasStartedTyping && sentenceStartTime) {
-                    sentenceTime = (Date.now() - sentenceStartTime) / 1000;
-                    totalSessionTime += sentenceTime;
-                }
-
-                const userText = userInput.value;
-                const comparison = compareTexts(referenceText, userText);
-                const wordStats = calculateWordStats(comparison);
-                
-                sessionResults.push({
-                    sentenceIndex: currentCueIndex,
-                    reference: referenceText,
-                    userInput: userText,
-                    stats: wordStats,
-                    time: sentenceTime,
-                    comparison: comparison
-                });
-            }
-            
-            let totalCorrectWords = 0;
-            let totalWrongWords = 0;
-            let totalWords = 0;
-            
-            sessionResults.forEach(result => {
-                totalCorrectWords += result.stats.correctWords;
-                totalWrongWords += result.stats.wrongWords;
-                totalWords += result.stats.totalWords;
-            });
-            
-            const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
-            
-            if (accuracyPercent) accuracyPercent.textContent = accuracy + '%';
-            if (correctWords) correctWords.textContent = totalCorrectWords;
-            if (wrongWords) wrongWords.textContent = totalWrongWords;
-
-            const timeElement = document.getElementById('timeTaken');
-            if (timeElement) {
-                timeElement.textContent = formatTime(totalSessionTime);
-            }
-            
-            if (statsSection) statsSection.style.display = 'grid';
-            if (checkBtn) checkBtn.style.display = 'none';
-            
-            setTimeout(sendHeightToParent, 100);
-        }
-        
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -256,6 +103,7 @@ function updateLiveFeedback() {
             align-items: center; 
             justify-content: center;
             outline: none;
+            position: relative;
         }
 
         .nav-btn,
@@ -364,10 +212,6 @@ function updateLiveFeedback() {
         .hint-tooltip.show {
             opacity: 1;
             pointer-events: auto;
-        }
-
-        .toggle-btn {
-            position: relative;
         }
 
         .play-btn {
@@ -676,7 +520,7 @@ function updateLiveFeedback() {
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, ignoreCaseBtn, hintBtn;
+        let checkBtn, resetBtn, ignoreCaseBtn, hintBtn, speedBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
@@ -1374,6 +1218,126 @@ function updateLiveFeedback() {
             liveFeedback.innerHTML = feedbackHTML;
         }
 
+        function updateProgress() {
+            if (!audioPlayer || !timeDisplay || !progressBar) return;
+            
+            const currentTime = audioPlayer.currentTime;
+            const duration = audioPlayer.duration;
+            
+            if (duration) {
+                const progress = (currentTime / duration) * 100;
+                progressBar.style.width = progress + '%';
+                
+                const formatTime = (time) => {
+                    const minutes = Math.floor(time / 60);
+                    const seconds = Math.floor(time % 60);
+                    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                };
+                
+                timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+            }
+        }
+
+        function calculateWordStats(comparison) {
+            const ignoreCase = ignoreCaseActive;
+            const ignorePunctuation = true;
+            
+            let refNormalized = referenceText;
+            let userNormalized = userInput.value;
+            
+            if (ignorePunctuation) {
+                refNormalized = refNormalized.replace(/[.,!?;:""''()]/g, '');
+                userNormalized = userNormalized.replace(/[.,!?;:""''()]/g, '');
+            }
+            
+            if (ignoreCase) {
+                refNormalized = refNormalized.toLowerCase();
+                userNormalized = userNormalized.toLowerCase();
+            }
+            
+            userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
+            
+            const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
+            const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
+            
+            const alignment = alignSequencesWithGaps(refWords, userWords);
+            
+            let correctWords = 0;
+            let wrongWords = 0;
+            let totalWords = refWords.length;
+            
+            alignment.forEach(item => {
+                if (item.type === 'match') {
+                    correctWords++;
+                } else if (item.type === 'substitute' || item.type === 'delete') {
+                    wrongWords++;
+                }
+            });
+            
+            return {
+                correctWords,
+                wrongWords,
+                totalWords
+            };
+        }
+
+        function showFinalResult() {
+            if (!userInput) return;
+            
+            if (userInput.value.trim() && sessionResults.length === currentCueIndex) {
+                let sentenceTime = 0;
+                if (hasStartedTyping && sentenceStartTime) {
+                    sentenceTime = (Date.now() - sentenceStartTime) / 1000;
+                    totalSessionTime += sentenceTime;
+                }
+
+                const userText = userInput.value;
+                const comparison = compareTexts(referenceText, userText);
+                const wordStats = calculateWordStats(comparison);
+                
+                sessionResults.push({
+                    sentenceIndex: currentCueIndex,
+                    reference: referenceText,
+                    userInput: userText,
+                    stats: wordStats,
+                    time: sentenceTime,
+                    comparison: comparison
+                });
+            }
+            
+            let totalCorrectWords = 0;
+            let totalWrongWords = 0;
+            let totalWords = 0;
+            
+            sessionResults.forEach(result => {
+                totalCorrectWords += result.stats.correctWords;
+                totalWrongWords += result.stats.wrongWords;
+                totalWords += result.stats.totalWords;
+            });
+            
+            const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
+            
+            if (accuracyPercent) accuracyPercent.textContent = accuracy + '%';
+            if (correctWords) correctWords.textContent = totalCorrectWords;
+            if (wrongWords) wrongWords.textContent = totalWrongWords;
+
+            const timeElement = document.getElementById('timeTaken');
+            if (timeElement) {
+                timeElement.textContent = formatTime(totalSessionTime);
+            }
+            
+            if (statsSection) statsSection.style.display = 'grid';
+            if (checkBtn) checkBtn.style.display = 'none';
+            
+            setTimeout(sendHeightToParent, 100);
+        }
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
         function resetDictation() {
             if (userInput) userInput.value = '';
             if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
@@ -1438,9 +1402,6 @@ function updateLiveFeedback() {
                 sendHeightToParent();
             }
         }
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
