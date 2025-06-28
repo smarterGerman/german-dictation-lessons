@@ -295,7 +295,6 @@
         .char-missing{color:#d97706;font-style:italic;font-weight:500;} 
         .char-extra{color:#2563eb;font-weight:500;} 
         .char-word-boundary,.char-char-space{color:#9ca3af;}
-        .char-hint{color:#8b5cf6;font-weight:600;background:rgba(139,92,246,0.1);padding:0 1px;}
 
         /* ----- OPTIONS ----------------------------------------------------- */
         .options { 
@@ -448,7 +447,6 @@
                 <div class="controls">
                     <button class="control-btn" id="checkBtn">Check</button>
                     <button class="control-btn" id="resetBtn">Reset</button>
-                    <button class="control-btn" id="helpBtn" title="Add hint letters (3 max)">Help</button>
                 </div>
             </div>
         </div>
@@ -477,8 +475,6 @@
         let sessionResults = [];
         let ignoreCaseActive = true; // Default state
         let currentSpeed = 1.0; // Default speed (100%)
-        let helpUsedCount = 0; // Track how many times help was used
-        let helpHints = []; // Store revealed letters for visual hints
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -486,7 +482,7 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn;
+        let checkBtn, resetBtn, ignoreCaseBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
@@ -504,7 +500,6 @@
             wrongWords = document.getElementById('wrongWords');
             checkBtn = document.getElementById('checkBtn');
             resetBtn = document.getElementById('resetBtn');
-            helpBtn = document.getElementById('helpBtn');
             ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
             speedBtn = document.getElementById('speedBtn');
             prevBtn = document.getElementById('prevBtn');
@@ -520,7 +515,6 @@
             }
             if (checkBtn) checkBtn.addEventListener('click', showFinalResult);
             if (resetBtn) resetBtn.addEventListener('click', resetDictation);
-            if (helpBtn) helpBtn.addEventListener('click', showHelp);
             if (ignoreCaseBtn) {
                 ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
                 // Set initial state
@@ -861,15 +855,6 @@
             if (userInput) userInput.value = '';
             updateLiveFeedback();
             
-            // Reset help button and hints when moving to new sentence
-            helpUsedCount = 0;
-            helpHints = {};
-            if (helpBtn) {
-                helpBtn.disabled = false;
-                helpBtn.textContent = 'Help';
-                helpBtn.style.opacity = '1';
-            }
-            
             sentenceStartTime = null;
             hasStartedTyping = false;
             
@@ -1156,12 +1141,7 @@
             const userText = userInput.value;
             
             if (userText.trim() === '') {
-                // Show hints even when no user input
-                if (Object.keys(helpHints).length > 0) {
-                    showHintsInFeedback();
-                } else {
-                    liveFeedback.innerHTML = 'Live Feedback';
-                }
+                liveFeedback.innerHTML = 'Live Feedback';
                 return;
             }
             
@@ -1187,269 +1167,7 @@
                 feedbackHTML += `<span class="char-${item.status}">${char}</span>`;
             });
             
-            // Add hint letters that haven't been typed yet
-            const userWords = userText.split(/\s+/).filter(w => w.length > 0);
-            const targetWords = referenceText.split(/\s+/).filter(w => w.length > 0);
-            
-            // If user has typed less than the target, show remaining hints
-            if (userWords.length < targetWords.length) {
-                for (let wordIndex = userWords.length; wordIndex < targetWords.length; wordIndex++) {
-                    const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
-                    const wordKey = `word_${wordIndex}`;
-                    
-                    if (wordIndex > 0 || userWords.length > 0) {
-                        feedbackHTML += '&nbsp;&nbsp;&nbsp;';
-                    }
-                    
-                    for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
-                        const char = targetWord[letterIndex];
-                        const isHinted = helpHints[wordKey] && helpHints[wordKey].includes(letterIndex);
-                        
-                        if (isHinted) {
-                            feedbackHTML += `<span class="char-hint">${char}</span>`;
-                        } else {
-                            feedbackHTML += `<span class="char-missing">_</span>`;
-                        }
-                    }
-                }
-            }
-            
             liveFeedback.innerHTML = feedbackHTML;
-        }
-
-        function showHintsInFeedback() {
-            if (!referenceText) return;
-            
-            const targetWords = referenceText.split(/\s+/).filter(w => w.length > 0);
-            let feedbackHTML = '';
-            
-            for (let wordIndex = 0; wordIndex < targetWords.length; wordIndex++) {
-                if (wordIndex > 0) {
-                    feedbackHTML += '&nbsp;&nbsp;&nbsp;';
-                }
-                
-                const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
-                const wordKey = `word_${wordIndex}`;
-                
-                for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
-                    const char = targetWord[letterIndex];
-                    const isHinted = helpHints[wordKey] && helpHints[wordKey].includes(letterIndex);
-                    
-                    if (isHinted) {
-                        feedbackHTML += `<span class="char-hint">${char}</span>`;
-                    } else {
-                        feedbackHTML += `<span class="char-missing">_</span>`;
-                    }
-                }
-            }
-            
-            liveFeedback.innerHTML = feedbackHTML;
-        }
-
-        function updateProgress() {
-            if (!audioPlayer || !timeDisplay || !progressBar) return;
-            
-            const currentTime = audioPlayer.currentTime;
-            const duration = audioPlayer.duration;
-            
-            if (duration) {
-                const progress = (currentTime / duration) * 100;
-                progressBar.style.width = progress + '%';
-                
-                const formatTime = (time) => {
-                    const minutes = Math.floor(time / 60);
-                    const seconds = Math.floor(time % 60);
-                    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                };
-                
-                timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-            }
-        }
-
-        function calculateWordStats(comparison) {
-            const ignoreCase = ignoreCaseActive;
-            const ignorePunctuation = true;
-            
-            let refNormalized = referenceText;
-            let userNormalized = userInput.value;
-            
-            if (ignorePunctuation) {
-                refNormalized = refNormalized.replace(/[.,!?;:""''()]/g, '');
-                userNormalized = userNormalized.replace(/[.,!?;:""''()]/g, '');
-            }
-            
-            if (ignoreCase) {
-                refNormalized = refNormalized.toLowerCase();
-                userNormalized = userNormalized.toLowerCase();
-            }
-            
-            userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
-            
-            const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
-            const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
-            
-            const alignment = alignSequencesWithGaps(refWords, userWords);
-            
-            let correctWords = 0;
-            let wrongWords = 0;
-            let totalWords = refWords.length;
-            
-            alignment.forEach(item => {
-                if (item.type === 'match') {
-                    correctWords++;
-                } else if (item.type === 'substitute' || item.type === 'delete') {
-                    wrongWords++;
-                }
-            });
-            
-            return {
-                correctWords,
-                wrongWords,
-                totalWords
-            };
-        }
-
-        function showFinalResult() {
-            if (!userInput) return;
-            
-            if (userInput.value.trim() && sessionResults.length === currentCueIndex) {
-                let sentenceTime = 0;
-                if (hasStartedTyping && sentenceStartTime) {
-                    sentenceTime = (Date.now() - sentenceStartTime) / 1000;
-                    totalSessionTime += sentenceTime;
-                }
-
-                const userText = userInput.value;
-                const comparison = compareTexts(referenceText, userText);
-                const wordStats = calculateWordStats(comparison);
-                
-                sessionResults.push({
-                    sentenceIndex: currentCueIndex,
-                    reference: referenceText,
-                    userInput: userText,
-                    stats: wordStats,
-                    time: sentenceTime,
-                    comparison: comparison
-                });
-            }
-            
-            let totalCorrectWords = 0;
-            let totalWrongWords = 0;
-            let totalWords = 0;
-            
-            sessionResults.forEach(result => {
-                totalCorrectWords += result.stats.correctWords;
-                totalWrongWords += result.stats.wrongWords;
-                totalWords += result.stats.totalWords;
-            });
-            
-            const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
-            
-            if (accuracyPercent) accuracyPercent.textContent = accuracy + '%';
-            if (correctWords) correctWords.textContent = totalCorrectWords;
-            if (wrongWords) wrongWords.textContent = totalWrongWords;
-
-            const timeElement = document.getElementById('timeTaken');
-            if (timeElement) {
-                timeElement.textContent = formatTime(totalSessionTime);
-            }
-            
-            if (statsSection) statsSection.style.display = 'grid';
-            if (checkBtn) checkBtn.style.display = 'none';
-            
-            setTimeout(sendHeightToParent, 100);
-        }
-        
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
-        function showHelp() {
-            if (helpUsedCount >= 3) {
-                // Disable help button and show it's maxed out
-                if (helpBtn) {
-                    helpBtn.disabled = true;
-                    helpBtn.textContent = '✕';
-                    helpBtn.style.opacity = '0.5';
-                }
-                return;
-            }
-            
-            const targetText = referenceText;
-            const targetWords = targetText.split(/\s+/).filter(w => w.length > 0);
-            
-            // Add one random hint letter to a random word
-            let availableWords = [];
-            for (let wordIndex = 0; wordIndex < targetWords.length; wordIndex++) {
-                const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
-                const wordKey = `word_${wordIndex}`;
-                
-                if (!helpHints[wordKey]) {
-                    helpHints[wordKey] = [];
-                }
-                
-                // Find positions that don't have hints yet
-                for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
-                    if (!helpHints[wordKey].includes(letterIndex)) {
-                        availableWords.push({ wordIndex, letterIndex });
-                    }
-                }
-            }
-            
-            // Pick a random position to reveal
-            if (availableWords.length > 0) {
-                const randomChoice = availableWords[Math.floor(Math.random() * availableWords.length)];
-                const wordKey = `word_${randomChoice.wordIndex}`;
-                
-                if (!helpHints[wordKey]) {
-                    helpHints[wordKey] = [];
-                }
-                helpHints[wordKey].push(randomChoice.letterIndex);
-            }
-            
-            // Update live feedback to show new hint
-            updateLiveFeedback();
-            
-            helpUsedCount++;
-            
-            // Update help button to show remaining uses
-            if (helpBtn) {
-                const remaining = 3 - helpUsedCount;
-                if (remaining > 0) {
-                    helpBtn.textContent = `Help (${remaining})`;
-                } else {
-                    helpBtn.disabled = true;
-                    helpBtn.textContent = '✕';
-                    helpBtn.style.opacity = '0.5';
-                }
-            }
-        }
-
-        function resetDictation() {
-            if (userInput) userInput.value = '';
-            if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
-            if (statsSection) statsSection.style.display = 'none';
-            if (checkBtn) checkBtn.style.display = 'inline-block';
-            
-            // Reset help button and hints
-            helpUsedCount = 0;
-            helpHints = {};
-            if (helpBtn) {
-                helpBtn.disabled = false;
-                helpBtn.textContent = 'Help';
-                helpBtn.style.opacity = '1';
-            }
-            
-            sentenceStartTime = null;
-            totalSessionTime = 0;
-            hasStartedTyping = false;
-            sessionResults = [];
-            currentCueIndex = 0;
-            
-            updateCurrentSentence();
-            setTimeout(sendHeightToParent, 100);
         }
 
         function showAnswer() {
@@ -1462,6 +1180,9 @@
                 sendHeightToParent();
             }
         }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
