@@ -101,7 +101,8 @@
             transition: all .3s ease; 
             display: flex; 
             align-items: center; 
-            justify-content: center; 
+            justify-content: center;
+            outline: none;
         }
 
         .nav-btn,
@@ -390,6 +391,7 @@
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
+          outline: none !important;
         }
 
         .control-btn:hover:not(:disabled) {
@@ -831,6 +833,7 @@
         
         function togglePlayback() {
             if (vttCues.length === 0) {
+                // No VTT cues, just play/pause the entire audio
                 if (isPlaying) {
                     audioPlayer.pause();
                 } else {
@@ -840,7 +843,12 @@
                     });
                 }
             } else {
-                playCurrentSentence();
+                // VTT cues available, toggle play/pause for current sentence
+                if (isPlaying) {
+                    audioPlayer.pause();
+                } else {
+                    playCurrentSentence();
+                }
             }
         }
 
@@ -1179,7 +1187,7 @@
             
             if (userText.trim() === '') {
                 // Show hints even when no user input
-                if (helpHints.length > 0) {
+                if (Object.keys(helpHints).length > 0) {
                     showHintsInFeedback();
                 } else {
                     liveFeedback.innerHTML = 'Live Feedback';
@@ -1190,16 +1198,9 @@
             const comparison = compareTexts(referenceText, userText);
             
             let feedbackHTML = '';
-            let charIndex = 0;
             
             comparison.chars.forEach(item => {
                 let char = item.char;
-                let status = item.status;
-                
-                // Check if this character should be shown as a hint
-                if (status !== 'correct' && shouldShowHint(charIndex, char)) {
-                    status = 'hint';
-                }
                 
                 if (char === ' ') {
                     if (item.status === 'word-boundary') {
@@ -1213,9 +1214,35 @@
                     char = '<br>';
                 }
                 
-                feedbackHTML += `<span class="char-${status}">${char}</span>`;
-                charIndex++;
+                feedbackHTML += `<span class="char-${item.status}">${char}</span>`;
             });
+            
+            // Add hint letters that haven't been typed yet
+            const userWords = userText.split(/\s+/).filter(w => w.length > 0);
+            const targetWords = referenceText.split(/\s+/).filter(w => w.length > 0);
+            
+            // If user has typed less than the target, show remaining hints
+            if (userWords.length < targetWords.length) {
+                for (let wordIndex = userWords.length; wordIndex < targetWords.length; wordIndex++) {
+                    const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
+                    const wordKey = `word_${wordIndex}`;
+                    
+                    if (wordIndex > 0 || userWords.length > 0) {
+                        feedbackHTML += '&nbsp;&nbsp;&nbsp;';
+                    }
+                    
+                    for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
+                        const char = targetWord[letterIndex];
+                        const isHinted = helpHints[wordKey] && helpHints[wordKey].includes(letterIndex);
+                        
+                        if (isHinted) {
+                            feedbackHTML += `<span class="char-hint">${char}</span>`;
+                        } else {
+                            feedbackHTML += `<span class="char-missing">_</span>`;
+                        }
+                    }
+                }
+            }
             
             liveFeedback.innerHTML = feedbackHTML;
         }
