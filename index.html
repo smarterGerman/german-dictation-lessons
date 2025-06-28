@@ -441,6 +441,21 @@
         .control-btn:active {
           transform: translateY(-1px) !important;
         }
+
+        /* Add this new style for your 'X' button */
+    .toggle-btn.end-button { /* Use .toggle-btn to ensure specificity if needed */
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); /* Red background */
+        color: white;
+        font-size: 1.5em; /* Make the 'X' larger */
+        font-weight: bold;
+        line-height: 1; /* Ensures X is vertically centered */
+        padding: 8px 12px; /* Adjust padding if needed to fit 'X' */
+    }
+
+    .toggle-btn.end-button:hover {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); /* Darker red on hover */
+        transform: translateY(-2px); /* Keep consistent hover effect */
+    }
     </style>
 </head>
 <body>
@@ -458,6 +473,7 @@
                     <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
                     <span id="timeDisplay">0:00 / 0:00</span>
                     <button class="toggle-btn" id="hintBtn" title="Show expected sentence">?</button>
+                    <button class="toggle-btn" id="endDictationBtn" title="End dictation & show stats">X</button>
                 </div>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 <audio id="audioPlayer" preload="auto"></audio>
