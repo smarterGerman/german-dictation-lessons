@@ -659,6 +659,7 @@
         }
 
         function handleGlobalKeyDown(e) {
+        console.log('Global keydown detected:', e.key, 'Shift:', e.shiftKey, 'Ctrl/Cmd:', (e.ctrlKey || e.metaKey)); // ADD THIS LINE
     // Shortcuts always enabled, even while typing
 
     // Hint shortcut: Shift + Ctrl/Cmd + ß (German), / (US), , (French)
@@ -684,6 +685,7 @@
     // Play/Pause (start dictation): Shift + Ctrl/Cmd + Enter
     if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
+        console.log('Shortcut for togglePlayback activated.'); //
         togglePlayback();
         return;
     }
@@ -855,6 +857,7 @@
         }
         
         function togglePlayback() {
+            console.log('togglePlayback called.');
             if (vttCues.length === 0) {
                 // No VTT cues, just play/pause the entire audio
                 if (isPlaying) {
@@ -879,6 +882,7 @@
             if (currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
                 const cue = vttCues[currentCueIndex];
                 audioPlayer.currentTime = cue.start;
+                          console.log('Attempting to play audio. audioPlayer.readyState:', audioPlayer.readyState, 'audioPlayer.networkState:', audioPlayer.networkState);
                 audioPlayer.play().catch(error => {
                     console.log('Audio playback failed:', error);
                     alert('Audio could not be played. Please check your internet connection.');
