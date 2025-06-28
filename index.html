@@ -362,6 +362,28 @@
             pointer-events: auto;
         }
 
+        /* Mobile tooltip adjustments */
+        @media(max-width: 768px) {
+            .hint-tooltip {
+                position: fixed; /* Fixed positioning on mobile */
+                top: auto;
+                bottom: 120px; /* Position above controls */
+                left: 50%;
+                transform: translateX(-50%);
+                max-width: calc(100vw - 40px); /* Responsive width with margins */
+                font-size: 13px; /* Slightly smaller on mobile */
+                margin-top: 0;
+                z-index: 1001; /* Higher z-index for mobile */
+            }
+
+            .hint-tooltip::after {
+                top: 100%; /* Arrow points down */
+                bottom: auto;
+                border-bottom-color: transparent;
+                border-top-color: #1f2937;
+            }
+        }
+
         .play-btn {
             position: relative;
             width: 72px; 
@@ -713,7 +735,7 @@
     .audio-section{ padding: 15px; }
     /* Mobile placeholder text sizing */
     .input-field::placeholder {
-        font-size: 16px !important; /* Even smaller on mobile */
+        font-size: 12px !important; /* Even smaller on mobile */
         line-height: 1.3;
     }
 
