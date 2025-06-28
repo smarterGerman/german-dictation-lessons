@@ -400,7 +400,7 @@
         let ignoreCaseActive = true; // Default state
 
         const CONFIG = {
-            lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons.json'
+            lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
         };
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
@@ -469,6 +469,345 @@
             loadAllLessons().then(() => {
                 loadLesson(lessonId);
             });
+            setTimeout(sendHeightToParent, 500);
+        });
+
+        function toggleIgnoreCase() {
+            ignoreCaseActive = !ignoreCaseActive;
+            if (ignoreCaseBtn) {
+                if (ignoreCaseActive) {
+                    ignoreCaseBtn.classList.add('active');
+                } else {
+                    ignoreCaseBtn.classList.remove('active');
+                }
+            }
+            updateLiveFeedback();
+        }
+
+        function handleUserInput(e) {
+            if (!hasStartedTyping && e.target.value.trim().length > 0) {
+                hasStartedTyping = true;
+                sentenceStartTime = Date.now();
+            }
+            
+            const cursorPos = e.target.selectionStart;
+            const convertedText = convertGermanChars(e.target.value);
+            if (convertedText !== e.target.value) {
+                e.target.value = convertedText;
+                e.target.setSelectionRange(cursorPos, cursorPos);
+            }
+            updateLiveFeedback();
+            setTimeout(sendHeightToParent, 100);
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                processCurrentSentenceAndAdvance();
+            }
+        }
+
+        function processCurrentSentenceAndAdvance() {
+            if (!userInput.value.trim()) {
+                playCurrentSentence();
+                return;
+            }
+
+            let sentenceTime = 0;
+            if (hasStartedTyping && sentenceStartTime) {
+                sentenceTime = (Date.now() - sentenceStartTime) / 1000;
+                totalSessionTime += sentenceTime;
+            }
+
+            const userText = userInput.value;
+            const comparison = compareTexts(referenceText, userText);
+            const wordStats = calculateWordStats(comparison);
+            
+            sessionResults.push({
+                sentenceIndex: currentCueIndex,
+                reference: referenceText,
+                userInput: userText,
+                stats: wordStats,
+                time: sentenceTime,
+                comparison: comparison
+            });
+
+            if (currentCueIndex < vttCues.length - 1) {
+                goToNextSentence();
+                playCurrentSentence();
+            } else {
+                showFinalResult();
+            }
+        }
+
+        function getLessonIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('lesson');
+        }
+
+        async function loadAllLessons() {
+            try {
+                const response = await fetch(CONFIG.lessonsUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to load lessons: ${response.status}`);
+                }
+                allLessons = await response.json();
+            } catch (error) {
+                console.error('Failed to load lessons:', error);
+                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
+            }
+        }
+
+        function parseVTT(vttText) {
+            const lines = vttText.split('\n');
+            const cues = [];
+            let i = 0;
+
+            while (i < lines.length && !lines[i].includes('-->')) {
+                i++;
+            }
+
+            while (i < lines.length) {
+                const line = lines[i].trim();
+                
+                if (line.includes('-->')) {
+                    const [startTime, endTime] = line.split('-->').map(t => t.trim());
+                    const startSeconds = parseTimeToSeconds(startTime);
+                    const endSeconds = parseTimeToSeconds(endTime);
+                    
+                    i++;
+                    let text = '';
+                    while (i < lines.length && lines[i].trim() !== '') {
+                        if (text) text += ' ';
+                        text += lines[i].trim();
+                        i++;
+                    }
+                    
+                    if (text) {
+                        cues.push({
+                            start: startSeconds,
+                            end: endSeconds,
+                            text: text
+                        });
+                    }
+                }
+                i++;
+            }
+            
+            return cues;
+        }
+
+        function parseTimeToSeconds(timeStr) {
+            const parts = timeStr.split(':');
+            const seconds = parts[parts.length - 1].split('.');
+            const sec = parseInt(seconds[0]);
+            const ms = parseInt(seconds[1] || 0);
+            
+            if (parts.length === 3) {
+                const hours = parseInt(parts[0]);
+                const minutes = parseInt(parts[1]);
+                return hours * 3600 + minutes * 60 + sec + ms / 1000;
+            } else {
+                const minutes = parseInt(parts[0]);
+                return minutes * 60 + sec + ms / 1000;
+            }
+        }
+
+        async function loadVTTFromUrl(vttUrl) {
+            try {
+                const response = await fetch(vttUrl);
+                if (!response.ok) {
+                    throw new Error(`VTT file not found: ${response.status}`);
+                }
+                
+                const vttText = await response.text();
+                const cues = parseVTT(vttText);
+                return cues;
+            } catch (error) {
+                console.error('Failed to load VTT file:', error);
+                return [];
+            }
+        }
+
+        function convertGermanChars(text) {
+            return text
+                .replace(/ae/g, 'ä')
+                .replace(/oe/g, 'ö')
+                .replace(/ue/g, 'ü')
+                .replace(/Ae/g, 'Ä')
+                .replace(/Oe/g, 'Ö')
+                .replace(/Ue/g, 'Ü')
+                .replace(/\B([aeiouäöü])B/g, '$1ß')
+                .replace(/([aeiouäöü])B([aeiouäöü])/g, '$1ß$2')
+                .replace(/([aeiouäöü])B$/g, '$1ß')
+                .replace(/([aeiouäöü])B(\s)/g, '$1ß$2');
+        }
+        
+        function togglePlayback() {
+            if (vttCues.length === 0) {
+                if (isPlaying) {
+                    audioPlayer.pause();
+                } else {
+                    audioPlayer.play().catch(error => {
+                        console.log('Audio playback failed:', error);
+                        alert('Audio could not be played. Please check your internet connection.');
+                    });
+                }
+            } else {
+                playCurrentSentence();
+            }
+        }
+
+        function playCurrentSentence() {
+            if (currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
+                const cue = vttCues[currentCueIndex];
+                audioPlayer.currentTime = cue.start;
+                audioPlayer.play().catch(error => {
+                    console.log('Audio playback failed:', error);
+                    alert('Audio could not be played. Please check your internet connection.');
+                });
+            }
+        }
+
+        function goToPreviousSentence() {
+            if (currentCueIndex > 0) {
+                currentCueIndex--;
+                updateCurrentSentence();
+                if (vttCues[currentCueIndex]) {
+                    audioPlayer.currentTime = vttCues[currentCueIndex].start;
+                }
+            }
+        }
+
+        function goToNextSentence() {
+            if (currentCueIndex < vttCues.length - 1) {
+                currentCueIndex++;
+                updateCurrentSentence();
+                if (vttCues[currentCueIndex]) {
+                    audioPlayer.currentTime = vttCues[currentCueIndex].start;
+                }
+            }
+        }
+
+        function updateCurrentSentence() {
+            updateNavigationButtons();
+            updateSentenceInfo();
+            updateCurrentReferenceText();
+            
+            if (userInput) userInput.value = '';
+            updateLiveFeedback();
+            
+            sentenceStartTime = null;
+            hasStartedTyping = false;
+            
+            if (statsSection) statsSection.style.display = 'none';
+            if (checkBtn) checkBtn.style.display = 'inline-block';
+            
+            setTimeout(sendHeightToParent, 100);
+        }
+
+        function updateNavigationButtons() {
+            if (prevBtn) prevBtn.disabled = (currentCueIndex <= 0);
+            if (nextBtn) nextBtn.disabled = (currentCueIndex >= vttCues.length - 1);
+        }
+
+        function updateSentenceInfo() {
+            if (sentenceInfo && vttCues.length > 0) {
+                sentenceInfo.textContent = `Sentence ${currentCueIndex + 1} of ${vttCues.length}`;
+            }
+        }
+
+        function updateCurrentReferenceText() {
+            if (vttCues.length > 0 && currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
+                referenceText = vttCues[currentCueIndex].text;
+                if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
+            }
+        }
+
+        function handleTimeUpdate() {
+            updateProgress();
+            
+            if (vttCues.length > 0 && isPlaying) {
+                const currentTime = audioPlayer.currentTime;
+                const currentCue = vttCues[currentCueIndex];
+                
+                if (currentCue && currentTime >= currentCue.end) {
+                    audioPlayer.pause();
+                }
+            }
+        }
+
+        async function loadLesson(lessonId) {
+            if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
+            if (playBtn) {
+                playBtn.textContent = '⏳';
+                playBtn.disabled = true;
+            }
+
+            // Check if lesson exists
+            if (!allLessons[lessonId]) {
+                console.error(`Lesson ${lessonId} not found`);
+                if (lessonInfo) lessonInfo.textContent = `Lesson ${lessonId} not found`;
+                return;
+            }
+
+            currentLessonId = lessonId;
+            const lessonData = allLessons[lessonId];
+            
+            if (lessonInfo) {
+                lessonInfo.textContent = `Loading lesson ${lessonId}...`;
+            }
+            
+            const cues = await loadVTTFromUrl(lessonData.vttUrl);
+            
+            if (cues.length === 0) {
+                console.error(`Failed to load VTT for lesson ${lessonId}`);
+                if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId}`;
+                return;
+            }
+            
+            vttCues = cues;
+            currentCueIndex = 0;
+            
+            referenceText = vttCues[0].text;
+            updateNavigationButtons();
+            updateSentenceInfo();
+            
+            if (audioPlayer) {
+                audioPlayer.src = lessonData.audioUrl;
+                
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    if (playBtn) {
+                        playBtn.textContent = '';
+                        playBtn.classList.remove('playing');
+                        playBtn.disabled = false;
+                    }
+                    updateProgress();
+                    if (lessonInfo) {
+                        lessonInfo.textContent = `Lesson ${lessonId}`;
+                    }
+                }, { once: true });
+                
+                audioPlayer.addEventListener('error', (e) => {
+                    if (playBtn) {
+                        playBtn.textContent = '❌';
+                        playBtn.disabled = true;
+                    }
+                    console.error('Failed to load audio:', lessonData.audioUrl, e);
+                }, { once: true });
+            }
+            
+            if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
+            if (userInput) userInput.value = '';
+            if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
+            if (statsSection) statsSection.style.display = 'none';
+            if (checkBtn) checkBtn.style.display = 'inline-block';
+            
+            sentenceStartTime = null;
+            totalSessionTime = 0;
+            hasStartedTyping = false;
+            sessionResults = [];
+            
             setTimeout(sendHeightToParent, 500);
         }
 
@@ -822,343 +1161,4 @@
         }
     </script>
 </body>
-</html>Parent, 500);
-        });
-
-        function toggleIgnoreCase() {
-            ignoreCaseActive = !ignoreCaseActive;
-            if (ignoreCaseBtn) {
-                if (ignoreCaseActive) {
-                    ignoreCaseBtn.classList.add('active');
-                } else {
-                    ignoreCaseBtn.classList.remove('active');
-                }
-            }
-            updateLiveFeedback();
-        }
-
-        function handleUserInput(e) {
-            if (!hasStartedTyping && e.target.value.trim().length > 0) {
-                hasStartedTyping = true;
-                sentenceStartTime = Date.now();
-            }
-            
-            const cursorPos = e.target.selectionStart;
-            const convertedText = convertGermanChars(e.target.value);
-            if (convertedText !== e.target.value) {
-                e.target.value = convertedText;
-                e.target.setSelectionRange(cursorPos, cursorPos);
-            }
-            updateLiveFeedback();
-            setTimeout(sendHeightToParent, 100);
-        }
-
-        function handleKeyDown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                processCurrentSentenceAndAdvance();
-            }
-        }
-
-        function processCurrentSentenceAndAdvance() {
-            if (!userInput.value.trim()) {
-                playCurrentSentence();
-                return;
-            }
-
-            let sentenceTime = 0;
-            if (hasStartedTyping && sentenceStartTime) {
-                sentenceTime = (Date.now() - sentenceStartTime) / 1000;
-                totalSessionTime += sentenceTime;
-            }
-
-            const userText = userInput.value;
-            const comparison = compareTexts(referenceText, userText);
-            const wordStats = calculateWordStats(comparison);
-            
-            sessionResults.push({
-                sentenceIndex: currentCueIndex,
-                reference: referenceText,
-                userInput: userText,
-                stats: wordStats,
-                time: sentenceTime,
-                comparison: comparison
-            });
-
-            if (currentCueIndex < vttCues.length - 1) {
-                goToNextSentence();
-                playCurrentSentence();
-            } else {
-                showFinalResult();
-            }
-        }
-
-        function getLessonIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('lesson');
-        }
-
-        async function loadAllLessons() {
-            try {
-                const response = await fetch(CONFIG.lessonsUrl);
-                if (!response.ok) {
-                    throw new Error(`Failed to load lessons: ${response.status}`);
-                }
-                allLessons = await response.json();
-            } catch (error) {
-                console.error('Failed to load lessons:', error);
-                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
-            }
-        }
-
-        function parseVTT(vttText) {
-            const lines = vttText.split('\n');
-            const cues = [];
-            let i = 0;
-
-            while (i < lines.length && !lines[i].includes('-->')) {
-                i++;
-            }
-
-            while (i < lines.length) {
-                const line = lines[i].trim();
-                
-                if (line.includes('-->')) {
-                    const [startTime, endTime] = line.split('-->').map(t => t.trim());
-                    const startSeconds = parseTimeToSeconds(startTime);
-                    const endSeconds = parseTimeToSeconds(endTime);
-                    
-                    i++;
-                    let text = '';
-                    while (i < lines.length && lines[i].trim() !== '') {
-                        if (text) text += ' ';
-                        text += lines[i].trim();
-                        i++;
-                    }
-                    
-                    if (text) {
-                        cues.push({
-                            start: startSeconds,
-                            end: endSeconds,
-                            text: text
-                        });
-                    }
-                }
-                i++;
-            }
-            
-            return cues;
-        }
-
-        function parseTimeToSeconds(timeStr) {
-            const parts = timeStr.split(':');
-            const seconds = parts[parts.length - 1].split('.');
-            const sec = parseInt(seconds[0]);
-            const ms = parseInt(seconds[1] || 0);
-            
-            if (parts.length === 3) {
-                const hours = parseInt(parts[0]);
-                const minutes = parseInt(parts[1]);
-                return hours * 3600 + minutes * 60 + sec + ms / 1000;
-            } else {
-                const minutes = parseInt(parts[0]);
-                return minutes * 60 + sec + ms / 1000;
-            }
-        }
-
-        async function loadVTTFromUrl(vttUrl) {
-            try {
-                const response = await fetch(vttUrl);
-                if (!response.ok) {
-                    throw new Error(`VTT file not found: ${response.status}`);
-                }
-                
-                const vttText = await response.text();
-                const cues = parseVTT(vttText);
-                return cues;
-            } catch (error) {
-                console.error('Failed to load VTT file:', error);
-                return [];
-            }
-        }
-
-        function convertGermanChars(text) {
-            return text
-                .replace(/ae/g, 'ä')
-                .replace(/oe/g, 'ö')
-                .replace(/ue/g, 'ü')
-                .replace(/Ae/g, 'Ä')
-                .replace(/Oe/g, 'Ö')
-                .replace(/Ue/g, 'Ü')
-                .replace(/\B([aeiouäöü])B/g, '$1ß')
-                .replace(/([aeiouäöü])B([aeiouäöü])/g, '$1ß$2')
-                .replace(/([aeiouäöü])B$/g, '$1ß')
-                .replace(/([aeiouäöü])B(\s)/g, '$1ß$2');
-        }
-        
-        function togglePlayback() {
-            if (vttCues.length === 0) {
-                if (isPlaying) {
-                    audioPlayer.pause();
-                } else {
-                    audioPlayer.play().catch(error => {
-                        console.log('Audio playback failed:', error);
-                        alert('Audio could not be played. Please check your internet connection.');
-                    });
-                }
-            } else {
-                playCurrentSentence();
-            }
-        }
-
-        function playCurrentSentence() {
-            if (currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
-                const cue = vttCues[currentCueIndex];
-                audioPlayer.currentTime = cue.start;
-                audioPlayer.play().catch(error => {
-                    console.log('Audio playback failed:', error);
-                    alert('Audio could not be played. Please check your internet connection.');
-                });
-            }
-        }
-
-        function goToPreviousSentence() {
-            if (currentCueIndex > 0) {
-                currentCueIndex--;
-                updateCurrentSentence();
-                if (vttCues[currentCueIndex]) {
-                    audioPlayer.currentTime = vttCues[currentCueIndex].start;
-                }
-            }
-        }
-
-        function goToNextSentence() {
-            if (currentCueIndex < vttCues.length - 1) {
-                currentCueIndex++;
-                updateCurrentSentence();
-                if (vttCues[currentCueIndex]) {
-                    audioPlayer.currentTime = vttCues[currentCueIndex].start;
-                }
-            }
-        }
-
-        function updateCurrentSentence() {
-            updateNavigationButtons();
-            updateSentenceInfo();
-            updateCurrentReferenceText();
-            
-            if (userInput) userInput.value = '';
-            updateLiveFeedback();
-            
-            sentenceStartTime = null;
-            hasStartedTyping = false;
-            
-            if (statsSection) statsSection.style.display = 'none';
-            if (checkBtn) checkBtn.style.display = 'inline-block';
-            
-            setTimeout(sendHeightToParent, 100);
-        }
-
-        function updateNavigationButtons() {
-            if (prevBtn) prevBtn.disabled = (currentCueIndex <= 0);
-            if (nextBtn) nextBtn.disabled = (currentCueIndex >= vttCues.length - 1);
-        }
-
-        function updateSentenceInfo() {
-            if (sentenceInfo && vttCues.length > 0) {
-                sentenceInfo.textContent = `Sentence ${currentCueIndex + 1} of ${vttCues.length}`;
-            }
-        }
-
-        function updateCurrentReferenceText() {
-            if (vttCues.length > 0 && currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
-                referenceText = vttCues[currentCueIndex].text;
-                if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
-            }
-        }
-
-        function handleTimeUpdate() {
-            updateProgress();
-            
-            if (vttCues.length > 0 && isPlaying) {
-                const currentTime = audioPlayer.currentTime;
-                const currentCue = vttCues[currentCueIndex];
-                
-                if (currentCue && currentTime >= currentCue.end) {
-                    audioPlayer.pause();
-                }
-            }
-        }
-
-        async function loadLesson(lessonId) {
-            if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
-            if (playBtn) {
-                playBtn.textContent = '⏳';
-                playBtn.disabled = true;
-            }
-
-            // Check if lesson exists
-            if (!allLessons[lessonId]) {
-                console.error(`Lesson ${lessonId} not found`);
-                if (lessonInfo) lessonInfo.textContent = `Lesson ${lessonId} not found`;
-                return;
-            }
-
-            currentLessonId = lessonId;
-            const lessonData = allLessons[lessonId];
-            
-            if (lessonInfo) {
-                lessonInfo.textContent = `Loading lesson ${lessonId}...`;
-            }
-            
-            const cues = await loadVTTFromUrl(lessonData.vttUrl);
-            
-            if (cues.length === 0) {
-                console.error(`Failed to load VTT for lesson ${lessonId}`);
-                if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId}`;
-                return;
-            }
-            
-            vttCues = cues;
-            currentCueIndex = 0;
-            
-            referenceText = vttCues[0].text;
-            updateNavigationButtons();
-            updateSentenceInfo();
-            
-            if (audioPlayer) {
-                audioPlayer.src = lessonData.audioUrl;
-                
-                audioPlayer.addEventListener('loadedmetadata', () => {
-                    if (playBtn) {
-                        playBtn.textContent = '';
-                        playBtn.classList.remove('playing');
-                        playBtn.disabled = false;
-                    }
-                    updateProgress();
-                    if (lessonInfo) {
-                        lessonInfo.textContent = `Lesson ${lessonId}`;
-                    }
-                }, { once: true });
-                
-                audioPlayer.addEventListener('error', (e) => {
-                    if (playBtn) {
-                        playBtn.textContent = '❌';
-                        playBtn.disabled = true;
-                    }
-                    console.error('Failed to load audio:', lessonData.audioUrl, e);
-                }, { once: true });
-            }
-            
-            if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
-            if (userInput) userInput.value = '';
-            if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
-            if (statsSection) statsSection.style.display = 'none';
-            if (checkBtn) checkBtn.style.display = 'inline-block';
-            
-            sentenceStartTime = null;
-            totalSessionTime = 0;
-            hasStartedTyping = false;
-            sessionResults = [];
-            
-            setTimeout(sendHeightTo
+</html>
