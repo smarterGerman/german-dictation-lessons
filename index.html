@@ -401,6 +401,7 @@
         let totalSessionTime = 0;
         let sessionResults = [];
         let ignoreCaseActive = true; // Default state
+        let currentSpeed = 1.0;
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -408,7 +409,7 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn;
+        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn, speedBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
