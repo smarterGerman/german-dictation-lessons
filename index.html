@@ -327,6 +327,24 @@
             .controls{ flex-direction: column; }
             .control-btn{ width: 100%; }
         }
+        /* ─── force those three buttons into 64px circles in one horizontal row ─── */
+.controls {
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: center;
+  gap: 12px;
+}
+
+.control-btn {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  /* no background here → keeps your existing gradient */
+}
     </style>
 </head>
 <body>
