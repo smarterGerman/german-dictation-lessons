@@ -193,7 +193,10 @@
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 14px;
-            white-space: nowrap;
+            white-space: normal;
+            max-width: 250px; 
+            text-align: left;
+            word-wrap: break-word; 
             z-index: 1000;
             margin-top: 8px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -396,50 +399,54 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
-        /* ----- RESPONSIVE -------------------------------------------------- */
+       /* ----- RESPONSIVE -------------------------------------------------- */
         @media(max-width:768px){
             body { padding: 10px; }
             .audio-section{ padding: 15px; }
-            .input-field, .live-feedback{ padding: 15px; font-size: 15px; }
-            .audio-controls{ gap: 8px; }
-            .nav-btn, .toggle-btn{ width: 44px; height: 44px; font-size: 16px; }
-            .play-btn{ width: 64px; height: 64px; font-size: 24px; }
-            .controls{ flex-direction: column; }
-            .control-btn{ width: 100%; }
-        }
+            .input-field, .live-feedback{ padding: 15px; font-size: 15px; } /* Your existing size preference for mobile text */
 
-        /* ─── match control-btn to play-btn exactly ─── */
-        .controls {
-          display: flex;
-          flex-direction: row !important;
-          flex-wrap: nowrap !important;
-          justify-content: center;
-          gap: 12px;
-        }
+            .audio-controls{
+                gap: 8px;
+                flex-wrap: wrap; /* ADDED/CONFIRMED: Allows items to move to next line */
+                justify-content: center; /* Confirmed: Keeps items centered */
+                padding: 0 5px; /* ADDED: Small horizontal padding for controls */
+            }
 
-        .control-btn {
-          width: 72px !important;
-          height: 72px !important;
-          border-radius: 50% !important;
-          border: none !important;
-          background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
-          color: white !important;
-          box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3) !important;
-          transition: all .3s ease !important;
-          padding: 0 !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          outline: none !important;
-        }
+            /* For the Previous/Next buttons and the Aa/100/?/X toggle buttons */
+            .nav-btn, .toggle-btn{
+                width: 44px; /* KEEP: Baseline size for good touch target */
+                height: 44px; /* KEEP: Baseline size for good touch target */
+                font-size: 16px; /* KEEP: Icon/text size */
+                flex-shrink: 0; /* ADDED: PREVENTS THESE BUTTONS FROM SHRINKING */
+                flex-grow: 0; /* Ensures they don't grow */
+                flex-basis: auto; /* Standard for fixed-size items */
+                /* REMOVE aspect-ratio: 1 / 1; if you added it, as we're relying on fixed width/height */
+            }
 
-        .control-btn:hover:not(:disabled) {
-          transform: translateY(-3px) !important;
-          box-shadow: 0 12px 32px rgba(168, 85, 247, 0.4) !important;
-        }
+            /* For the Play/Pause button */
+            .play-btn{
+                width: 64px; /* KEEP: Larger size */
+                height: 64px; /* KEEP: Larger size */
+                font-size: 24px; /* KEEP: Icon size */
+                flex-shrink: 0; /* ADDED: PREVENTS THIS BUTTON FROM SHRINKING */
+                flex-grow: 0; /* Ensures it doesn't grow */
+                flex-basis: auto; /* Standard for fixed-size items */
+                /* REMOVE aspect-ratio: 1 / 1; if you added it */
+            }
 
-        .control-btn:active {
-          transform: translateY(-1px) !important;
+            /* For the time display (0:00 / 0:00) */
+            #timeDisplay {
+                min-width: unset; /* IMPORTANT: REMOVED FIXED MINIMUM WIDTH, allows it to shrink */
+                font-size: 14px; /* OPTIONAL: Smaller font size for mobile fit */
+                margin: 0 5px; /* REDUCED MARGINS for more space */
+                flex-grow: 1; /* Allows it to take up remaining space on its line */
+                flex-shrink: 1; /* Allows it to shrink if needed */
+                flex-basis: auto; /* Helps with flexible width */
+                text-align: center; /* Centers text if it's on its own line */
+            }
+
+            .controls{ flex-direction: column; } /* Existing rule for stats section controls */
+            .control-btn{ width: 100%; } /* Existing rule for stats section controls */
         }
 
         /* Add this new style for your 'X' button */
