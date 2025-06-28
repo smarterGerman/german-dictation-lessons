@@ -541,6 +541,10 @@
                         playBtn.classList.add('playing');
                         playBtn.textContent = '';
                     }
+                    // Auto-focus input field when audio starts
+                    if (userInput) {
+                        userInput.focus();
+                    }
                 });
                 audioPlayer.addEventListener('pause', () => {
                     isPlaying = false;
@@ -559,33 +563,6 @@
             });
             setTimeout(sendHeightToParent, 500);
         });
-
-        function toggleSpeed() {
-            // Remove all speed classes first
-            if (speedBtn) {
-                speedBtn.classList.remove('speed-100', 'speed-75', 'speed-50');
-            }
-            
-            // Cycle through speeds: 100% → 75% → 50% → 100%
-            if (currentSpeed === 1.0) {
-                currentSpeed = 0.75;
-                speedBtn.textContent = '75';
-                speedBtn.classList.add('speed-75');
-            } else if (currentSpeed === 0.75) {
-                currentSpeed = 0.5;
-                speedBtn.textContent = '50';
-                speedBtn.classList.add('speed-50');
-            } else {
-                currentSpeed = 1.0;
-                speedBtn.textContent = '100';
-                speedBtn.classList.add('speed-100');
-            }
-            
-            // Apply speed to audio player
-            if (audioPlayer) {
-                audioPlayer.playbackRate = currentSpeed;
-            }
-        }
 
         function toggleSpeed() {
             // Remove all speed classes first
@@ -651,17 +628,10 @@
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
             const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
             
-           // Shift + Cmd/Ctrl + Enter = Play/Pause toggle and Start dictation
+            // Shift + Cmd/Ctrl + Enter = Play/Pause toggle and Start dictation
             if (e.shiftKey && ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
                 togglePlayback();
-                return;
-            }
-            
-            // Shift + Cmd/Ctrl + Enter = Start dictation (play current sentence)
-            if (e.shiftKey && ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                playCurrentSentence();
                 return;
             }
             
@@ -893,7 +863,7 @@
             
             // Reset help button and hints when moving to new sentence
             helpUsedCount = 0;
-            helpHints = [];
+            helpHints = {};
             if (helpBtn) {
                 helpBtn.disabled = false;
                 helpBtn.textContent = 'Help';
@@ -1247,28 +1217,6 @@
             liveFeedback.innerHTML = feedbackHTML;
         }
 
-        function shouldShowHint(charIndex, char) {
-            // Logic to determine if this character position should show as a hint
-            // This is a simplified version - you might want to make this more sophisticated
-            const targetWords = referenceText.split(/\s+/).filter(w => w.length > 0);
-            let currentCharIndex = 0;
-            
-            for (let wordIndex = 0; wordIndex < targetWords.length; wordIndex++) {
-                const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
-                const wordKey = `word_${wordIndex}`;
-                
-                for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
-                    if (currentCharIndex === charIndex) {
-                        return helpHints[wordKey] && helpHints[wordKey].includes(letterIndex);
-                    }
-                    currentCharIndex++;
-                }
-                currentCharIndex++; // Space between words
-            }
-            
-            return false;
-        }
-
         function showHintsInFeedback() {
             if (!referenceText) return;
             
@@ -1429,52 +1377,40 @@
                 return;
             }
             
-            const currentInput = userInput ? userInput.value : '';
             const targetText = referenceText;
-            
-            // Get words from both texts
-            const inputWords = currentInput.split(/\s+/).filter(w => w.length > 0);
             const targetWords = targetText.split(/\s+/).filter(w => w.length > 0);
             
-            let newInput = '';
-            
-            // Process each target word
-            for (let i = 0; i < targetWords.length; i++) {
-                const targetWord = targetWords[i].replace(/[.,!?;:""''()]/g, ''); // Remove punctuation
-                const inputWord = inputWords[i] || '';
+            // Add one random hint letter to a random word
+            let availableWords = [];
+            for (let wordIndex = 0; wordIndex < targetWords.length; wordIndex++) {
+                const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
+                const wordKey = `word_${wordIndex}`;
                 
-                if (i > 0) newInput += ' ';
+                if (!helpHints[wordKey]) {
+                    helpHints[wordKey] = [];
+                }
                 
-                if (inputWord.toLowerCase() === targetWord.toLowerCase()) {
-                    // Word is correct, keep it as is
-                    newInput += inputWord;
-                } else {
-                    // Word needs help - add one random missing letter
-                    let helpedWord = inputWord;
-                    const missingPositions = [];
-                    
-                    // Find positions where letters are missing or wrong
-                    for (let j = 0; j < targetWord.length; j++) {
-                        if (j >= helpedWord.length || helpedWord[j].toLowerCase() !== targetWord[j].toLowerCase()) {
-                            missingPositions.push(j);
-                        }
+                // Find positions that don't have hints yet
+                for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
+                    if (!helpHints[wordKey].includes(letterIndex)) {
+                        availableWords.push({ wordIndex, letterIndex });
                     }
-                    
-                    // Add one random missing letter
-                    if (missingPositions.length > 0) {
-                        const randomPos = missingPositions[Math.floor(Math.random() * missingPositions.length)];
-                        helpedWord = helpedWord.substring(0, randomPos) + targetWord[randomPos] + helpedWord.substring(randomPos);
-                    }
-                    
-                    newInput += helpedWord;
                 }
             }
             
-            // Update the input field
-            if (userInput) {
-                userInput.value = newInput;
-                updateLiveFeedback();
+            // Pick a random position to reveal
+            if (availableWords.length > 0) {
+                const randomChoice = availableWords[Math.floor(Math.random() * availableWords.length)];
+                const wordKey = `word_${randomChoice.wordIndex}`;
+                
+                if (!helpHints[wordKey]) {
+                    helpHints[wordKey] = [];
+                }
+                helpHints[wordKey].push(randomChoice.letterIndex);
             }
+            
+            // Update live feedback to show new hint
+            updateLiveFeedback();
             
             helpUsedCount++;
             
@@ -1485,7 +1421,7 @@
                     helpBtn.textContent = `Help (${remaining})`;
                 } else {
                     helpBtn.disabled = true;
-                    helpBtn.textContent = '🚫';
+                    helpBtn.textContent = '✕';
                     helpBtn.style.opacity = '0.5';
                 }
             }
@@ -1499,7 +1435,7 @@
             
             // Reset help button and hints
             helpUsedCount = 0;
-            helpHints = [];
+            helpHints = {};
             if (helpBtn) {
                 helpBtn.disabled = false;
                 helpBtn.textContent = 'Help';
