@@ -484,7 +484,6 @@
                 </div>
                 <div class="controls">
                     <button class="control-btn" id="checkBtn">Check</button>
-                    <button class="control-btn" id="resetBtn">Reset</button>
                 </div>
             </div>
         </div>
@@ -537,7 +536,6 @@
             correctWords = document.getElementById('correctWords');
             wrongWords = document.getElementById('wrongWords');
             checkBtn = document.getElementById('checkBtn');
-            resetBtn = document.getElementById('resetBtn');
             ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
             speedBtn = document.getElementById('speedBtn');
             hintBtn = document.getElementById('hintBtn');
@@ -553,7 +551,6 @@
                 userInput.addEventListener('keydown', handleKeyDown);
             }
             if (checkBtn) checkBtn.addEventListener('click', showFinalResult);
-            if (resetBtn) resetBtn.addEventListener('click', resetDictation);
             if (ignoreCaseBtn) {
                 ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
                 // Set initial state
@@ -1336,25 +1333,6 @@
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
-        function resetDictation() {
-            if (userInput) userInput.value = '';
-            if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
-            if (statsSection) statsSection.style.display = 'none';
-            if (checkBtn) checkBtn.style.display = 'inline-block';
-            
-            // Hide hint tooltip
-            hideHint();
-            
-            sentenceStartTime = null;
-            totalSessionTime = 0;
-            hasStartedTyping = false;
-            sessionResults = [];
-            currentCueIndex = 0;
-            
-            updateCurrentSentence();
-            setTimeout(sendHeightToParent, 100);
         }
 
         function showHint() {
