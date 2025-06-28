@@ -825,7 +825,7 @@
                 <!-- Export button -->
                 <div class="export-controls" id="exportControls" style="display:none;">
                     <button class="export-csv-btn" id="exportCsvBtn" title="Export results as CSV file">
-                        📊 Export CSV
+                        Export CSV
                     </button>
                 </div>
 
@@ -863,8 +863,8 @@
         let ignoreCaseActive = true; // Default: ignore case (white button = checking OFF)
         let currentSpeed = 1.0; // Default speed (100%)
 
-        // FIX: Move initialPlaceholderText to global scope
-        const initialPlaceholderText = "Press SHIFT+CTRL/CMD+ENTER to play/pause audio.\nType what you hear here...\n(Use ae for ä, oe for ö, ue for ü, B for ß)";
+        // Unicode symbols with ASCII fallback
+        const initialPlaceholderText = "⇧+⌘+↵ = ⏯ or Shift+Cmd+Enter = Play/Pause\nae = ä | oe = ö | ue = ü | B = ß\nType here...";
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -1773,36 +1773,11 @@
             
             const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
             
-            // Create CSV content
-            let csvContent = '';
+            // Extract lesson ID from current lesson (e.g., A1L01)
+            const lessonId = currentLessonId || 'Unknown';
             
-            // Header
-            csvContent += 'Dictation Results\n\n';
-            
-            // Overall stats
-            csvContent += 'Overall Statistics\n';
-            csvContent += 'Metric,Value\n';
-            csvContent += `Accuracy,${accuracy}%\n`;
-            csvContent += `Correct Words,${totalCorrectWords}\n`;
-            csvContent += `Wrong Words,${totalWrongWords}\n`;
-            csvContent += `Total Words,${totalWords}\n`;
-            csvContent += `Time Taken,${formatTime(totalSessionTime)}\n\n`;
-            
-            // Sentence details
-            csvContent += 'Sentence Details\n';
-            csvContent += 'Sentence,Reference Text,User Input,Correct Words,Wrong Words,Time (seconds)\n';
-            
-            sessionResults.forEach((result, index) => {
-                // Escape quotes in text by doubling them and wrapping in quotes
-                const escapeCSV = (text) => `"${text.replace(/"/g, '""')}"`;
-                
-                csvContent += `${index + 1},`;
-                csvContent += `${escapeCSV(result.reference)},`;
-                csvContent += `${escapeCSV(result.userInput)},`;
-                csvContent += `${result.stats.correctWords},`;
-                csvContent += `${result.stats.wrongWords},`;
-                csvContent += `${result.time.toFixed(1)}\n`;
-            });
+            // Create simple CSV - just one row of values for easy spreadsheet pasting
+            const csvContent = `${lessonId},${accuracy},${totalCorrectWords},${totalWrongWords},${totalWords},${formatTime(totalSessionTime)}`;
             
             // Download CSV
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1810,11 +1785,8 @@
             const link = document.createElement('a');
             link.href = url;
             
-            // Generate filename with current date
-            const now = new Date();
-            const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
-            const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
-            link.download = `dictation-results-${dateStr}-${timeStr}.csv`;
+            // Simple filename with lesson ID
+            link.download = `${lessonId}-results.csv`;
             
             document.body.appendChild(link);
             link.click();
