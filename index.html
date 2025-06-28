@@ -105,6 +105,40 @@
             box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
         }
 
+        /* Speed button colors */
+        .toggle-btn.speed-100 {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+
+        .toggle-btn.speed-100:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+        }
+
+        .toggle-btn.speed-75 {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+        }
+
+        .toggle-btn.speed-75:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+        }
+
+        .toggle-btn.speed-50 {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+
+        .toggle-btn.speed-50:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
         .play-btn {
             position: relative;
             width: 72px; 
@@ -401,7 +435,6 @@
         let totalSessionTime = 0;
         let sessionResults = [];
         let ignoreCaseActive = true; // Default state
-        let currentSpeed = 1.0;
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -409,7 +442,7 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn, speedBtn;
+        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
@@ -453,6 +486,8 @@
             }
             if (speedBtn) {
                 speedBtn.addEventListener('click', toggleSpeed);
+                // Set initial green color for 100% speed
+                speedBtn.classList.add('speed-100');
             }
 
             if (audioPlayer) {
@@ -481,16 +516,24 @@
         });
 
         function toggleSpeed() {
+            // Remove all speed classes first
+            if (speedBtn) {
+                speedBtn.classList.remove('speed-100', 'speed-75', 'speed-50');
+            }
+            
             // Cycle through speeds: 100% → 75% → 50% → 100%
             if (currentSpeed === 1.0) {
                 currentSpeed = 0.75;
                 speedBtn.textContent = '75';
+                speedBtn.classList.add('speed-75');
             } else if (currentSpeed === 0.75) {
                 currentSpeed = 0.5;
                 speedBtn.textContent = '50';
+                speedBtn.classList.add('speed-50');
             } else {
                 currentSpeed = 1.0;
                 speedBtn.textContent = '100';
+                speedBtn.classList.add('speed-100');
             }
             
             // Apply speed to audio player
