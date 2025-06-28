@@ -543,7 +543,13 @@
        @media(max-width:768px){
     body { padding: 10px; }
     .audio-section{ padding: 15px; }
-    .input-field, .live-feedback{ padding: 15px; font-size: 24px; } /* Increased mobile font size from 15px to 24px */
+    /* Mobile placeholder text sizing */
+    .input-field::placeholder {
+        font-size: 12px !important; /* Even smaller on mobile */
+        line-height: 1.3;
+    }
+
+    .input-field, .live-feedback{ padding: 15px; font-size: 24px; } /* Keeps typed text large on mobile */
 
     /* Mobile: adjust sizing only */
     .player-pill {
