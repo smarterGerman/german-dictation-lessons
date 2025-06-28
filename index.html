@@ -168,11 +168,25 @@
             transform: translateY(-1px) !important;
         }
 
-        /* Secondary button sizing */
+        /* Larger desktop buttons */
+        .nav-btn,
+        .toggle-btn:not(.secondary-btn) {
+            width: 56px; /* Increased from default */
+            height: 56px;
+            font-size: 18px; /* Increased font size */
+        }
+
+        .play-btn {
+            width: 68px; /* Increased from default */
+            height: 68px;
+            font-size: 26px; /* Increased font size */
+        }
+
+        /* Secondary button sizing - keep smaller but proportional */
         .secondary-btn {
-            width: 36px !important;
-            height: 36px !important;
-            font-size: 14px !important;
+            width: 40px !important; /* Slightly larger */
+            height: 40px !important;
+            font-size: 16px !important; /* Slightly larger font */
             flex-shrink: 0;
         }
 
@@ -540,13 +554,85 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
+        /* Sentence results styling */
+        .sentence-results {
+            margin-top: 32px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .results-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .sentences-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sentence-result {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            border-left: 4px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .sentence-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        .sentence-text {
+            font-size: 18px;
+            line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        /* Word coloring in results */
+        .result-word-correct {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .result-word-wrong {
+            color: #dc2626;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+
+        .result-word-missing {
+            color: #d97706;
+            font-style: italic;
+            border-bottom: 2px dashed #d97706;
+            display: inline-block;
+            min-width: 1em;
+        }
+
+        .result-word-extra {
+            color: #2563eb;
+            font-weight: 500;
+            background: rgba(37, 99, 235, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
        /* ----- RESPONSIVE -------------------------------------------------- */
        @media(max-width:768px){
     body { padding: 10px; }
     .audio-section{ padding: 15px; }
     /* Mobile placeholder text sizing */
     .input-field::placeholder {
-        font-size: 14px !important; /* Even smaller on mobile */
+        font-size: 12px !important; /* Even smaller on mobile */
         line-height: 1.3;
     }
 
@@ -653,6 +739,14 @@
                     <div class="stat-item"><span class="stat-label">Correct Words</span><span class="stat-value" id="correctWords">0</span></div>
                     <div class="stat-item"><span class="stat-label">Wrong Words</span><span class="stat-value" id="wrongWords">0</span></div>
                     <div class="stat-item"><span class="stat-label">Time Taken</span><span class="stat-value" id="timeTaken">0:00</span></div>
+                </div>
+
+                <!-- Detailed sentence results -->
+                <div class="sentence-results" id="sentenceResults" style="display:none;">
+                    <h3 class="results-title">Your Dictation Results</h3>
+                    <div class="sentences-container" id="sentencesContainer">
+                        <!-- Sentences will be inserted here by JavaScript -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1561,8 +1655,69 @@
             }
             
             if (statsSection) statsSection.style.display = 'grid';
+            
+            // Show detailed sentence results
+            showDetailedResults();
                         
             setTimeout(sendHeightToParent, 100);
+        }
+
+        function showDetailedResults() {
+            const sentenceResultsDiv = document.getElementById('sentenceResults');
+            const sentencesContainer = document.getElementById('sentencesContainer');
+            
+            if (!sentenceResultsDiv || !sentencesContainer) return;
+            
+            // Clear existing content
+            sentencesContainer.innerHTML = '';
+            
+            // Create detailed results for each sentence
+            sessionResults.forEach((result, index) => {
+                const sentenceDiv = document.createElement('div');
+                sentenceDiv.className = 'sentence-result';
+                
+                const sentenceNumber = document.createElement('div');
+                sentenceNumber.className = 'sentence-number';
+                sentenceNumber.textContent = `Sentence ${index + 1}`;
+                
+                const sentenceText = document.createElement('div');
+                sentenceText.className = 'sentence-text';
+                sentenceText.innerHTML = generateResultHTML(result);
+                
+                sentenceDiv.appendChild(sentenceNumber);
+                sentenceDiv.appendChild(sentenceText);
+                sentencesContainer.appendChild(sentenceDiv);
+            });
+            
+            sentenceResultsDiv.style.display = 'block';
+        }
+
+        function generateResultHTML(result) {
+            const alignment = alignSequencesWithGaps(
+                result.reference.replace(/[.,!?;:""''()]/g, '').toLowerCase().split(/\s+/).filter(w => w.length > 0),
+                convertGermanChars(result.userInput).replace(/[.,!?;:""''()]/g, '').toLowerCase().split(/\s+/).filter(w => w.length > 0)
+            );
+            
+            let html = '';
+            
+            alignment.forEach((item, index) => {
+                if (index > 0) html += ' ';
+                
+                if (item.type === 'match') {
+                    html += `<span class="result-word-correct">${item.userWord}</span>`;
+                } else if (item.type === 'substitute') {
+                    html += `<span class="result-word-wrong">${item.userWord}</span>`;
+                } else if (item.type === 'insert') {
+                    html += `<span class="result-word-extra">${item.userWord}</span>`;
+                } else if (item.type === 'delete') {
+                    // Create underscore with length proportional to missing word
+                    const underscoreLength = Math.max(item.refWord.length, 3);
+                    const underscore = '_'.repeat(underscoreLength);
+                    html += `<span class="result-word-missing">${underscore}</span>`;
+                }
+            });
+            
+            return html;
         }
         
         function formatTime(seconds) {
