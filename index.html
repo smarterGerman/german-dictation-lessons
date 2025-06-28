@@ -185,7 +185,7 @@
         /* Hint tooltip styles */
         .hint-tooltip {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
             background: #1f2937;
@@ -195,7 +195,7 @@
             font-size: 14px;
             white-space: nowrap;
             z-index: 1000;
-            margin-bottom: 8px;
+            margin-top: 8px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             opacity: 0;
             pointer-events: none;
@@ -205,11 +205,11 @@
         .hint-tooltip::after {
             content: '';
             position: absolute;
-            top: 100%;
+            bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-top-color: #1f2937;
+            border-bottom-color: #1f2937;
         }
 
         .hint-tooltip.show {
