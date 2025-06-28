@@ -54,9 +54,8 @@
             align-items: center; 
             gap: 12px; 
             margin-bottom: 28px; 
-            flex-wrap: nowrap; 
+            flex-wrap: wrap; /* Allow wrapping for better mobile layout */
             overflow: visible !important;
-
         }
 
         .loading-spinner {
@@ -267,18 +266,20 @@
             font-size:16px; 
             color:#6b7280; 
             font-weight:500; 
-            margin-left: 16px; 
-            margin-right: 16px;
+            margin-left: 8px; 
+            margin-right: 8px;
         }
         
         .progress-container { 
-             flex-grow: 1; /* Allows it to take up available space in the flex container */
-    max-width: 320px; /* Limits its maximum width to avoid being too wide on large screens */
-    height: 8px;
-    background: rgba(0, 0, 0, 0.3); /* Changed to a darker, more visible background */
-    border-radius: 20px;
-    overflow: hidden;
-    margin: 0 10px; /* Add horizontal margin to separate from buttons/time */ 
+            flex-grow: 1;
+            max-width: 200px; /* Reduced max width for better fit */
+            min-width: 120px; /* Ensure minimum visibility */
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0 8px; /* Reduced margins */
+            order: 2; /* Place after speed button but before time */
         }
         
         .progress-bar { 
@@ -288,6 +289,17 @@
             border-radius:20px; 
             transition:width .3s ease; 
         }
+
+        /* Add ordering for proper layout */
+        .nav-btn:first-of-type { order: -3; } /* Previous button */
+        .play-btn { order: -2; } /* Play button */
+        .nav-btn:nth-of-type(2) { order: -1; } /* Next button */
+        #ignoreCaseBtn { order: 0; } /* Aa button */
+        #speedBtn { order: 1; } /* Speed button */
+        .progress-container { order: 2; } /* Progress bar */
+        #timeDisplay { order: 3; } /* Time display */
+        #hintBtn { order: 4; } /* ? button */
+        #endDictationBtn { order: 5; } /* X button */
 
         /* ----- INPUT / FEEDBACK ------------------------------------------- */
         .input-area { 
@@ -411,53 +423,58 @@
        @media(max-width:768px){
     body { padding: 10px; }
     .audio-section{ padding: 15px; }
-    .input-field, .live-feedback{ padding: 15px; font-size: 15px; } /* Your existing size preference for mobile text */
+    .input-field, .live-feedback{ padding: 15px; font-size: 15px; }
 
-    /* Hide progress bar on mobile */
+    /* Hide progress bar on mobile only */
     .progress-container {
-        display: none; /* Hides the progress bar on small screens */
+        display: none !important;
     }
 
     .audio-controls{
         gap: 8px;
-        flex-wrap: wrap; /* Allows items to move to next line */
-        justify-content: center; /* Centers items when they wrap */
-        padding: 0 5px; /* Small horizontal padding for controls */
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0 5px;
+    }
+
+    /* Reset ordering on mobile for better wrapping */
+    .nav-btn, .play-btn, .toggle-btn, #timeDisplay {
+        order: unset;
     }
 
     /* For the Previous/Next buttons and the Aa/100/?/X toggle buttons */
     .nav-btn, .toggle-btn{
-        width: 44px; /* Baseline size for good touch target */
-        height: 44px; /* Baseline size for good touch target */
-        font-size: 16px; /* Icon/text size */
-        flex-shrink: 0; /* PREVENTS THESE BUTTONS FROM SHRINKING */
-        flex-grow: 0; /* Ensures they don't grow */
-        flex-basis: auto; /* Standard for fixed-size items */
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+        flex-shrink: 0;
+        flex-grow: 0;
+        flex-basis: auto;
     }
 
     /* For the Play/Pause button */
     .play-btn{
-        width: 64px; /* Larger size */
-        height: 64px; /* Larger size */
-        font-size: 24px; /* Icon size */
-        flex-shrink: 0; /* PREVENTS THIS BUTTON FROM SHRINKING */
-        flex-grow: 0; /* Ensures it doesn't grow */
-        flex-basis: auto; /* Standard for fixed-size items */
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+        flex-shrink: 0;
+        flex-grow: 0;
+        flex-basis: auto;
     }
 
     /* For the time display (0:00 / 0:00) */
     #timeDisplay {
-        min-width: unset; /* IMPORTANT: REMOVES FIXED MINIMUM WIDTH, allows it to shrink */
-        font-size: 14px; /* OPTIONAL: Smaller font size for mobile fit */
-        margin: 0 5px; /* REDUCED MARGINS for more space */
-        flex-grow: 1; /* Allows it to take up remaining space on its line */
-        flex-shrink: 1; /* Allows it to shrink if needed */
-        flex-basis: auto; /* Helps with flexible width */
-        text-align: center; /* Centers text if it's on its own line */
+        min-width: unset;
+        font-size: 14px;
+        margin: 0 5px;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: auto;
+        text-align: center;
     }
 
-    .controls{ flex-direction: column; } /* Existing rule for stats section controls (if still in use) */
-    .control-btn{ width: 100%; } /* Existing rule for stats section controls (if still in use) */
+    .controls{ flex-direction: column; }
+    .control-btn{ width: 100%; }
 }
 
         /* Add this new style for your 'X' button */
