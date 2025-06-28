@@ -178,6 +178,45 @@
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
 
+        /* Hint tooltip styles */
+        .hint-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .hint-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1f2937;
+        }
+
+        .hint-tooltip.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .toggle-btn {
+            position: relative;
+        }
+
         .play-btn {
             position: relative;
             width: 72px; 
@@ -225,6 +264,7 @@
             color:#6b7280; 
             font-weight:500; 
             margin-left: 16px; 
+            margin-right: 16px;
         }
         
         .progress-container { 
@@ -417,6 +457,7 @@
                     <button class="toggle-btn" id="ignoreCaseBtn" title="Ignore Capitalization">Aa</button>
                     <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
                     <span id="timeDisplay">0:00 / 0:00</span>
+                    <button class="toggle-btn" id="hintBtn" title="Show expected sentence">?</button>
                 </div>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                 <audio id="audioPlayer" preload="metadata"></audio>
@@ -482,7 +523,7 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, ignoreCaseBtn;
+        let checkBtn, resetBtn, ignoreCaseBtn, hintBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
@@ -502,6 +543,7 @@
             resetBtn = document.getElementById('resetBtn');
             ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
             speedBtn = document.getElementById('speedBtn');
+            hintBtn = document.getElementById('hintBtn');
             prevBtn = document.getElementById('prevBtn');
             nextBtn = document.getElementById('nextBtn');
             sentenceInfo = document.getElementById('sentenceInfo');
@@ -526,6 +568,9 @@
                 speedBtn.addEventListener('click', toggleSpeed);
                 // Set initial green color for 100% speed
                 speedBtn.classList.add('speed-100');
+            }
+            if (hintBtn) {
+                hintBtn.addEventListener('click', showHint);
             }
 
             if (audioPlayer) {
@@ -598,6 +643,9 @@
         }
 
         function handleUserInput(e) {
+            // Hide hint tooltip when user starts typing
+            hideHint();
+            
             if (!hasStartedTyping && e.target.value.trim().length > 0) {
                 hasStartedTyping = true;
                 sentenceStartTime = Date.now();
