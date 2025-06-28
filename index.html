@@ -31,12 +31,10 @@
         .audio-section {
             padding: 20px;
             margin-bottom: 24px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%);
+            /* Removed: background gradient, border, box-shadow */
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
             text-align: center;
             color: #374151;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             width: 100%;
             overflow: visible !important;
         }
@@ -79,35 +77,102 @@
             max-width: 400px;
         }
 
-        /* Make nav buttons more visible */
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 2px solid rgba(168, 85, 247, 0.3) !important;
-            color: #6b7280 !important;
-            font-weight: bold;
-            font-size: 18px;
+        /* Beautiful gradient-filled buttons without borders */
+        .nav-btn,
+        .toggle-btn:not(.active):not([class*="speed-"]) {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+            border: none !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
         }
 
-        .nav-btn:hover {
-            border-color: #a855f7 !important;
-            background: rgba(255, 255, 255, 1) !important;
-            color: #374151 !important;
+        .nav-btn:hover,
+        .toggle-btn:not(.active):not([class*="speed-"]):hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+            color: #334155 !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-1px) !important;
         }
 
-        /* Secondary buttons (? and X) - smaller and subtle */
+        /* Play button and Aa button - pink gradient (when active) */
+        .play-btn,
+        .toggle-btn.active:not([class*="speed-"]) {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3) !important;
+        }
+
+        .play-btn:hover,
+        .toggle-btn.active:not([class*="speed-"]):hover {
+            background: linear-gradient(135deg, #9333ea 0%, #db2777 100%) !important;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Speed button gradients - traffic light colors */
+        .toggle-btn.speed-100 {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3) !important;
+        }
+
+        .toggle-btn.speed-100:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .toggle-btn.speed-75 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3) !important;
+        }
+
+        .toggle-btn.speed-75:hover {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .toggle-btn.speed-50 {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        .toggle-btn.speed-50:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Secondary buttons (? and X) - gentle gradient that complements pink */
+        .secondary-btn {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%) !important;
+            border: none !important;
+            color: #be185d !important;
+            font-weight: 600 !important;
+            box-shadow: 0 3px 10px rgba(244, 114, 182, 0.2) !important;
+        }
+
+        .secondary-btn:hover {
+            background: linear-gradient(135deg, #fce7f3 0%, #f9a8d4 50%, #f472b6 100%) !important;
+            color: #a21caf !important;
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Secondary button sizing */
         .secondary-btn {
             width: 36px !important;
             height: 36px !important;
             font-size: 14px !important;
-            background: rgba(255, 255, 255, 0.8);
             flex-shrink: 0;
-        }
-
-        /* Progress bar takes up remaining space */
-        .progress-controls-row .progress-container {
-            flex-grow: 1;
-            height: 8px;
-            margin: 0 8px;
         }
 
         /* Time display */
