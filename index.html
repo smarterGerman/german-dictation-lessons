@@ -118,14 +118,14 @@
         }
 
         .toggle-btn.speed-75 {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
-            box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
         }
 
         .toggle-btn.speed-75:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4);
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
         }
 
         .toggle-btn.speed-50 {
@@ -435,7 +435,6 @@
         let totalSessionTime = 0;
         let sessionResults = [];
         let ignoreCaseActive = true; // Default state
-        let currentSpeed = 1.0; 
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -443,7 +442,7 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, revealBtn, speedBtn, ignoreCaseBtn;
+        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
