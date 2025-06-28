@@ -1374,6 +1374,60 @@ function updateLiveFeedback() {
             liveFeedback.innerHTML = feedbackHTML;
         }
 
+        function resetDictation() {
+            if (userInput) userInput.value = '';
+            if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
+            if (statsSection) statsSection.style.display = 'none';
+            if (checkBtn) checkBtn.style.display = 'inline-block';
+            
+            // Hide hint tooltip
+            hideHint();
+            
+            sentenceStartTime = null;
+            totalSessionTime = 0;
+            hasStartedTyping = false;
+            sessionResults = [];
+            currentCueIndex = 0;
+            
+            updateCurrentSentence();
+            setTimeout(sendHeightToParent, 100);
+        }
+
+        function showHint() {
+            if (!referenceText || !hintBtn) return;
+            
+            // Remove any existing tooltip
+            const existingTooltip = hintBtn.querySelector('.hint-tooltip');
+            if (existingTooltip) {
+                existingTooltip.remove();
+            }
+            
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'hint-tooltip';
+            tooltip.textContent = referenceText;
+            
+            // Add tooltip to hint button
+            hintBtn.appendChild(tooltip);
+            
+            // Show tooltip with animation
+            setTimeout(() => {
+                tooltip.classList.add('show');
+            }, 10);
+        }
+
+        function hideHint() {
+            if (!hintBtn) return;
+            
+            const tooltip = hintBtn.querySelector('.hint-tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 200); // Wait for fade out animation
+            }
+        }
+
         function showAnswer() {
             if (referenceTextDiv) {
                 referenceTextDiv.style.display = 'block';
