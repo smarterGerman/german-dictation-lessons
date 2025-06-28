@@ -56,6 +56,36 @@
             flex-wrap: nowrap; 
         }
 
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .play-btn .loading-spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .play-btn::before {
+            display: none;
+        }
+
+        .play-btn:has(.loading-spinner[style*="block"])::before {
+            display: none !important;
+        }
+
         .nav-btn,
         .play-btn,
         .toggle-btn { 
@@ -368,10 +398,11 @@
         <div class="content">
             <!-- AUDIO SECTION -->
             <div class="audio-section">
-                <div id="lessonInfo" style="margin-bottom:10px;font-size:14px;color:#6b7280;text-align:center;">Loading lesson...</div>
                 <div class="audio-controls">
                     <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
-                    <button class="play-btn" id="playBtn"></button>
+                    <button class="play-btn" id="playBtn">
+                        <div class="loading-spinner" id="loadingSpinner"></div>
+                    </button>
                     <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
                     <button class="toggle-btn" id="ignoreCaseBtn" title="Ignore Capitalization">Aa</button>
                     <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
@@ -434,12 +465,13 @@
         let totalSessionTime = 0;
         let sessionResults = [];
         let ignoreCaseActive = true; // Default state
+        let currentSpeed = 1.0; // Default speed (100%)
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
         };
 
-        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
+        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
         let checkBtn, resetBtn, revealBtn, ignoreCaseBtn;
         let prevBtn, nextBtn, sentenceInfo;
@@ -450,7 +482,7 @@
             progressBar = document.getElementById('progressBar');
             timeDisplay = document.getElementById('timeDisplay');
             referenceTextDiv = document.getElementById('referenceText');
-            lessonInfo = document.getElementById('lessonInfo');
+            loadingSpinner = document.getElementById('loadingSpinner');
             statsSection = document.getElementById('statsSection');
             userInput = document.getElementById('userInput');
             liveFeedback = document.getElementById('liveFeedback');
@@ -834,7 +866,8 @@
         }
 
         async function loadLesson(lessonId) {
-            if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
+            // Show loading spinner
+            if (loadingSpinner) loadingSpinner.classList.remove('hidden');
             if (playBtn) {
                 playBtn.textContent = '⏳';
                 playBtn.disabled = true;
@@ -843,22 +876,18 @@
             // Check if lesson exists
             if (!allLessons[lessonId]) {
                 console.error(`Lesson ${lessonId} not found`);
-                if (lessonInfo) lessonInfo.textContent = `Lesson ${lessonId} not found`;
+                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
                 return;
             }
 
             currentLessonId = lessonId;
             const lessonData = allLessons[lessonId];
             
-            if (lessonInfo) {
-                lessonInfo.textContent = `Loading lesson ${lessonId}...`;
-            }
-            
             const cues = await loadVTTFromUrl(lessonData.vttUrl);
             
             if (cues.length === 0) {
                 console.error(`Failed to load VTT for lesson ${lessonId}`);
-                if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId}`;
+                if (loadingSpinner) loadingSpinner.classList.add('hidden');
                 return;
             }
             
@@ -867,7 +896,6 @@
             
             referenceText = vttCues[0].text;
             updateNavigationButtons();
-            updateSentenceInfo();
             
             if (audioPlayer) {
                 audioPlayer.src = lessonData.audioUrl;
@@ -881,9 +909,8 @@
                     // Set the current speed when audio loads
                     audioPlayer.playbackRate = currentSpeed;
                     updateProgress();
-                    if (lessonInfo) {
-                        lessonInfo.textContent = `Lesson ${lessonId}`;
-                    }
+                    // Hide loading spinner when ready
+                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
                 }, { once: true });
                 
                 audioPlayer.addEventListener('error', (e) => {
@@ -891,6 +918,7 @@
                         playBtn.textContent = '❌';
                         playBtn.disabled = true;
                     }
+                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
                     console.error('Failed to load audio:', lessonData.audioUrl, e);
                 }, { once: true });
             }
