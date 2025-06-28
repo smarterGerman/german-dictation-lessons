@@ -378,7 +378,6 @@
     </div>
 
     <script>
-        // Auto-resize iframe height for Teachable integration
         function sendHeightToParent() {
             const height = document.body.scrollHeight;
             if (window.parent !== window) {
@@ -386,41 +385,29 @@
             }
         }
 
-        // Call on load and when content changes
         window.addEventListener('load', sendHeightToParent);
         window.addEventListener('resize', sendHeightToParent);
 
-        // App state
         let referenceText = '';
         let isPlaying = false;
         let vttCues = [];
         let currentCueIndex = 0;
         let hasStartedTyping = false;
-        
-        // Timer tracking
         let sentenceStartTime = null;
         let totalSessionTime = 0;
-        
-        // Stats tracking
         let sessionResults = [];
 
-        // Configuration with lessons folder support
         const CONFIG = {
             audioBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/audio',
             lessonsBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/lessons'
         };
 
-        // DOM elements
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
         let checkBtn, resetBtn, revealBtn, ignoreCaseToggle;
         let prevBtn, nextBtn, sentenceInfo;
 
-        // Initialize when page loads
         window.addEventListener('load', function() {
-            console.log('App initializing...');
-            
-            // Get DOM elements
             audioPlayer = document.getElementById('audioPlayer');
             playBtn = document.getElementById('playBtn');
             progressBar = document.getElementById('progressBar');
@@ -441,7 +428,6 @@
             nextBtn = document.getElementById('nextBtn');
             sentenceInfo = document.getElementById('sentenceInfo');
 
-            // Set up event listeners
             if (playBtn) playBtn.addEventListener('click', togglePlayback);
             if (prevBtn) prevBtn.addEventListener('click', goToPreviousSentence);
             if (nextBtn) nextBtn.addEventListener('click', goToNextSentence);
@@ -472,22 +458,15 @@
                 audioPlayer.addEventListener('timeupdate', handleTimeUpdate);
             }
 
-            // Load first lesson
             const lessonId = getLessonIdFromUrl() || 1;
-            console.log('Loading lesson:', lessonId);
             loadLesson(lessonId);
-
-            // Send height after content loads
             setTimeout(sendHeightToParent, 500);
         });
 
-        // Handle user input with German character conversion and live feedback
         function handleUserInput(e) {
-            // Start timer on first keystroke for current sentence
             if (!hasStartedTyping && e.target.value.trim().length > 0) {
                 hasStartedTyping = true;
                 sentenceStartTime = Date.now();
-                console.log('Timer started for sentence', currentCueIndex + 1);
             }
             
             const cursorPos = e.target.selectionStart;
@@ -497,12 +476,9 @@
                 e.target.setSelectionRange(cursorPos, cursorPos);
             }
             updateLiveFeedback();
-            
-            // Update height when content changes
             setTimeout(sendHeightToParent, 100);
         }
 
-        // Handle keyboard shortcuts
         function handleKeyDown(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -510,27 +486,22 @@
             }
         }
 
-        // Process current sentence stats and move to next
         function processCurrentSentenceAndAdvance() {
             if (!userInput.value.trim()) {
                 playCurrentSentence();
                 return;
             }
 
-            // Calculate sentence time
             let sentenceTime = 0;
             if (hasStartedTyping && sentenceStartTime) {
                 sentenceTime = (Date.now() - sentenceStartTime) / 1000;
                 totalSessionTime += sentenceTime;
-                console.log(`Sentence ${currentCueIndex + 1} completed in ${sentenceTime.toFixed(1)}s`);
             }
 
-            // Calculate and store stats for current sentence
             const userText = userInput.value;
             const comparison = compareTexts(referenceText, userText);
             const wordStats = calculateWordStats(comparison);
             
-            // Store complete sentence result
             sessionResults.push({
                 sentenceIndex: currentCueIndex,
                 reference: referenceText,
@@ -539,32 +510,25 @@
                 time: sentenceTime,
                 comparison: comparison
             });
-            
-            console.log('Session results so far:', sessionResults);
 
-            // Move to next sentence if available
             if (currentCueIndex < vttCues.length - 1) {
                 goToNextSentence();
                 playCurrentSentence();
             } else {
-                // Last sentence - show final results
                 showFinalResult();
             }
         }
 
-        // Get lesson ID from URL parameters
         function getLessonIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('lesson');
         }
 
-        // Parse VTT file
         function parseVTT(vttText) {
             const lines = vttText.split('\n');
             const cues = [];
             let i = 0;
 
-            // Skip header
             while (i < lines.length && !lines[i].includes('-->')) {
                 i++;
             }
@@ -577,7 +541,6 @@
                     const startSeconds = parseTimeToSeconds(startTime);
                     const endSeconds = parseTimeToSeconds(endTime);
                     
-                    // Get the text (next non-empty line)
                     i++;
                     let text = '';
                     while (i < lines.length && lines[i].trim() !== '') {
@@ -600,7 +563,6 @@
             return cues;
         }
 
-        // Convert time string to seconds
         function parseTimeToSeconds(timeStr) {
             const parts = timeStr.split(':');
             const seconds = parts[parts.length - 1].split('.');
@@ -608,34 +570,25 @@
             const ms = parseInt(seconds[1] || 0);
             
             if (parts.length === 3) {
-                // HH:MM:SS.mmm
                 const hours = parseInt(parts[0]);
                 const minutes = parseInt(parts[1]);
                 return hours * 3600 + minutes * 60 + sec + ms / 1000;
             } else {
-                // MM:SS.mmm
                 const minutes = parseInt(parts[0]);
                 return minutes * 60 + sec + ms / 1000;
             }
         }
 
-        // Load VTT file for lesson
         async function loadVTTFile(lessonId) {
             try {
                 const vttUrl = `${CONFIG.audioBaseUrl}/A1L${lessonId.toString().padStart(2, '0')}.vtt`;
-                console.log('Loading VTT from:', vttUrl);
-                
                 const response = await fetch(vttUrl);
                 if (!response.ok) {
                     throw new Error(`VTT file not found: ${response.status}`);
                 }
                 
                 const vttText = await response.text();
-                console.log('VTT content loaded, length:', vttText.length);
-                
                 const cues = parseVTT(vttText);
-                console.log('Parsed cues:', cues.length);
-                
                 return cues;
             } catch (error) {
                 console.error('Failed to load VTT file:', error);
@@ -643,7 +596,6 @@
             }
         }
 
-        // German character conversion
         function convertGermanChars(text) {
             return text
                 .replace(/ae/g, 'ä')
@@ -652,17 +604,13 @@
                 .replace(/Ae/g, 'Ä')
                 .replace(/Oe/g, 'Ö')
                 .replace(/Ue/g, 'Ü')
-                // Replace B with ß, but only when B is NOT at the beginning of a word
-                .replace(/\B([aeiouäöü])B/g, '$1ß')  // B after vowel, not at word start
-                .replace(/([aeiouäöü])B([aeiouäöü])/g, '$1ß$2')  // B between vowels
-                .replace(/([aeiouäöü])B$/g, '$1ß')  // B at end after vowel
-                .replace(/([aeiouäöü])B(\s)/g, '$1ß$2');  // B before space after vowel
+                .replace(/\B([aeiouäöü])B/g, '$1ß')
+                .replace(/([aeiouäöü])B([aeiouäöü])/g, '$1ß$2')
+                .replace(/([aeiouäöü])B$/g, '$1ß')
+                .replace(/([aeiouäöü])B(\s)/g, '$1ß$2');
         }
-
-        // Audio controls
         function togglePlayback() {
             if (vttCues.length === 0) {
-                // No VTT cues, play normally
                 if (isPlaying) {
                     audioPlayer.pause();
                 } else {
@@ -672,7 +620,6 @@
                     });
                 }
             } else {
-                // Play current sentence
                 playCurrentSentence();
             }
         }
@@ -692,7 +639,6 @@
             if (currentCueIndex > 0) {
                 currentCueIndex--;
                 updateCurrentSentence();
-                // Actually seek to the new sentence
                 if (vttCues[currentCueIndex]) {
                     audioPlayer.currentTime = vttCues[currentCueIndex].start;
                 }
@@ -703,32 +649,26 @@
             if (currentCueIndex < vttCues.length - 1) {
                 currentCueIndex++;
                 updateCurrentSentence();
-                // Actually seek to the new sentence
                 if (vttCues[currentCueIndex]) {
                     audioPlayer.currentTime = vttCues[currentCueIndex].start;
                 }
             }
         }
 
-        // Better sentence management
         function updateCurrentSentence() {
             updateNavigationButtons();
             updateSentenceInfo();
             updateCurrentReferenceText();
             
-            // Reset input for new sentence
             if (userInput) userInput.value = '';
             updateLiveFeedback();
             
-            // Reset timer for new sentence
             sentenceStartTime = null;
             hasStartedTyping = false;
             
-            // Reset stats display
             if (statsSection) statsSection.style.display = 'none';
             if (checkBtn) checkBtn.style.display = 'inline-block';
             
-            // Update height when content changes
             setTimeout(sendHeightToParent, 100);
         }
 
@@ -750,7 +690,6 @@
             }
         }
 
-        // Handle time updates to auto-pause at sentence end
         function handleTimeUpdate() {
             updateProgress();
             
@@ -764,30 +703,22 @@
             }
         }
 
-        // Load lesson with both JSON and VTT data
         async function loadLesson(lessonId) {
-            console.log(`Loading lesson ${lessonId}...`);
-            
             if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
             if (playBtn) {
                 playBtn.textContent = '⏳';
                 playBtn.disabled = true;
             }
 
-            // Load lesson JSON data first
             try {
                 const jsonUrl = `${CONFIG.lessonsBaseUrl}/${lessonId}.json`;
-                console.log('Loading lesson JSON from:', jsonUrl);
-                
                 const jsonResponse = await fetch(jsonUrl);
                 if (!jsonResponse.ok) {
                     throw new Error(`Lesson JSON not found: ${jsonResponse.status}`);
                 }
                 
                 const lessonData = await jsonResponse.json();
-                console.log('Lesson data loaded:', lessonData);
                 
-                // Update lesson info with real data
                 if (lessonInfo) {
                     lessonInfo.innerHTML = `
                         <strong>${lessonData.title}</strong><br>
@@ -801,7 +732,6 @@
                 if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId} data`;
             }
             
-            // Load VTT file
             const cues = await loadVTTFile(lessonId);
             
             if (cues.length === 0) {
@@ -813,12 +743,10 @@
             vttCues = cues;
             currentCueIndex = 0;
             
-            // Use first sentence from VTT as reference
             referenceText = vttCues[0].text;
             updateNavigationButtons();
             updateSentenceInfo();
             
-            // Set up audio player with direct audio URL
             const audioUrl = `${CONFIG.audioBaseUrl}/A1L${lessonId.toString().padStart(2, '0')}.mp3`;
             if (audioPlayer) {
                 audioPlayer.src = audioUrl;
@@ -830,7 +758,6 @@
                         playBtn.disabled = false;
                     }
                     updateProgress();
-                    console.log('Audio metadata loaded successfully');
                 }, { once: true });
                 
                 audioPlayer.addEventListener('error', (e) => {
@@ -848,24 +775,19 @@
             if (statsSection) statsSection.style.display = 'none';
             if (checkBtn) checkBtn.style.display = 'inline-block';
             
-            // Reset all session data for new lesson
             sentenceStartTime = null;
             totalSessionTime = 0;
             hasStartedTyping = false;
             sessionResults = [];
             
-            console.log('Lesson loaded successfully. VTT cues:', vttCues.length);
-            
-            // Update iframe height after loading
             setTimeout(sendHeightToParent, 500);
         }
 
-        // Enhanced sequence alignment with missing word placeholders
         function compareTexts(reference, userText) {
             userText = convertGermanChars(userText);
             
             const ignoreCase = ignoreCaseToggle ? ignoreCaseToggle.checked : true;
-            const ignorePunctuation = true; // Always ignore punctuation now
+            const ignorePunctuation = true;
             
             let refNormalized = reference;
             let userNormalized = userText;
@@ -880,17 +802,13 @@
                 userNormalized = userNormalized.toLowerCase();
             }
             
-            // Handle multiple spaces in user input - normalize to single spaces
             userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
             
-            // Get word arrays for smart alignment
             const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
             const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
             
-            // Perform sequence alignment to handle omissions/insertions
             const alignment = alignSequencesWithGaps(refWords, userWords);
             
-            // Build result with character-level feedback including placeholders
             const result = [];
             let correct = 0;
             let wrongPosition = 0;
@@ -898,37 +816,31 @@
             let extra = 0;
             let missing = 0;
             
-            // Process aligned sequences with proper word boundaries
             for (let i = 0; i < alignment.length; i++) {
                 const item = alignment[i];
                 
-                // Add word boundary space before each item except the first
                 if (i > 0) {
                     result.push({ char: ' ', status: 'word-boundary' });
                 }
                 
                 if (item.type === 'match') {
-                    // Correct word in correct position
                     for (let char of item.userWord) {
                         result.push({ char, status: 'correct' });
                         correct++;
                     }
                 } else if (item.type === 'substitute') {
-                    // Character-level diff for missing prefix OR suffix
                     const ref = item.refWord;
                     const user = item.userWord;
 
                     let missingPrefix = 0;
                     let missingSuffix = 0;
 
-                    // Check for suffix match (user matches end of ref, e.g. "morgen" in "montagmorgen")
                     for (let idx = 1; idx <= ref.length; idx++) {
                         if (ref.slice(-idx) === user) {
                             missingPrefix = ref.length - idx;
                             break;
                         }
                     }
-                    // Check for prefix match (user matches start of ref, e.g. "jahr" in "jahren")
                     if (missingPrefix === 0) {
                         for (let idx = 1; idx <= ref.length; idx++) {
                             if (ref.slice(0, idx) === user) {
@@ -938,7 +850,6 @@
                         }
                     }
 
-                    // Add underscores for missing prefix
                     if (missingPrefix > 0) {
                         for (let k = 0; k < missingPrefix; k++) {
                             if (k > 0) result.push({ char: ' ', status: 'char-space' });
@@ -947,13 +858,11 @@
                         }
                     }
 
-                    // Render user's word (always in red)
                     for (let c = 0; c < user.length; c++) {
                         result.push({ char: user[c], status: 'wrong' });
                         wrong++;
                     }
 
-                    // Add underscores for missing suffix
                     if (missingSuffix > 0) {
                         for (let k = 0; k < missingSuffix; k++) {
                             result.push({ char: ' ', status: 'char-space' });
@@ -963,18 +872,14 @@
                     }
 
                 } else if (item.type === 'insert') {
-                    // Extra word in user input
                     for (let char of item.userWord) {
                         result.push({ char, status: 'extra' });
                         extra++;
                     }
                 } else if (item.type === 'delete') {
-                    // Missing word - show as individual underscores with spaces between them
                     const wordLength = item.refWord.length;
                     
-                    // Create individual underscores with spaces for each character
                     for (let k = 0; k < wordLength; k++) {
-                        // Add character-level space before underscore (except for first character of word)
                         if (k > 0) {
                             result.push({ char: ' ', status: 'char-space' });
                         }
@@ -997,15 +902,12 @@
             };
         }
 
-        // Sequence alignment function
         function alignSequencesWithGaps(refWords, userWords) {
-            // Simple dynamic programming alignment
             const N = refWords.length, M = userWords.length;
             const dp = Array.from({ length: N + 1 }, () => Array(M + 1).fill(0));
 
             const COST = { MATCH: 0, SUB: 3, INS: 2, DEL: 2 };
 
-            // Build matrix
             for (let i = 0; i <= N; i++) dp[i][0] = i * COST.DEL;
             for (let j = 0; j <= M; j++) dp[0][j] = j * COST.INS;
 
@@ -1020,12 +922,10 @@
                 }
             }
 
-            // Back-trace to build alignment array
             let i = N, j = M, alignment = [];
             while (i > 0 || j > 0) {
                 const current = dp[i][j];
 
-                // Match / Substitute
                 if (i > 0 && j > 0 &&
                     current === dp[i - 1][j - 1] +
                                (refWords[i - 1] === userWords[j - 1] ? COST.MATCH : COST.SUB)) {
@@ -1038,14 +938,12 @@
                     continue;
                 }
 
-                // Deletion
                 if (i > 0 && current === dp[i - 1][j] + COST.DEL) {
                     alignment.unshift({ type: 'delete', refWord: refWords[i - 1], userWord: null });
                     i--;
                     continue;
                 }
 
-                // Insertion
                 alignment.unshift({ type: 'insert', refWord: null, userWord: userWords[j - 1] });
                 j--;
             }
@@ -1053,7 +951,6 @@
             return alignment;
         }
 
-        // Update live feedback
         function updateLiveFeedback() {
             if (!userInput || !liveFeedback) return;
             
@@ -1072,13 +969,10 @@
                 
                 if (char === ' ') {
                     if (item.status === 'word-boundary') {
-                        // Bigger space for word boundaries
                         char = '&nbsp;&nbsp;&nbsp;';
                     } else if (item.status === 'char-space') {
-                        // Normal space between characters within missing words
                         char = '&nbsp;';
                     } else {
-                        // Regular space
                         char = '&nbsp;';
                     }
                 } else if (char === '\n') {
@@ -1091,7 +985,6 @@
             liveFeedback.innerHTML = feedbackHTML;
         }
 
-        // Update progress bar
         function updateProgress() {
             if (!audioPlayer || !timeDisplay || !progressBar) return;
             
@@ -1112,7 +1005,6 @@
             }
         }
 
-        // Calculate word-based statistics properly
         function calculateWordStats(comparison) {
             const ignoreCase = ignoreCaseToggle ? ignoreCaseToggle.checked : true;
             const ignorePunctuation = true;
@@ -1130,27 +1022,23 @@
                 userNormalized = userNormalized.toLowerCase();
             }
             
-            // Normalize spaces
             userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
             
             const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
             const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
             
-            // Perform alignment to get word-level statistics
             const alignment = alignSequencesWithGaps(refWords, userWords);
             
             let correctWords = 0;
             let wrongWords = 0;
             let totalWords = refWords.length;
             
-            // Count based on alignment results
             alignment.forEach(item => {
                 if (item.type === 'match') {
                     correctWords++;
                 } else if (item.type === 'substitute' || item.type === 'delete') {
                     wrongWords++;
                 }
-                // Note: 'insert' items (extra words) don't count toward reference total
             });
             
             return {
@@ -1160,11 +1048,9 @@
             };
         }
 
-        // Better final result calculation
         function showFinalResult() {
             if (!userInput) return;
             
-            // Process current sentence if not already processed
             if (userInput.value.trim() && sessionResults.length === currentCueIndex) {
                 let sentenceTime = 0;
                 if (hasStartedTyping && sentenceStartTime) {
@@ -1186,7 +1072,6 @@
                 });
             }
             
-            // Calculate overall stats from sessionResults
             let totalCorrectWords = 0;
             let totalWrongWords = 0;
             let totalWords = 0;
@@ -1197,15 +1082,12 @@
                 totalWords += result.stats.totalWords;
             });
             
-            // Calculate accuracy
             const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
             
-            // Update display
             if (accuracyPercent) accuracyPercent.textContent = accuracy + '%';
             if (correctWords) correctWords.textContent = totalCorrectWords;
             if (wrongWords) wrongWords.textContent = totalWrongWords;
 
-            // Update timing display
             const timeElement = document.getElementById('timeTaken');
             if (timeElement) {
                 timeElement.textContent = formatTime(totalSessionTime);
@@ -1214,13 +1096,9 @@
             if (statsSection) statsSection.style.display = 'grid';
             if (checkBtn) checkBtn.style.display = 'none';
             
-            console.log(`Final stats: ${accuracy}% accuracy, ${totalCorrectWords}/${totalWords} words correct, ${formatTime(totalSessionTime)} total time`);
-            
-            // Update iframe height when stats appear
             setTimeout(sendHeightToParent, 100);
         }
         
-        // Format time in MM:SS format
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = Math.floor(seconds % 60);
@@ -1233,17 +1111,13 @@
             if (statsSection) statsSection.style.display = 'none';
             if (checkBtn) checkBtn.style.display = 'inline-block';
             
-            // Reset all session data
             sentenceStartTime = null;
             totalSessionTime = 0;
             hasStartedTyping = false;
             sessionResults = [];
             currentCueIndex = 0;
             
-            // Reset to first sentence
             updateCurrentSentence();
-            
-            // Update iframe height
             setTimeout(sendHeightToParent, 100);
         }
 
