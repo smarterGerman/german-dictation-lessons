@@ -651,8 +651,8 @@
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
             const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
             
-            // Cmd/Ctrl + Enter = Play/Pause
-            if (ctrlKey && e.key === 'Enter' && !e.shiftKey) {
+           // Shift + Cmd/Ctrl + Enter = Play/Pause toggle and Start dictation
+            if (e.shiftKey && ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
                 togglePlayback();
                 return;
