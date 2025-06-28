@@ -377,12 +377,26 @@
     </div>
 
     <script>
-        function sendHeightToParent() {
-            const height = document.body.scrollHeight;
-            if (window.parent !== window) {
-                window.parent.postMessage({ frameHeight: height }, '*');
-            }
+      function sendHeightToParent() {
+    try {
+        const height = Math.max(
+            document.body.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.clientHeight,
+            document.documentElement.scrollHeight,
+            document.documentElement.offsetHeight
+        );
+        
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ 
+                frameHeight: height,
+                type: 'resize'
+            }, '*');
         }
+    } catch (e) {
+        console.log('Height messaging failed:', e);
+    }
+}
 
         window.addEventListener('load', sendHeightToParent);
         window.addEventListener('resize', sendHeightToParent);
