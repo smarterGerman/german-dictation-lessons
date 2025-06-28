@@ -554,7 +554,7 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
-        /* Sentence results styling */
+        /* Sentence results styling - more compact */
         .sentence-results {
             margin-top: 32px;
             padding: 24px;
@@ -574,25 +574,11 @@
         .sentences-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px; /* Reduced from 20px */
         }
 
         .sentence-result {
-            padding: 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 12px;
-            border-left: 4px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .sentence-number {
-            font-size: 14px;
-            font-weight: 600;
-            color: #6b7280;
-            margin-bottom: 12px;
-        }
-
-        .sentence-text {
+            /* Removed padding, background, border, box-shadow for compactness */
             font-size: 18px;
             line-height: 1.6;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -608,6 +594,15 @@
             color: #dc2626;
             font-weight: 500;
             text-decoration: underline;
+            cursor: pointer; /* Indicate clickable */
+            position: relative; /* For tooltip positioning */
+        }
+
+        .result-word-wrong:hover {
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px; /* Compensate for padding */
         }
 
         .result-word-missing {
@@ -624,6 +619,63 @@
             background: rgba(37, 99, 235, 0.1);
             padding: 2px 4px;
             border-radius: 4px;
+        }
+
+        /* Tooltip for wrong words */
+        .word-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .word-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1f2937;
+        }
+
+        .word-tooltip.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Prevent tooltip cutoff */
+        .word-tooltip.adjust-left {
+            left: 0;
+            transform: translateX(0);
+        }
+
+        .word-tooltip.adjust-right {
+            left: auto;
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .word-tooltip.adjust-left::after {
+            left: 20px;
+        }
+
+        .word-tooltip.adjust-right::after {
+            left: auto;
+            right: 20px;
         }
 
        /* ----- RESPONSIVE -------------------------------------------------- */
@@ -1675,19 +1727,13 @@
             sessionResults.forEach((result, index) => {
                 const sentenceDiv = document.createElement('div');
                 sentenceDiv.className = 'sentence-result';
+                sentenceDiv.innerHTML = generateResultHTML(result);
                 
-                const sentenceNumber = document.createElement('div');
-                sentenceNumber.className = 'sentence-number';
-                sentenceNumber.textContent = `Sentence ${index + 1}`;
-                
-                const sentenceText = document.createElement('div');
-                sentenceText.className = 'sentence-text';
-                sentenceText.innerHTML = generateResultHTML(result);
-                
-                sentenceDiv.appendChild(sentenceNumber);
-                sentenceDiv.appendChild(sentenceText);
                 sentencesContainer.appendChild(sentenceDiv);
             });
+            
+            // Add click listeners for wrong words
+            addTooltipListeners();
             
             sentenceResultsDiv.style.display = 'block';
         }
@@ -1706,7 +1752,7 @@
                 if (item.type === 'match') {
                     html += `<span class="result-word-correct">${item.userWord}</span>`;
                 } else if (item.type === 'substitute') {
-                    html += `<span class="result-word-wrong">${item.userWord}</span>`;
+                    html += `<span class="result-word-wrong" data-correct="${item.refWord}">${item.userWord}</span>`;
                 } else if (item.type === 'insert') {
                     html += `<span class="result-word-extra">${item.userWord}</span>`;
                 } else if (item.type === 'delete') {
@@ -1718,6 +1764,53 @@
             });
             
             return html;
+        }
+
+        function addTooltipListeners() {
+            const wrongWords = document.querySelectorAll('.result-word-wrong');
+            
+            wrongWords.forEach(word => {
+                word.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove any existing tooltips
+                    document.querySelectorAll('.word-tooltip').forEach(tooltip => tooltip.remove());
+                    
+                    const correctWord = this.getAttribute('data-correct');
+                    if (!correctWord) return;
+                    
+                    // Create tooltip
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'word-tooltip';
+                    tooltip.textContent = `Correct: ${correctWord}`;
+                    
+                    // Add tooltip to the word
+                    this.appendChild(tooltip);
+                    
+                    // Position adjustment to prevent cutoff
+                    setTimeout(() => {
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        const containerRect = document.querySelector('.sentences-container').getBoundingClientRect();
+                        
+                        // Check if tooltip goes outside left edge
+                        if (tooltipRect.left < containerRect.left) {
+                            tooltip.classList.add('adjust-left');
+                        }
+                        // Check if tooltip goes outside right edge
+                        else if (tooltipRect.right > containerRect.right) {
+                            tooltip.classList.add('adjust-right');
+                        }
+                        
+                        tooltip.classList.add('show');
+                    }, 10);
+                    
+                    // Hide tooltip when clicking elsewhere
+                    document.addEventListener('click', function hideTooltip() {
+                        tooltip.remove();
+                        document.removeEventListener('click', hideTooltip);
+                    });
+                });
+            });
         }
         
         function formatTime(seconds) {
