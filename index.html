@@ -1741,10 +1741,29 @@
         }
 
         function generateResultHTML(result) {
-            const alignment = alignSequencesWithGaps(
-                result.reference.replace(/[.,!?;:""''()]/g, '').toLowerCase().split(/\s+/).filter(w => w.length > 0),
-                convertGermanChars(result.userInput).replace(/[.,!?;:""''()]/g, '').toLowerCase().split(/\s+/).filter(w => w.length > 0)
-            );
+            // Use the same case sensitivity settings as the live feedback
+            const ignoreCase = ignoreCaseActive;
+            const ignorePunctuation = true;
+            
+            let refNormalized = result.reference;
+            let userNormalized = convertGermanChars(result.userInput);
+            
+            if (ignorePunctuation) {
+                refNormalized = refNormalized.replace(/[.,!?;:""''()]/g, '');
+                userNormalized = userNormalized.replace(/[.,!?;:""''()]/g, '');
+            }
+            
+            if (ignoreCase) {
+                refNormalized = refNormalized.toLowerCase();
+                userNormalized = userNormalized.toLowerCase();
+            }
+            
+            userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
+            
+            const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
+            const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
+            
+            const alignment = alignSequencesWithGaps(refWords, userWords);
             
             let html = '';
             
