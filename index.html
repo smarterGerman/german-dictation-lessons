@@ -863,8 +863,8 @@
         let ignoreCaseActive = true; // Default: ignore case (white button = checking OFF)
         let currentSpeed = 1.0; // Default speed (100%)
 
-        // Unicode symbols with ASCII fallback
-        const initialPlaceholderText = "⇧+⌘+↵ = ⏯ or Shift+Cmd+Enter = Play/Pause\nae = ä | oe = ö | ue = ü | B = ß\nType here...";
+        // ASCII only - clear and readable at all sizes
+        const initialPlaceholderText = "Shift+Cmd+Enter = Play/Pause\nae = ä | oe = ö | ue = ü | B = ß\nType here...";
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -1776,8 +1776,9 @@
             // Extract lesson ID from current lesson (e.g., A1L01)
             const lessonId = currentLessonId || 'Unknown';
             
-            // Create simple CSV - just one row of values for easy spreadsheet pasting
-            const csvContent = `${lessonId},${accuracy},${totalCorrectWords},${totalWrongWords},${totalWords},${formatTime(totalSessionTime)}`;
+            // Create CSV with header row and data row
+            let csvContent = 'Lesson,Accuracy,Correct Words,Wrong Words,Total Words,Time Taken\n';
+            csvContent += `${lessonId},${accuracy},${totalCorrectWords},${totalWrongWords},${totalWords},${formatTime(totalSessionTime)}`;
             
             // Download CSV
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
