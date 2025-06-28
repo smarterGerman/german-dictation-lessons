@@ -1058,13 +1058,21 @@
                 }, { once: true });
                 
                 audioPlayer.addEventListener('error', (e) => {
-                    if (playBtn) {
-                        playBtn.textContent = '❌';
-                        playBtn.disabled = true;
-                    }
-                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    console.error('Failed to load audio:', lessonData.audioUrl, e);
-                }, { once: true });
+    const error = e.target.error; // Get the MediaError object
+    console.error('Audio Loading Error in Listener:', {
+        networkState: audioPlayer.networkState,
+        code: error ? error.code : 'N/A',
+        message: error ? error.message : 'Unknown Error Object',
+        event: e // Log the full event object for more context
+    });
+    if (playBtn) {
+        playBtn.textContent = '❌';
+        playBtn.disabled = true;
+    }
+    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+    // Removed alert as you can check the console
+    // alert('Error loading audio. Please check your internet connection or the audio file path.');
+}, { once: true });
             }
             
             if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
