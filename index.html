@@ -547,6 +547,7 @@
                 audioPlayer.addEventListener('timeupdate', handleTimeUpdate);
             }
 
+            window.addEventListener('keydown', handleGlobalKeyDown);
             const lessonId = getLessonIdFromUrl() || 'A1L01';
             loadAllLessons().then(() => {
                 loadLesson(lessonId);
@@ -634,6 +635,45 @@
             }
             updateLiveFeedback();
             setTimeout(sendHeightToParent, 100);
+        }
+
+        function handleGlobalKeyDown(e) {
+            // Check if user is typing in input field
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+                return; // Don't interfere with typing
+            }
+            
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+            
+            // Cmd/Ctrl + Enter = Play/Pause
+            if (ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                togglePlayback();
+                return;
+            }
+            
+            // Shift + Cmd/Ctrl + Arrow keys
+            if (e.shiftKey && ctrlKey) {
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        goToPreviousSentence();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        goToNextSentence();
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        playCurrentSentence(); // Repeat current sentence
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        toggleSpeed(); // Speed toggle
+                        break;
+                }
+            }
         }
 
         function handleKeyDown(e) {
