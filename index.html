@@ -1214,6 +1214,32 @@
         // Load lesson
         async function loadLesson(lessonId) {
             console.log(`Loading lesson ${lessonId}...`);
+// Load lesson JSON data first
+try {
+    const jsonUrl = `${CONFIG.lessonsBaseUrl}/${lessonId}.json`;
+    console.log('Loading lesson JSON from:', jsonUrl);
+    
+    const jsonResponse = await fetch(jsonUrl);
+    if (!jsonResponse.ok) {
+        throw new Error(`Lesson JSON not found: ${jsonResponse.status}`);
+    }
+    
+    const lessonData = await jsonResponse.json();
+    console.log('Lesson data loaded:', lessonData);
+    
+    // Update lesson info with real data
+    if (lessonInfo) {
+        lessonInfo.innerHTML = `
+            <strong>${lessonData.title}</strong><br>
+            <span style="color: #888;">
+                Lesson ${lessonId} • ${lessonData.wordCount} words • ${lessonData.duration}s
+            </span>
+        `;
+    }
+} catch (error) {
+    console.error('Failed to load lesson JSON:', error);
+    if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId} data`;
+}
             
             if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
             if (playBtn) {
