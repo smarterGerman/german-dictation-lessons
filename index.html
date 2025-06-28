@@ -665,6 +665,33 @@
             
             const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
             const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+
+// German: Shift+Ctrl/Cmd+ß
+if (e.shiftKey && ctrlKey && e.key === 'ß') {
+    e.preventDefault();
+    showHint();
+    if (hintBtn) hintBtn.focus();
+    return;
+}
+
+// US/Intl: Shift+Ctrl/Cmd+/
+if (e.shiftKey && ctrlKey && e.key === '/') {
+    e.preventDefault();
+    showHint();
+    if (hintBtn) hintBtn.focus();
+    return;
+}
+
+// French: Shift+Ctrl/Cmd+,
+if (e.shiftKey && ctrlKey && e.key === ',') {
+    e.preventDefault();
+    showHint();
+    if (hintBtn) hintBtn.focus();
+    return;
+}
             
             // Shift + Cmd/Ctrl + Enter = Play/Pause toggle and Start dictation
             if (e.shiftKey && ctrlKey && e.key === 'Enter') {
