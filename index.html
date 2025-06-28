@@ -896,6 +896,7 @@
         }
         
         function togglePlayback() {
+           console.log(`[DEBUG] Play/Pause button tapped. IsPaused: ${audioPlayer.paused}. Current Network State: ${audioPlayer.networkState}.`);
             console.log('togglePlayback called.');
             if (vttCues.length === 0) {
                 // No VTT cues, just play/pause the entire audio
@@ -918,14 +919,23 @@
         }
 
         function playCurrentSentence() {
-            if (currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
-                const cue = vttCues[currentCueIndex];
-                audioPlayer.currentTime = cue.start;
-                          console.log('Attempting to play audio. audioPlayer.readyState:', audioPlayer.readyState, 'audioPlayer.networkState:', audioPlayer.networkState);
-                audioPlayer.play().catch(error => {
-                    console.log('Audio playback failed:', error);
-                    alert('Audio could not be played. Please check your internet connection.');
+    if (currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
+        const cue = vttCues[currentCueIndex];
+        audioPlayer.currentTime = cue.start;
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('[DEBUG] Playback promise resolved (audio started).');
+            }).catch(error => {
+                console.error('Audio Playback Promise Rejected:', {
+                    name: error.name,
+                    message: error.message,
+                    networkState: audioPlayer.networkState,
+                    errorObject: error // Log the full error object
                 });
+                // Removed alert as you can check the console
+                // alert('Audio could not be played. Please check your internet connection.');
+            });
             }
         }
 
@@ -1043,8 +1053,11 @@
             
             if (audioPlayer) {
                 audioPlayer.src = lessonData.audioUrl;
+                console.log(`[DEBUG] Attempting to load audio: ${lessonData.audioUrl.substring(lessonData.audioUrl.lastIndexOf('/') + 1)}. Current Network State: ${audioPlayer.networkState}.`); // Log the file name and network state
+                // ... existing code ...
                 
                 audioPlayer.addEventListener('loadedmetadata', () => {
+                    console.log(`[DEBUG] Metadata loaded. Duration: ${audioPlayer.duration.toFixed(2)}s. Network State: ${audioPlayer.networkState}.`);
                     if (playBtn) {
                         playBtn.textContent = '';
                         playBtn.classList.remove('playing');
