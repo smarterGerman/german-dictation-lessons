@@ -48,26 +48,76 @@
             font-weight: 500; 
         }
 
-        /* Desktop layout - horizontal */
+        /* Unified minimalist design for all screen sizes */
         .audio-controls { 
             display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 12px; 
+            flex-direction: column;
+            align-items: center;
+            gap: 16px; 
             margin-bottom: 28px; 
-            flex-wrap: wrap;
             overflow: visible !important;
         }
 
-        /* Mobile containers are invisible on desktop */
-        .mobile-player-pill,
-        .mobile-progress-row {
-            display: none;
+        /* Main player pill */
+        .player-pill {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
 
-        /* Desktop-only elements */
-        .desktop-only {
+        /* Progress and secondary controls row */
+        .progress-controls-row {
             display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Make nav buttons more visible */
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 2px solid rgba(168, 85, 247, 0.3) !important;
+            color: #6b7280 !important;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .nav-btn:hover {
+            border-color: #a855f7 !important;
+            background: rgba(255, 255, 255, 1) !important;
+            color: #374151 !important;
+        }
+
+        /* Secondary buttons (? and X) - smaller and subtle */
+        .secondary-btn {
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 14px !important;
+            background: rgba(255, 255, 255, 0.8);
+            flex-shrink: 0;
+        }
+
+        /* Progress bar takes up remaining space */
+        .progress-controls-row .progress-container {
+            flex-grow: 1;
+            height: 8px;
+            margin: 0 8px;
+        }
+
+        /* Time display */
+        .progress-controls-row #timeDisplay {
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+            min-width: 80px;
+            text-align: center;
         }
 
         .loading-spinner {
@@ -430,71 +480,39 @@
     .audio-section{ padding: 15px; }
     .input-field, .live-feedback{ padding: 15px; font-size: 15px; }
 
-    /* Mobile: Hide desktop layout, show mobile containers */
-    .audio-controls {
-        flex-direction: column;
-        gap: 16px;
+    /* Mobile: adjust sizing only */
+    .player-pill {
+        padding: 10px 20px;
+        gap: 14px;
     }
 
-    /* Hide desktop buttons on mobile */
-    .desktop-only {
-        display: none !important;
+    .progress-controls-row {
+        max-width: 320px;
+        gap: 8px;
     }
 
-    /* Hide individual buttons in favor of containers */
-    .audio-controls > .nav-btn,
-    .audio-controls > .play-btn,
-    .audio-controls > .toggle-btn,
-    .audio-controls > .progress-container,
-    .audio-controls > #timeDisplay {
-        display: none;
+    /* Smaller buttons on mobile */
+    .nav-btn, .toggle-btn {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 16px !important;
     }
 
-    /* Show mobile containers */
-    .mobile-player-pill {
-        display: flex !important;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 50px;
-        padding: 12px 24px;
-        align-items: center;
-        gap: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    .play-btn {
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 24px !important;
     }
 
-    .mobile-progress-row {
-        display: flex !important;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        max-width: 300px;
+    .secondary-btn {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 12px !important;
     }
 
-    /* Progress bar styling for mobile */
-    .mobile-progress-row .progress-container {
-        flex-grow: 1;
-        height: 8px;
-        margin: 0;
-    }
-
-    .mobile-progress-row #timeDisplay {
-        flex-shrink: 0;
-        font-size: 14px;
-        color: #6b7280;
-        margin: 0;
-    }
-
-    /* Mobile button sizing */
-    .mobile-player-pill .nav-btn,
-    .mobile-player-pill .toggle-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 16px;
-    }
-
-    .mobile-player-pill .play-btn {
-        width: 56px;
-        height: 56px;
-        font-size: 24px;
+    .progress-controls-row #timeDisplay {
+        font-size: 12px;
+        min-width: 70px;
     }
 }
 
@@ -520,8 +538,8 @@
             <!-- AUDIO SECTION -->
             <div class="audio-section">
                 <div class="audio-controls">
-                    <!-- Mobile pill container (will be styled with CSS) -->
-                    <div class="mobile-player-pill">
+                    <!-- Unified pill design for all screen sizes -->
+                    <div class="player-pill">
                         <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
                         <button class="play-btn" id="playBtn">
                             <div class="loading-spinner" id="loadingSpinner"></div>
@@ -531,15 +549,13 @@
                         <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
                     </div>
                     
-                    <!-- Mobile progress row -->
-                    <div class="mobile-progress-row">
+                    <!-- Progress bar and controls row -->
+                    <div class="progress-controls-row">
+                        <button class="toggle-btn secondary-btn" id="hintBtn" title="Show expected sentence">?</button>
                         <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                         <span id="timeDisplay">0:00 / 0:00</span>
+                        <button class="toggle-btn secondary-btn" id="endDictationBtn" title="End dictation & show stats">X</button>
                     </div>
-                    
-                    <!-- Desktop-only buttons -->
-                    <button class="toggle-btn desktop-only" id="hintBtn" title="Show expected sentence">?</button>
-                    <button class="toggle-btn desktop-only" id="endDictationBtn" title="End dictation & show stats">X</button>
                 </div>
                 <audio id="audioPlayer" preload="auto"></audio>
             </div>
