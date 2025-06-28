@@ -467,7 +467,7 @@
         }
 
         .input-field::placeholder {
-            font-size: 30px !important; /* Increased from 14px to 21px (50% bigger) */
+            font-size: 21px !important; /* Increased from 14px to 21px (50% bigger) */
             color: #9CA3AF;
             opacity: 1;
             line-height: 1.4;
@@ -681,6 +681,32 @@
             right: 20px;
         }
 
+        /* Export controls styling */
+        .export-controls {
+            text-align: center;
+            margin: 24px 0;
+            padding: 16px;
+        }
+
+        .export-csv-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .export-csv-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+        }
+
        /* ----- RESPONSIVE -------------------------------------------------- */
        @media(max-width:768px){
     body { padding: 10px; }
@@ -796,6 +822,13 @@
                     <div class="stat-item"><span class="stat-label">Time Taken</span><span class="stat-value" id="timeTaken">0:00</span></div>
                 </div>
 
+                <!-- Export button -->
+                <div class="export-controls" id="exportControls" style="display:none;">
+                    <button class="export-csv-btn" id="exportCsvBtn" title="Export results as CSV file">
+                        📊 Export CSV
+                    </button>
+                </div>
+
                 <!-- Detailed sentence results -->
                 <div class="sentence-results" id="sentenceResults" style="display:none;">
                     <div class="sentences-container" id="sentencesContainer">
@@ -840,7 +873,7 @@
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
         let endDictationBtn, resetBtn, ignoreCaseBtn, hintBtn, speedBtn;
-        let prevBtn, nextBtn, sentenceInfo;
+        let prevBtn, nextBtn, sentenceInfo, exportCsvBtn;
 
         window.addEventListener('load', function() {
             audioPlayer = document.getElementById('audioPlayer');
@@ -867,6 +900,7 @@
             prevBtn = document.getElementById('prevBtn');
             nextBtn = document.getElementById('nextBtn');
             sentenceInfo = document.getElementById('sentenceInfo');
+            exportCsvBtn = document.getElementById('exportCsvBtn');
 
             if (playBtn) playBtn.addEventListener('click', togglePlayback);
             if (prevBtn) prevBtn.addEventListener('click', goToPreviousSentence);
@@ -889,6 +923,9 @@
             }
             if (hintBtn) {
                 hintBtn.addEventListener('click', showHint);
+            }
+            if (exportCsvBtn) {
+                exportCsvBtn.addEventListener('click', exportCSV);
             }
 
             if (audioPlayer) {
@@ -1710,10 +1747,79 @@
             
             if (statsSection) statsSection.style.display = 'grid';
             
+            // Show export controls
+            const exportControls = document.getElementById('exportControls');
+            if (exportControls) exportControls.style.display = 'block';
+            
             // Show detailed sentence results
             showDetailedResults();
                         
             setTimeout(sendHeightToParent, 100);
+        }
+
+        function exportCSV() {
+            if (sessionResults.length === 0) return;
+            
+            // Calculate totals
+            let totalCorrectWords = 0;
+            let totalWrongWords = 0;
+            let totalWords = 0;
+            
+            sessionResults.forEach(result => {
+                totalCorrectWords += result.stats.correctWords;
+                totalWrongWords += result.stats.wrongWords;
+                totalWords += result.stats.totalWords;
+            });
+            
+            const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
+            
+            // Create CSV content
+            let csvContent = '';
+            
+            // Header
+            csvContent += 'Dictation Results\n\n';
+            
+            // Overall stats
+            csvContent += 'Overall Statistics\n';
+            csvContent += 'Metric,Value\n';
+            csvContent += `Accuracy,${accuracy}%\n`;
+            csvContent += `Correct Words,${totalCorrectWords}\n`;
+            csvContent += `Wrong Words,${totalWrongWords}\n`;
+            csvContent += `Total Words,${totalWords}\n`;
+            csvContent += `Time Taken,${formatTime(totalSessionTime)}\n\n`;
+            
+            // Sentence details
+            csvContent += 'Sentence Details\n';
+            csvContent += 'Sentence,Reference Text,User Input,Correct Words,Wrong Words,Time (seconds)\n';
+            
+            sessionResults.forEach((result, index) => {
+                // Escape quotes in text by doubling them and wrapping in quotes
+                const escapeCSV = (text) => `"${text.replace(/"/g, '""')}"`;
+                
+                csvContent += `${index + 1},`;
+                csvContent += `${escapeCSV(result.reference)},`;
+                csvContent += `${escapeCSV(result.userInput)},`;
+                csvContent += `${result.stats.correctWords},`;
+                csvContent += `${result.stats.wrongWords},`;
+                csvContent += `${result.time.toFixed(1)}\n`;
+            });
+            
+            // Download CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+            link.download = `dictation-results-${dateStr}-${timeStr}.csv`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         function showDetailedResults() {
