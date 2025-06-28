@@ -467,10 +467,12 @@
         }
 
         .input-field::placeholder {
+            font-size: 14px !important; /* Desktop placeholder font size */
             color: #9CA3AF; /* A lighter grey color */
             opacity: 1;    /* Ensures full opacity across browsers (Firefox defaults lower) */
+            line-height: 1.4;
             transition: color 0.3s ease; /* Optional: smooth transition if placeholder changes */
-}
+        }
         
         .live-feedback {
             min-height:70px; /* Reduced from 100px to 70px (about one row less) */
@@ -1774,7 +1776,7 @@
             wrongWords.forEach(word => {
                 word.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    showTooltip(this, `Correct: ${this.getAttribute('data-correct')}`);
+                    showTooltip(this, this.getAttribute('data-correct'));
                 });
             });
 
@@ -1782,7 +1784,7 @@
             missingWords.forEach(word => {
                 word.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    showTooltip(this, `Missing: ${this.getAttribute('data-missing')}`);
+                    showTooltip(this, this.getAttribute('data-missing'));
                 });
             });
         }
