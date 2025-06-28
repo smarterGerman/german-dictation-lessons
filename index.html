@@ -48,14 +48,26 @@
             font-weight: 500; 
         }
 
+        /* Desktop layout - horizontal */
         .audio-controls { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             gap: 12px; 
             margin-bottom: 28px; 
-            flex-wrap: wrap; /* Allow wrapping for better mobile layout */
+            flex-wrap: wrap;
             overflow: visible !important;
+        }
+
+        /* Mobile containers are invisible on desktop */
+        .mobile-player-pill,
+        .mobile-progress-row {
+            display: none;
+        }
+
+        /* Desktop-only elements */
+        .desktop-only {
+            display: flex;
         }
 
         .loading-spinner {
@@ -418,51 +430,72 @@
     .audio-section{ padding: 15px; }
     .input-field, .live-feedback{ padding: 15px; font-size: 15px; }
 
-    .audio-controls{
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 0 5px;
+    /* Mobile: Hide desktop layout, show mobile containers */
+    .audio-controls {
+        flex-direction: column;
+        gap: 16px;
     }
 
-    /* Reset ordering on mobile for better wrapping */
-    .nav-btn, .play-btn, .toggle-btn, #timeDisplay {
-        order: unset;
+    /* Hide desktop buttons on mobile */
+    .desktop-only {
+        display: none !important;
     }
 
-    /* For the Previous/Next buttons and the Aa/100/?/X toggle buttons */
-    .nav-btn, .toggle-btn{
-        width: 44px;
-        height: 44px;
-        font-size: 16px;
-        flex-shrink: 0;
-        flex-grow: 0;
-        flex-basis: auto;
+    /* Hide individual buttons in favor of containers */
+    .audio-controls > .nav-btn,
+    .audio-controls > .play-btn,
+    .audio-controls > .toggle-btn,
+    .audio-controls > .progress-container,
+    .audio-controls > #timeDisplay {
+        display: none;
     }
 
-    /* For the Play/Pause button */
-    .play-btn{
-        width: 64px;
-        height: 64px;
-        font-size: 24px;
-        flex-shrink: 0;
-        flex-grow: 0;
-        flex-basis: auto;
+    /* Show mobile containers */
+    .mobile-player-pill {
+        display: flex !important;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50px;
+        padding: 12px 24px;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
 
-    /* For the time display (0:00 / 0:00) */
-    #timeDisplay {
-        min-width: unset;
-        font-size: 14px;
-        margin: 0 5px;
+    .mobile-progress-row {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* Progress bar styling for mobile */
+    .mobile-progress-row .progress-container {
         flex-grow: 1;
-        flex-shrink: 1;
-        flex-basis: auto;
-        text-align: center;
+        height: 8px;
+        margin: 0;
     }
 
-    .controls{ flex-direction: column; }
-    .control-btn{ width: 100%; }
+    .mobile-progress-row #timeDisplay {
+        flex-shrink: 0;
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    /* Mobile button sizing */
+    .mobile-player-pill .nav-btn,
+    .mobile-player-pill .toggle-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 16px;
+    }
+
+    .mobile-player-pill .play-btn {
+        width: 56px;
+        height: 56px;
+        font-size: 24px;
+    }
 }
 
         /* Add this new style for your 'X' button */
@@ -487,17 +520,26 @@
             <!-- AUDIO SECTION -->
             <div class="audio-section">
                 <div class="audio-controls">
-                    <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
-                    <button class="play-btn" id="playBtn">
-                        <div class="loading-spinner" id="loadingSpinner"></div>
-                    </button>
-                    <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
-                    <button class="toggle-btn" id="ignoreCaseBtn" title="Capitalization checking OFF">Aa</button>
-                    <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
-                    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-                    <span id="timeDisplay">0:00 / 0:00</span>
-                    <button class="toggle-btn" id="hintBtn" title="Show expected sentence">?</button>
-                    <button class="toggle-btn" id="endDictationBtn" title="End dictation & show stats">X</button>
+                    <!-- Mobile pill container (will be styled with CSS) -->
+                    <div class="mobile-player-pill">
+                        <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
+                        <button class="play-btn" id="playBtn">
+                            <div class="loading-spinner" id="loadingSpinner"></div>
+                        </button>
+                        <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
+                        <button class="toggle-btn" id="ignoreCaseBtn" title="Capitalization checking OFF">Aa</button>
+                        <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
+                    </div>
+                    
+                    <!-- Mobile progress row -->
+                    <div class="mobile-progress-row">
+                        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+                        <span id="timeDisplay">0:00 / 0:00</span>
+                    </div>
+                    
+                    <!-- Desktop-only buttons -->
+                    <button class="toggle-btn desktop-only" id="hintBtn" title="Show expected sentence">?</button>
+                    <button class="toggle-btn desktop-only" id="endDictationBtn" title="End dictation & show stats">X</button>
                 </div>
                 <audio id="audioPlayer" preload="auto"></audio>
             </div>
