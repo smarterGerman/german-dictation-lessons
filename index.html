@@ -339,6 +339,7 @@
                     <button class="play-btn" id="playBtn"></button>
                     <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
                     <button class="toggle-btn" id="ignoreCaseBtn" title="Ignore Capitalization">Aa</button>
+                    <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
                     <span id="timeDisplay">0:00 / 0:00</span>
                 </div>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
@@ -377,26 +378,12 @@
     </div>
 
     <script>
-      function sendHeightToParent() {
-    try {
-        const height = Math.max(
-            document.body.scrollHeight,
-            document.body.offsetHeight,
-            document.documentElement.clientHeight,
-            document.documentElement.scrollHeight,
-            document.documentElement.offsetHeight
-        );
-        
-        if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ 
-                frameHeight: height,
-                type: 'resize'
-            }, '*');
+        function sendHeightToParent() {
+            const height = document.body.scrollHeight;
+            if (window.parent !== window) {
+                window.parent.postMessage({ frameHeight: height }, '*');
+            }
         }
-    } catch (e) {
-        console.log('Height messaging failed:', e);
-    }
-}
 
         window.addEventListener('load', sendHeightToParent);
         window.addEventListener('resize', sendHeightToParent);
@@ -439,6 +426,7 @@
             resetBtn = document.getElementById('resetBtn');
             revealBtn = document.getElementById('revealBtn');
             ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
+            speedBtn = document.getElementById('speedBtn');
             prevBtn = document.getElementById('prevBtn');
             nextBtn = document.getElementById('nextBtn');
             sentenceInfo = document.getElementById('sentenceInfo');
@@ -459,6 +447,9 @@
                 if (ignoreCaseActive) {
                     ignoreCaseBtn.classList.add('active');
                 }
+            }
+            if (speedBtn) {
+                speedBtn.addEventListener('click', toggleSpeed);
             }
 
             if (audioPlayer) {
@@ -485,6 +476,25 @@
             });
             setTimeout(sendHeightToParent, 500);
         });
+
+        function toggleSpeed() {
+            // Cycle through speeds: 100% → 75% → 50% → 100%
+            if (currentSpeed === 1.0) {
+                currentSpeed = 0.75;
+                speedBtn.textContent = '75';
+            } else if (currentSpeed === 0.75) {
+                currentSpeed = 0.5;
+                speedBtn.textContent = '50';
+            } else {
+                currentSpeed = 1.0;
+                speedBtn.textContent = '100';
+            }
+            
+            // Apply speed to audio player
+            if (audioPlayer) {
+                audioPlayer.playbackRate = currentSpeed;
+            }
+        }
 
         function toggleIgnoreCase() {
             ignoreCaseActive = !ignoreCaseActive;
@@ -796,6 +806,8 @@
                         playBtn.classList.remove('playing');
                         playBtn.disabled = false;
                     }
+                    // Set the current speed when audio loads
+                    audioPlayer.playbackRate = currentSpeed;
                     updateProgress();
                     if (lessonInfo) {
                         lessonInfo.textContent = `Lesson ${lessonId}`;
