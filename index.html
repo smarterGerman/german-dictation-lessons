@@ -406,9 +406,9 @@
 
         // Configuration
         const CONFIG = {
-    audioBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/audio',
-    lessonsBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/lessons'
-};
+            audioBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/audio',
+            lessonsBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/lessons'
+        };
 
         // DOM elements
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
@@ -744,12 +744,108 @@
             if (vttCues.length > 0 && currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
                 referenceText = vttCues[currentCueIndex].text;
                 if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
+            }
+        }
+
+        // Handle time updates to auto-pause at sentence end
+        function handleTimeUpdate() {
+            updateProgress();
+            
+            if (vttCues.length > 0 && isPlaying) {
+                const currentTime = audioPlayer.currentTime;
+                const currentCue = vttCues[currentCueIndex];
+                
+                if (currentCue && currentTime >= currentCue.end) {
+                    audioPlayer.pause();
+                }
+            }
+        }
+
+        // Load lesson
+        async function loadLesson(lessonId) {
+            console.log(`Loading lesson ${lessonId}...`);
+            
+            if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
+            if (playBtn) {
+                playBtn.textContent = '⏳';
+                playBtn.disabled = true;
+            }
+
+            // Load lesson JSON data first
+            try {
+                const jsonUrl = `${CONFIG.lessonsBaseUrl}/${lessonId}.json`;
+                console.log('Loading lesson JSON from:', jsonUrl);
+                
+                const jsonResponse = await fetch(jsonUrl);
+                if (!jsonResponse.ok) {
+                    throw new Error(`Lesson JSON not found: ${jsonResponse.status}`);
+                }
+                
+                const lessonData = await jsonResponse.json();
+                console.log('Lesson data loaded:', lessonData);
+                
+                // Update lesson info with real data
+                if (lessonInfo) {
+                    lessonInfo.innerHTML = `
+                        <strong>${lessonData.title}</strong><br>
+                        <span style="color: #888;">
+                            Lesson ${lessonId} • ${lessonData.wordCount} words • ${lessonData.duration}s
+                        </span>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load lesson JSON:', error);
+                if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId} data`;
+            }
+            
+            // Load VTT file
+            const cues = await loadVTTFile(lessonId);
+            
+            if (cues.length === 0) {
+                console.error(`Failed to load VTT for lesson ${lessonId}`);
+                if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId}`;
+                return;
+            }
+            
+            vttCues = cues;
+            currentCueIndex = 0;
+            
+            // Use first sentence from VTT as reference
+            referenceText = vttCues[0].text;
+            updateNavigationButtons();
+            updateSentenceInfo();
+            
+            // Set up audio player with direct audio URL
+            const audioUrl = `${CONFIG.audioBaseUrl}/A1L${lessonId.toString().padStart(2, '0')}.mp3`;
+            if (audioPlayer) {
+                audioPlayer.src = audioUrl;
+                
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    if (playBtn) {
+                        playBtn.textContent = '';
+                        playBtn.classList.remove('playing');
+                        playBtn.disabled = false;
+                    }
+                    updateProgress();
+                    console.log('Audio metadata loaded successfully');
+                }, { once: true });
+                
+                audioPlayer.addEventListener('error', (e) => {
+                    if (playBtn) {
+                        playBtn.textContent = '❌';
+                        playBtn.disabled = true;
+                    }
+                    console.error('Failed to load audio:', audioUrl, e);
+                }, { once: true });
+            }
+            
+            if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
             if (userInput) userInput.value = '';
             if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
             if (statsSection) statsSection.style.display = 'none';
             if (checkBtn) checkBtn.style.display = 'inline-block';
             
-            // Reset timer and stats
+            // Reset all session data for new lesson
             sentenceStartTime = null;
             totalSessionTime = 0;
             hasStartedTyping = false;
@@ -1193,100 +1289,4 @@
         }
     </script>
 </body>
-</html>Text;
-            }
-        }
-
-        // Handle time updates to auto-pause at sentence end
-        function handleTimeUpdate() {
-            updateProgress();
-            
-            if (vttCues.length > 0 && isPlaying) {
-                const currentTime = audioPlayer.currentTime;
-                const currentCue = vttCues[currentCueIndex];
-                
-                if (currentCue && currentTime >= currentCue.end) {
-                    audioPlayer.pause();
-                }
-            }
-        }
-
-        // Load lesson
-        async function loadLesson(lessonId) {
-            console.log(`Loading lesson ${lessonId}...`);
-// Load lesson JSON data first
-try {
-    const jsonUrl = `${CONFIG.lessonsBaseUrl}/${lessonId}.json`;
-    console.log('Loading lesson JSON from:', jsonUrl);
-    
-    const jsonResponse = await fetch(jsonUrl);
-    if (!jsonResponse.ok) {
-        throw new Error(`Lesson JSON not found: ${jsonResponse.status}`);
-    }
-    
-    const lessonData = await jsonResponse.json();
-    console.log('Lesson data loaded:', lessonData);
-    
-} catch (error) {
-    console.error('Failed to load lesson JSON:', error);
-    if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId} data`;
-}
-            
-            if (lessonInfo) lessonInfo.textContent = 'Loading lesson...';
-            if (playBtn) {
-                playBtn.textContent = '⏳';
-                playBtn.disabled = true;
-            }
-            
-            // Load VTT file only
-            const cues = await loadVTTFile(lessonId);
-            
-            if (cues.length === 0) {
-                console.error(`Failed to load VTT for lesson ${lessonId}`);
-                if (lessonInfo) lessonInfo.textContent = `Failed to load lesson ${lessonId}`;
-                return;
-            }
-            
-            vttCues = cues;
-            currentCueIndex = 0;
-            
-            // Use first sentence from VTT as reference
-            referenceText = vttCues[0].text;
-            updateNavigationButtons();
-            updateSentenceInfo();
-            
-            // Set up audio player with direct audio URL
-            const audioUrl = `${CONFIG.audioBaseUrl}/A1L${lessonId.toString().padStart(2, '0')}.mp3`;
-            if (audioPlayer) {
-                audioPlayer.src = audioUrl;
-                
-                audioPlayer.addEventListener('loadedmetadata', () => {
-                    if (playBtn) {
-                        playBtn.textContent = '';
-                        playBtn.classList.remove('playing');
-                        playBtn.disabled = false;
-                    }
-                    updateProgress();
-                    console.log('Audio metadata loaded successfully');
-                }, { once: true });
-                
-                audioPlayer.addEventListener('error', (e) => {
-                    if (playBtn) {
-                        playBtn.textContent = '❌';
-                        playBtn.disabled = true;
-                    }
-                    console.error('Failed to load audio:', audioUrl, e);
-                }, { once: true });
-            }
-            
-            // Update lesson info
-            if (lessonInfo) {
-                lessonInfo.innerHTML = `
-                    <strong>German Dictation - Lesson ${lessonId}</strong><br>
-                    <span style="color: #888;">
-                        ${vttCues.length} sentences
-                    </span>
-                `;
-            }
-            
-            if (referenceTextDiv) referenceTextDiv.textContent = reference
+</html>
