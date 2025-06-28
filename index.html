@@ -538,7 +538,7 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, ignoreCaseBtn, hintBtn, speedBtn;
+        let endDictationBtn, resetBtn, ignoreCaseBtn, hintBtn, speedBtn;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
@@ -554,7 +554,7 @@
             accuracyPercent = document.getElementById('accuracyPercent');
             correctWords = document.getElementById('correctWords');
             wrongWords = document.getElementById('wrongWords');
-            checkBtn = document.getElementById('checkBtn');
+            endDictationBtn = document.getElementById('endDictationBtn');
             ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
             speedBtn = document.getElementById('speedBtn');
             hintBtn = document.getElementById('hintBtn');
@@ -569,7 +569,7 @@
                 userInput.addEventListener('input', handleUserInput);
                 userInput.addEventListener('keydown', handleKeyDown);
             }
-            if (checkBtn) checkBtn.addEventListener('click', showFinalResult);
+            if (endDictationBtn) endDictationBtn.addEventListener('click', showFinalResult);
             if (ignoreCaseBtn) {
                 ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
                 // Set initial state
@@ -943,7 +943,6 @@
             hasStartedTyping = false;
             
             if (statsSection) statsSection.style.display = 'none';
-            if (checkBtn) checkBtn.style.display = 'inline-block';
             
             setTimeout(sendHeightToParent, 100);
         }
@@ -1041,7 +1040,6 @@
             if (userInput) userInput.value = '';
             if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
             if (statsSection) statsSection.style.display = 'none';
-            if (checkBtn) checkBtn.style.display = 'inline-block';
             
             sentenceStartTime = null;
             totalSessionTime = 0;
@@ -1363,8 +1361,7 @@
             }
             
             if (statsSection) statsSection.style.display = 'grid';
-            if (checkBtn) checkBtn.style.display = 'none';
-            
+                        
             setTimeout(sendHeightToParent, 100);
         }
         
