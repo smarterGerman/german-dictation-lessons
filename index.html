@@ -500,7 +500,7 @@
                         <div class="loading-spinner" id="loadingSpinner"></div>
                     </button>
                     <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
-                    <button class="toggle-btn" id="ignoreCaseBtn" title="Ignore Capitalization">Aa</button>
+                    <button class="toggle-btn" id="ignoreCaseBtn" title="Capitalization checking OFF">Aa</button>
                     <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
                     <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
                     <span id="timeDisplay">0:00 / 0:00</span>
@@ -557,7 +557,7 @@
         let sentenceStartTime = null;
         let totalSessionTime = 0;
         let sessionResults = [];
-        let ignoreCaseActive = true; // Default state
+        let ignoreCaseActive = true; // Default: ignore case (white button = checking OFF)
         let currentSpeed = 1.0; // Default speed (100%)
 
         // FIX: Move initialPlaceholderText to global scope
@@ -608,10 +608,9 @@
             if (endDictationBtn) endDictationBtn.addEventListener('click', showFinalResult);
             if (ignoreCaseBtn) {
                 ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
-                // Set initial state
-                if (ignoreCaseActive) {
-                    ignoreCaseBtn.classList.add('active');
-                }
+                // Start white = capitalization checking OFF (ignore case)
+                ignoreCaseBtn.classList.remove('active');
+                ignoreCaseBtn.title = "Capitalization checking OFF";
             }
             if (speedBtn) {
                 speedBtn.addEventListener('click', toggleSpeed);
@@ -683,9 +682,13 @@
             ignoreCaseActive = !ignoreCaseActive;
             if (ignoreCaseBtn) {
                 if (ignoreCaseActive) {
-                    ignoreCaseBtn.classList.add('active');
-                } else {
+                    // White button = capitalization checking OFF (ignore case)
                     ignoreCaseBtn.classList.remove('active');
+                    ignoreCaseBtn.title = "Capitalization checking OFF";
+                } else {
+                    // Purple button = capitalization checking ON (case matters)
+                    ignoreCaseBtn.classList.add('active');
+                    ignoreCaseBtn.title = "Capitalization checking ON";
                 }
             }
             updateLiveFeedback();
