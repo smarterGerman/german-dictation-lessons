@@ -597,6 +597,8 @@
             loadAllLessons().then(() => {
                 loadLesson(lessonId);
             });
+            window.focus();
+            console.log('Main window load event completed, focus attempted.'); // For debugging
             setTimeout(sendHeightToParent, 500);
         });
 
