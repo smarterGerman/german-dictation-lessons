@@ -659,70 +659,57 @@
         }
 
         function handleGlobalKeyDown(e) {
-            // Check if user is typing in input field
-            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
-                return; // Don't interfere with typing
-            }
-            
-            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-            const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+    // Shortcuts always enabled, even while typing
 
-            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+    // Hint shortcut: Shift + Ctrl/Cmd + ß (German), / (US), , (French)
+    if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'ß') {
+        e.preventDefault();
+        showHint();
+        if (hintBtn) hintBtn.focus();
+        return;
+    }
+    if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        showHint();
+        if (hintBtn) hintBtn.focus();
+        return;
+    }
+    if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === ',') {
+        e.preventDefault();
+        showHint();
+        if (hintBtn) hintBtn.focus();
+        return;
+    }
 
-// German: Shift+Ctrl/Cmd+ß
-if (e.shiftKey && ctrlKey && e.key === 'ß') {
-    e.preventDefault();
-    showHint();
-    if (hintBtn) hintBtn.focus();
-    return;
-}
+    // Play/Pause (start dictation): Shift + Ctrl/Cmd + Enter
+    if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        togglePlayback();
+        return;
+    }
 
-// US/Intl: Shift+Ctrl/Cmd+/
-if (e.shiftKey && ctrlKey && e.key === '/') {
-    e.preventDefault();
-    showHint();
-    if (hintBtn) hintBtn.focus();
-    return;
-}
-
-// French: Shift+Ctrl/Cmd+,
-if (e.shiftKey && ctrlKey && e.key === ',') {
-    e.preventDefault();
-    showHint();
-    if (hintBtn) hintBtn.focus();
-    return;
-}
-            
-            // Shift + Cmd/Ctrl + Enter = Play/Pause toggle and Start dictation
-            if (e.shiftKey && ctrlKey && e.key === 'Enter') {
+    // Sentence navigation: Shift + Ctrl/Cmd + Arrow keys
+    if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
+        switch (e.key) {
+            case 'ArrowLeft':
                 e.preventDefault();
-                togglePlayback();
-                return;
-            }
-            
-            // Shift + Cmd/Ctrl + Arrow keys
-            if (e.shiftKey && ctrlKey) {
-                switch(e.key) {
-                    case 'ArrowLeft':
-                        e.preventDefault();
-                        goToPreviousSentence();
-                        break;
-                    case 'ArrowRight':
-                        e.preventDefault();
-                        goToNextSentence();
-                        break;
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        playCurrentSentence(); // Repeat current sentence
-                        break;
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        toggleSpeed(); // Speed toggle
-                        break;
-                }
-            }
+                goToPreviousSentence();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                goToNextSentence();
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                playCurrentSentence();
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                toggleSpeed();
+                break;
         }
+    }
+}
 
         function handleKeyDown(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
