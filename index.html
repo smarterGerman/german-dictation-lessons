@@ -369,7 +369,6 @@
             <!-- AUDIO SECTION -->
             <div class="audio-section">
                 <div id="lessonInfo" style="margin-bottom:10px;font-size:14px;color:#6b7280;text-align:center;">Loading lesson...</div>
-                <div class="sentence-info" id="sentenceInfo">Sentence 1 of 1</div>
                 <div class="audio-controls">
                     <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
                     <button class="play-btn" id="playBtn"></button>
@@ -514,6 +513,33 @@
             });
             setTimeout(sendHeightToParent, 500);
         });
+
+        function toggleSpeed() {
+            // Remove all speed classes first
+            if (speedBtn) {
+                speedBtn.classList.remove('speed-100', 'speed-75', 'speed-50');
+            }
+            
+            // Cycle through speeds: 100% → 75% → 50% → 100%
+            if (currentSpeed === 1.0) {
+                currentSpeed = 0.75;
+                speedBtn.textContent = '75';
+                speedBtn.classList.add('speed-75');
+            } else if (currentSpeed === 0.75) {
+                currentSpeed = 0.5;
+                speedBtn.textContent = '50';
+                speedBtn.classList.add('speed-50');
+            } else {
+                currentSpeed = 1.0;
+                speedBtn.textContent = '100';
+                speedBtn.classList.add('speed-100');
+            }
+            
+            // Apply speed to audio player
+            if (audioPlayer) {
+                audioPlayer.playbackRate = currentSpeed;
+            }
+        }
 
         function toggleSpeed() {
             // Remove all speed classes first
