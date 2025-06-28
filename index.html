@@ -294,6 +294,7 @@
         .char-missing{color:#d97706;font-style:italic;font-weight:500;} 
         .char-extra{color:#2563eb;font-weight:500;} 
         .char-word-boundary,.char-char-space{color:#9ca3af;}
+        .char-hint{color:#8b5cf6;font-weight:600;background:rgba(139,92,246,0.1);padding:0 1px;}
 
         /* ----- OPTIONS ----------------------------------------------------- */
         .options { 
@@ -475,6 +476,7 @@
         let ignoreCaseActive = true; // Default state
         let currentSpeed = 1.0; // Default speed (100%)
         let helpUsedCount = 0; // Track how many times help was used
+        let helpHints = []; // Store revealed letters for visual hints
 
         const CONFIG = {
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
@@ -881,8 +883,9 @@
             if (userInput) userInput.value = '';
             updateLiveFeedback();
             
-            // Reset help button when moving to new sentence
+            // Reset help button and hints when moving to new sentence
             helpUsedCount = 0;
+            helpHints = [];
             if (helpBtn) {
                 helpBtn.disabled = false;
                 helpBtn.textContent = 'Help';
@@ -1175,15 +1178,28 @@
             const userText = userInput.value;
             
             if (userText.trim() === '') {
-                liveFeedback.innerHTML = 'Live Feedback';
+                // Show hints even when no user input
+                if (helpHints.length > 0) {
+                    showHintsInFeedback();
+                } else {
+                    liveFeedback.innerHTML = 'Live Feedback';
+                }
                 return;
             }
             
             const comparison = compareTexts(referenceText, userText);
             
             let feedbackHTML = '';
+            let charIndex = 0;
+            
             comparison.chars.forEach(item => {
                 let char = item.char;
+                let status = item.status;
+                
+                // Check if this character should be shown as a hint
+                if (status !== 'correct' && shouldShowHint(charIndex, char)) {
+                    status = 'hint';
+                }
                 
                 if (char === ' ') {
                     if (item.status === 'word-boundary') {
@@ -1197,8 +1213,60 @@
                     char = '<br>';
                 }
                 
-                feedbackHTML += `<span class="char-${item.status}">${char}</span>`;
+                feedbackHTML += `<span class="char-${status}">${char}</span>`;
+                charIndex++;
             });
+            
+            liveFeedback.innerHTML = feedbackHTML;
+        }
+
+        function shouldShowHint(charIndex, char) {
+            // Logic to determine if this character position should show as a hint
+            // This is a simplified version - you might want to make this more sophisticated
+            const targetWords = referenceText.split(/\s+/).filter(w => w.length > 0);
+            let currentCharIndex = 0;
+            
+            for (let wordIndex = 0; wordIndex < targetWords.length; wordIndex++) {
+                const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
+                const wordKey = `word_${wordIndex}`;
+                
+                for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
+                    if (currentCharIndex === charIndex) {
+                        return helpHints[wordKey] && helpHints[wordKey].includes(letterIndex);
+                    }
+                    currentCharIndex++;
+                }
+                currentCharIndex++; // Space between words
+            }
+            
+            return false;
+        }
+
+        function showHintsInFeedback() {
+            if (!referenceText) return;
+            
+            const targetWords = referenceText.split(/\s+/).filter(w => w.length > 0);
+            let feedbackHTML = '';
+            
+            for (let wordIndex = 0; wordIndex < targetWords.length; wordIndex++) {
+                if (wordIndex > 0) {
+                    feedbackHTML += '&nbsp;&nbsp;&nbsp;';
+                }
+                
+                const targetWord = targetWords[wordIndex].replace(/[.,!?;:""''()]/g, '');
+                const wordKey = `word_${wordIndex}`;
+                
+                for (let letterIndex = 0; letterIndex < targetWord.length; letterIndex++) {
+                    const char = targetWord[letterIndex];
+                    const isHinted = helpHints[wordKey] && helpHints[wordKey].includes(letterIndex);
+                    
+                    if (isHinted) {
+                        feedbackHTML += `<span class="char-hint">${char}</span>`;
+                    } else {
+                        feedbackHTML += `<span class="char-missing">_</span>`;
+                    }
+                }
+            }
             
             liveFeedback.innerHTML = feedbackHTML;
         }
@@ -1328,7 +1396,7 @@
                 // Disable help button and show it's maxed out
                 if (helpBtn) {
                     helpBtn.disabled = true;
-                    helpBtn.textContent = 'No More';
+                    helpBtn.textContent = '✕';
                     helpBtn.style.opacity = '0.5';
                 }
                 return;
@@ -1390,7 +1458,7 @@
                     helpBtn.textContent = `Help (${remaining})`;
                 } else {
                     helpBtn.disabled = true;
-                    helpBtn.textContent = 'No More';
+                    helpBtn.textContent = '🚫';
                     helpBtn.style.opacity = '0.5';
                 }
             }
@@ -1402,8 +1470,9 @@
             if (statsSection) statsSection.style.display = 'none';
             if (checkBtn) checkBtn.style.display = 'inline-block';
             
-            // Reset help button
+            // Reset help button and hints
             helpUsedCount = 0;
+            helpHints = [];
             if (helpBtn) {
                 helpBtn.disabled = false;
                 helpBtn.textContent = 'Help';
