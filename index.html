@@ -404,7 +404,7 @@
         // Stats tracking
         let sessionResults = [];
 
-        // Configuration
+        // Configuration with lessons folder support
         const CONFIG = {
             audioBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/audio',
             lessonsBaseUrl: 'https://raw.githubusercontent.com/smarterGerman/german-dictation-lessons/main/lessons'
@@ -418,6 +418,8 @@
 
         // Initialize when page loads
         window.addEventListener('load', function() {
+            console.log('App initializing...');
+            
             // Get DOM elements
             audioPlayer = document.getElementById('audioPlayer');
             playBtn = document.getElementById('playBtn');
@@ -472,6 +474,7 @@
 
             // Load first lesson
             const lessonId = getLessonIdFromUrl() || 1;
+            console.log('Loading lesson:', lessonId);
             loadLesson(lessonId);
 
             // Send height after content loads
@@ -628,10 +631,10 @@
                 }
                 
                 const vttText = await response.text();
-                console.log('VTT content:', vttText);
+                console.log('VTT content loaded, length:', vttText.length);
                 
                 const cues = parseVTT(vttText);
-                console.log('Parsed cues:', cues);
+                console.log('Parsed cues:', cues.length);
                 
                 return cues;
             } catch (error) {
@@ -761,7 +764,7 @@
             }
         }
 
-        // Load lesson
+        // Load lesson with both JSON and VTT data
         async function loadLesson(lessonId) {
             console.log(`Loading lesson ${lessonId}...`);
             
@@ -851,7 +854,7 @@
             hasStartedTyping = false;
             sessionResults = [];
             
-            console.log('VTT cues loaded:', vttCues);
+            console.log('Lesson loaded successfully. VTT cues:', vttCues.length);
             
             // Update iframe height after loading
             setTimeout(sendHeightToParent, 500);
@@ -860,9 +863,6 @@
         // Enhanced sequence alignment with missing word placeholders
         function compareTexts(reference, userText) {
             userText = convertGermanChars(userText);
-            console.log('\n=== COMPARE TEXTS DEBUG ===');
-            console.log('Reference:', reference);
-            console.log('User text:', userText);
             
             const ignoreCase = ignoreCaseToggle ? ignoreCaseToggle.checked : true;
             const ignorePunctuation = true; // Always ignore punctuation now
@@ -883,20 +883,12 @@
             // Handle multiple spaces in user input - normalize to single spaces
             userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
             
-            console.log('Normalized reference:', refNormalized);
-            console.log('Normalized user:', userNormalized);
-            
             // Get word arrays for smart alignment
             const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
             const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
             
-            console.log('Reference words:', refWords);
-            console.log('User words:', userWords);
-            
             // Perform sequence alignment to handle omissions/insertions
             const alignment = alignSequencesWithGaps(refWords, userWords);
-            
-            console.log('Alignment result:', alignment);
             
             // Build result with character-level feedback including placeholders
             const result = [];
@@ -906,28 +898,22 @@
             let extra = 0;
             let missing = 0;
             
-            console.log('\n=== PROCESSING ALIGNMENT ===');
             // Process aligned sequences with proper word boundaries
             for (let i = 0; i < alignment.length; i++) {
                 const item = alignment[i];
-                console.log(`Processing item ${i}:`, item);
                 
                 // Add word boundary space before each item except the first
                 if (i > 0) {
-                    console.log('  -> Adding word boundary space');
                     result.push({ char: ' ', status: 'word-boundary' });
                 }
                 
                 if (item.type === 'match') {
                     // Correct word in correct position
-                    console.log('  -> Processing MATCH:', item.userWord);
                     for (let char of item.userWord) {
                         result.push({ char, status: 'correct' });
                         correct++;
                     }
                 } else if (item.type === 'substitute') {
-                   console.log('  -> Processing SUBSTITUTE:', item.userWord);
-
                     // Character-level diff for missing prefix OR suffix
                     const ref = item.refWord;
                     const user = item.userWord;
@@ -978,14 +964,12 @@
 
                 } else if (item.type === 'insert') {
                     // Extra word in user input
-                    console.log('  -> Processing INSERT:', item.userWord);
                     for (let char of item.userWord) {
                         result.push({ char, status: 'extra' });
                         extra++;
                     }
                 } else if (item.type === 'delete') {
                     // Missing word - show as individual underscores with spaces between them
-                    console.log('  -> Processing DELETE (missing word):', item.refWord);
                     const wordLength = item.refWord.length;
                     
                     // Create individual underscores with spaces for each character
@@ -994,18 +978,11 @@
                         if (k > 0) {
                             result.push({ char: ' ', status: 'char-space' });
                         }
-                        console.log('    -> Adding spaced underscore for missing character');
                         result.push({ char: '_', status: 'missing' });
                         missing++;
                     }
                 }
             }
-            
-            console.log('\n=== FINAL RESULT ===');
-            console.log('Result array length:', result.length);
-            console.log('Result preview:', result.slice(0, 20));
-            console.log('Stats:', { correct, wrongPosition, wrong, extra, missing });
-            console.log('===================\n');
             
             return {
                 chars: result,
@@ -1218,13 +1195,6 @@
                 totalCorrectWords += result.stats.correctWords;
                 totalWrongWords += result.stats.wrongWords;
                 totalWords += result.stats.totalWords;
-            });
-            
-            console.log('Final calculation:', {
-                totalCorrectWords,
-                totalWrongWords,
-                totalWords,
-                sessionResults
             });
             
             // Calculate accuracy
