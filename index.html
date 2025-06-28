@@ -5,475 +5,474 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>German Dictation Tool</title>
     <style>
-    /* General Body Styles */
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background: linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%); /* Light blue to light purple */
-        color: #333;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start; /* Align content to the top */
-        box-sizing: border-box; /* Include padding in element's total width and height */
-        transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Dark Theme */
-    body.dark-theme {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); /* Dark gradient */
-        color: #f7fafc; /* Light text */
-    }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fdfdfd;
+            color: #1f2937;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    /* Main Container for the entire tool */
-    .container {
-        background-color: #fff;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        max-width: 700px;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 20px; /* Space between container and anything below */
-        box-sizing: border-box;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    body.dark-theme .container {
-        background-color: #2d3748;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    }
-
-    h1 {
-        color: #6a0dad; /* Purple */
-        margin-bottom: 25px;
-        font-size: 2em;
-    }
-
-    body.dark-theme h1 {
-        color: #9f7aea; /* Lighter purple for dark theme */
-    }
-
-    /* Lesson Title */
-    #lessonTitle {
-        font-size: 1.4em;
-        font-weight: 600;
-        margin-top: 0;
-        margin-bottom: 15px;
-        color: #4a5568;
-    }
-
-    body.dark-theme #lessonTitle {
-        color: #cbd5e0;
-    }
-
-    /* Audio Section */
-    .audio-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 25px;
-        padding: 20px;
-        background: linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%); /* Same as body for blending */
-        border-radius: 10px;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    body.dark-theme .audio-section {
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-    }
-
-    .audio-controls {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        width: 100%;
-        justify-content: center;
-        margin-top: 10px; /* Space above controls */
-    }
-
-    .toggle-btn {
-        background-color: #8b5cf6; /* Vibrant purple */
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 1.8em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        flex-shrink: 0; /* Prevent shrinking */
-        line-height: 1; /* Adjust for icon vertical alignment */
-        padding: 0; /* Remove default padding */
-    }
-
-    .toggle-btn:hover:not(:disabled) {
-        background-color: #7c3aed; /* Darker purple on hover */
-        transform: translateY(-2px);
-    }
-
-    .toggle-btn:active:not(:disabled) {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .toggle-btn:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-        box-shadow: none;
-        opacity: 0.7;
-    }
-
-    .toggle-btn.playing {
-        background-color: #ef4444; /* Red for pause */
-    }
-
-    .toggle-btn.playing:hover:not(:disabled) {
-        background-color: #dc2626;
-    }
-
-    /* Progress bar container (the track) */
-    .progress-container {
-        flex-grow: 1; /* Allows it to take up available space in the flex container */
-        max-width: 320px; /* Limits its maximum width on large screens */
-        height: 8px;
-        background: rgba(0, 0, 0, 0.3); /* Darker, more visible background for the track */
-        border-radius: 20px;
-        overflow: hidden; /* Ensures inner bar doesn't overflow corners */
-        margin: 0 10px; /* Add horizontal margin to separate from buttons/time */
-        cursor: pointer; /* Indicate it's clickable */
-    }
-
-    body.dark-theme .progress-container {
-        background: rgba(255, 255, 255, 0.2); /* Lighter background for dark theme */
-    }
-
-    /* Progress bar (the filled part) */
-    .progress-bar {
-        height: 100%;
-        width: 0%; /* Initial state */
-        background: linear-gradient(90deg, #a855f7, #ec4899); /* Vibrant gradient */
-        border-radius: 20px;
-        transition: width 0.3s ease; /* Smooth transition for width changes */
-    }
-
-    /* Time Display */
-    #timeDisplay {
-        font-family: 'SF Mono', 'Consolas', monospace; /* Monospaced font for time */
-        font-size: 0.9em;
-        color: #555;
-        min-width: 90px; /* Ensure space for time */
-        text-align: center;
-    }
-
-    body.dark-theme #timeDisplay {
-        color: #a0aec0;
-    }
-
-    /* Loading Spinner */
-    #loadingSpinner {
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #3498db;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        animation: spin 1s linear infinite;
-        margin-left: 10px; /* Space from button */
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .hidden {
-        display: none !important; /* Forces element to be hidden */
-    }
-
-    /* Text Input Area */
-    .input-area {
-        margin-bottom: 25px;
-        width: 100%;
-    }
-
-    #currentSentence {
-        background-color: #f0f4f8;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-        font-size: 1.1em;
-        min-height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: #4a5568;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    body.dark-theme #currentSentence {
-        background-color: #1a202c;
-        color: #cbd5e0;
-    }
-
-    .input-field {
-        width: calc(100% - 20px); /* Account for padding */
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 1em;
-        box-sizing: border-box;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .input-field:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        outline: none;
-    }
-
-    body.dark-theme .input-field {
-        background-color: #4a5568;
-        border-color: #616e7f;
-        color: #f7fafc;
-    }
-
-    .live-feedback {
-        margin-top: 15px;
-        padding: 10px;
-        background-color: #e6ffed; /* Light green */
-        border-left: 5px solid #48bb78; /* Green border */
-        border-radius: 5px;
-        text-align: left;
-        font-size: 0.95em;
-        line-height: 1.5;
-        color: #2d3748;
-    }
-
-    body.dark-theme .live-feedback {
-        background-color: #2d3748;
-        border-color: #48bb78;
-        color: #e2e8f0;
-    }
-
-    .correct-word {
-        color: #48bb78; /* Green */
-        font-weight: bold;
-    }
-
-    .wrong-word {
-        color: #e53e3e; /* Red */
-        font-weight: bold;
-        text-decoration: underline;
-    }
-
-    /* Lesson Selection */
-    .lesson-selector {
-        margin-bottom: 20px;
-    }
-
-    label {
-        font-weight: 600;
-        margin-right: 10px;
-        color: #4a5568;
-    }
-
-    body.dark-theme label {
-        color: #cbd5e0;
-    }
-
-    #lessonSelect {
-        padding: 8px 12px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 1em;
-        background-color: #fff;
-        cursor: pointer;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    #lessonSelect:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        outline: none;
-    }
-
-    body.dark-theme #lessonSelect {
-        background-color: #4a5568;
-        border-color: #616e7f;
-        color: #f7fafc;
-    }
-
-    /* Modal Styles */
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 100; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        justify-content: center; /* Center content horizontally */
-        align-items: center; /* Center content vertically */
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto; /* Auto margin for centering */
-        padding: 30px;
-        border: 1px solid #888;
-        border-radius: 10px;
-        width: 80%; /* Could be responsive */
-        max-width: 500px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        position: relative; /* For close button positioning */
-        text-align: left;
-    }
-
-    body.dark-theme .modal-content {
-        background-color: #2d3748;
-        border-color: #4a5568;
-        color: #f7fafc;
-    }
-
-    .close-button {
-        color: #aaa;
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .close-button:hover,
-    .close-button:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    body.dark-theme .close-button {
-        color: #f7fafc;
-    }
-
-    body.dark-theme .close-button:hover,
-    body.dark-theme .close-button:focus {
-        color: #cbd5e0;
-    }
-
-    /* Settings specific styles */
-    .settings-group {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
-    }
-
-    body.dark-theme .settings-group {
-        border-color: #4a5568;
-    }
-
-    .settings-group:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .settings-group h3 {
-        margin-top: 0;
-        color: #6a0dad;
-        font-size: 1.2em;
-        margin-bottom: 15px;
-    }
-
-    body.dark-theme .settings-group h3 {
-        color: #9f7aea;
-    }
-
-    .settings-option {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .settings-option label {
-        flex-grow: 1;
-        margin-right: 15px;
-    }
-
-    .settings-option input[type="checkbox"] {
-        transform: scale(1.2); /* Make checkbox slightly larger */
-        margin-right: 5px;
-    }
-
-    /* Stats Display */
-    .stats-summary {
-        margin-bottom: 20px;
-        text-align: center;
-        font-size: 1.1em;
-    }
-
-    .stats-summary p {
-        margin: 5px 0;
-    }
-
-    .mistakes-list {
-        list-style: none;
-        padding: 0;
-        text-align: left;
-    }
-
-    .mistakes-list li {
-        background-color: #fff5f5;
-        border: 1px solid #feb2b2;
-        border-radius: 5px;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-    }
-
-    body.dark-theme .mistakes-list li {
-        background-color: #4a5568;
-        border-color: #feb2b2;
-    }
-
-    /* Responsive adjustments */
-    @media(max-width:768px){
-        body { padding: 10px; }
         .container {
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 { font-size: 1.8em; margin-bottom: 20px; }
-        .audio-section{ padding: 15px; gap: 10px; }
-        .audio-controls {
-            flex-wrap: wrap; /* Allows items to wrap to next line */
-            justify-content: center; /* Centers items when they wrap */
-            padding: 0 5px; /* Small horizontal padding for controls */
-            gap: 10px; /* Adjust gap for wrapped items */
-        }
-        .toggle-btn { width: 45px; height: 45px; font-size: 1.6em; }
-
-        /* Hide progress bar on mobile */
-        .progress-container {
-            display: none; /* This hides the progress bar ONLY on screens up to 768px wide */
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            background: transparent;
         }
 
-        #timeDisplay { font-size: 0.85em; min-width: 80px; }
-        .input-field, .live-feedback{ padding: 12px; font-size: 0.95em; }
-        #currentSentence { font-size: 1em; min-height: 35px; padding: 12px; }
-        .modal-content {
-            width: 95%; /* Make modal wider on small screens */
-            padding: 20px;
+        .content { 
+            padding: 0; 
+            width: 100%; 
         }
+
+        /* ----- AUDIO SECTION ---------------------------------------------- */
+        .audio-section {
+            padding: 20px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            color: #374151;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            overflow: visible !important;
+        }
+        
+        .sentence-info { 
+            margin-bottom: 24px; 
+            font-size: 15px; 
+            color: #6b7280; 
+            font-weight: 500; 
+        }
+
+        .audio-controls { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 28px; 
+            flex-wrap: nowrap; 
+            overflow: visible !important;
+
+        }
+
+        .loading-spinner {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            display: none; /* FIX: Start hidden, control via JS */
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .play-btn .loading-spinner {
+            display: none;
+        }
+
+        .play-btn.loading .loading-spinner {
+            display: block;
+        }
+
+        .play-btn::before { 
+            content:''; 
+            position:absolute; 
+            left:50%; 
+            top:50%; 
+            transform:translate(-50%,-50%);
+            z-index: 2;
+        }
+
+        .nav-btn,
+        .play-btn,
+        .toggle-btn { 
+            border: none; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: all .3s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            outline: none;
+            position: relative;
+        }
+
+        .nav-btn,
+        .toggle-btn {
+            width: 52px; 
+            height: 52px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            font-size: 18px;
+            color: #6b7280;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        
+        .nav-btn:hover:not(:disabled),
+        .toggle-btn:hover { 
+            transform: translateY(-2px); 
+            background: rgba(255, 255, 255, 1);
+            color: #374151;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+        
+        .nav-btn:disabled { 
+            opacity:0.3; 
+            cursor:not-allowed; 
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3), 0 0 0 3px rgba(168, 85, 247, 0.4), 0 0 20px rgba(168, 85, 247, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .toggle-btn.active:hover {
+            background: linear-gradient(135deg, #9333ea 0%, #db2777 100%);
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4), 0 0 0 3px rgba(168, 85, 247, 0.5), 0 0 25px rgba(168, 85, 247, 0.7);
+            transform: translateY(-2px);
+        }
+
+        /* Speed button colors - Traffic Light */
+        .toggle-btn.speed-100 {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+
+        .toggle-btn.speed-100:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+        }
+
+        .toggle-btn.speed-75 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+        }
+
+        .toggle-btn.speed-75:hover {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4);
+        }
+
+        .toggle-btn.speed-50 {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+
+        .toggle-btn.speed-50:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Hint tooltip styles */
+        .hint-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: normal;
+            max-width: 250px; 
+            text-align: left;
+            word-wrap: break-word; 
+            z-index: 1000;
+            margin-top: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .hint-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: #1f2937;
+        }
+
+        .hint-tooltip.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .play-btn {
+            position: relative;
+            width: 72px; 
+            height: 72px;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+            font-size: 28px;
+            color: white;
+        }
+        
+        .play-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 32px rgba(168, 85, 247, 0.4);
+        }
+        
+        .play-btn:disabled{
+            opacity:.5;
+            cursor:not-allowed;
+        }
+        
+        .play-btn::before { 
+            content:''; 
+            position:absolute; 
+            left:50%; 
+            top:50%; 
+            transform:translate(-50%,-50%); 
+        }
+        
+        .play-btn.playing::before { 
+            width:4px;
+            height:20px;
+            background:white;
+            box-shadow:8px 0 0 white; 
+        }
+        
+        .play-btn:not(.playing)::before { 
+            border-left:12px solid white; 
+            border-top:8px solid transparent; 
+            border-bottom:8px solid transparent; 
+        }
+
+        #timeDisplay { 
+            min-width:110px; 
+            font-size:16px; 
+            color:#6b7280; 
+            font-weight:500; 
+            margin-left: 16px; 
+            margin-right: 16px;
+        }
+        
+        .progress-container { 
+             flex-grow: 1; /* Allows it to take up available space in the flex container */
+    max-width: 320px; /* Limits its maximum width to avoid being too wide on large screens */
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3); /* Changed to a darker, more visible background */
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 0 10px; /* Add horizontal margin to separate from buttons/time */ 
+        }
+        
+        .progress-bar { 
+            height:100%; 
+            width:0%; 
+            background:linear-gradient(90deg, #a855f7, #ec4899); 
+            border-radius:20px; 
+            transition:width .3s ease; 
+        }
+
+        /* ----- INPUT / FEEDBACK ------------------------------------------- */
+        .input-area { 
+            display:flex; 
+            flex-direction:column; 
+            gap:20px; 
+            padding: 0; 
+        }
+        
+        .input-field {
+            width:100%; 
+            min-height:100px; 
+            padding:18px;
+            background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%); 
+            color:#374151;
+            border:2px solid #e879f9; 
+            border-radius: 16px;
+            font-size:16px; 
+            line-height:1.5; 
+            resize:vertical;
+            transition:all .3s ease;
+            box-shadow: 0 4px 16px rgba(232, 121, 249, 0.1);
+        }
+        
+        .input-field:focus { 
+            border-color:#c084fc; 
+            box-shadow:0 0 0 4px rgba(192, 132, 252, 0.15), 0 4px 16px rgba(232, 121, 249, 0.2); 
+            outline:none; 
+            transform: translateY(-1px);
+        }
+
+        .input-field::placeholder {
+            color: #9CA3AF; /* A lighter grey color */
+            opacity: 1;    /* Ensures full opacity across browsers (Firefox defaults lower) */
+            transition: color 0.3s ease; /* Optional: smooth transition if placeholder changes */
+}
+        
+        .live-feedback {
+            min-height:100px; 
+            padding:18px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #fef3ff 100%); 
+            border: none; 
+            border-radius: 16px;
+            font-size:28px; 
+            line-height:1.5; 
+            white-space:pre-wrap; 
+            word-break:break-word;
+            color: #9ca3af;
+            box-shadow: 0 4px 16px rgba(167, 139, 250, 0.1);
+        }
+
+        /* feedback colors */
+        .char-correct{color:#059669;font-weight:500;} 
+        .char-wrong-position{color:#d97706;font-weight:500;} 
+        .char-wrong{color:#dc2626;text-decoration:underline;font-weight:500;} 
+        .char-missing{color:#d97706;font-style:italic;font-weight:500;} 
+        .char-extra{color:#2563eb;font-weight:500;} 
+        .char-word-boundary,.char-char-space{color:#9ca3af;}
+
+        /* ----- OPTIONS ----------------------------------------------------- */
+        .options { 
+            display: none;
+        }
+
+        /* ----- STATS & CONTROLS ------------------------------------------- */
+        .stats-section{
+            margin:32px 0 0 0;
+            padding-top:24px;
+            border-top:1px solid #f3f4f6;
+        }
+        
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+            gap:16px;
+            margin-bottom:24px;
+        }
+        
+        .stat-item{
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border:none;
+            border-radius:16px;
+            padding:24px;
+            text-align:center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: all .3s ease;
+        }
+        
+        .stat-item:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-value{
+            font-size:36px;
+            font-weight:700;
+            color:#e879f9;
+            margin-bottom:8px;
+            display:block;
+        }
+        
+        .stat-label{
+            font-size:14px;
+            font-weight:500;
+            color:#6b7280;
+        }
+
+        .reference-text{
+            margin-top:24px;
+            padding:20px;
+            background:#fef9e7;
+            border:1px solid #fcd34d;
+            border-radius:8px;
+            color:#92400e;
+            display:none;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+       /* ----- RESPONSIVE -------------------------------------------------- */
+       @media(max-width:768px){
+    body { padding: 10px; }
+    .audio-section{ padding: 15px; }
+    .input-field, .live-feedback{ padding: 15px; font-size: 15px; } /* Your existing size preference for mobile text */
+
+    /* Hide progress bar on mobile */
+    .progress-container {
+        display: none; /* Hides the progress bar on small screens */
+    }
+
+    .audio-controls{
+        gap: 8px;
+        flex-wrap: wrap; /* Allows items to move to next line */
+        justify-content: center; /* Centers items when they wrap */
+        padding: 0 5px; /* Small horizontal padding for controls */
+    }
+
+    /* For the Previous/Next buttons and the Aa/100/?/X toggle buttons */
+    .nav-btn, .toggle-btn{
+        width: 44px; /* Baseline size for good touch target */
+        height: 44px; /* Baseline size for good touch target */
+        font-size: 16px; /* Icon/text size */
+        flex-shrink: 0; /* PREVENTS THESE BUTTONS FROM SHRINKING */
+        flex-grow: 0; /* Ensures they don't grow */
+        flex-basis: auto; /* Standard for fixed-size items */
+    }
+
+    /* For the Play/Pause button */
+    .play-btn{
+        width: 64px; /* Larger size */
+        height: 64px; /* Larger size */
+        font-size: 24px; /* Icon size */
+        flex-shrink: 0; /* PREVENTS THIS BUTTON FROM SHRINKING */
+        flex-grow: 0; /* Ensures it doesn't grow */
+        flex-basis: auto; /* Standard for fixed-size items */
+    }
+
+    /* For the time display (0:00 / 0:00) */
+    #timeDisplay {
+        min-width: unset; /* IMPORTANT: REMOVES FIXED MINIMUM WIDTH, allows it to shrink */
+        font-size: 14px; /* OPTIONAL: Smaller font size for mobile fit */
+        margin: 0 5px; /* REDUCED MARGINS for more space */
+        flex-grow: 1; /* Allows it to take up remaining space on its line */
+        flex-shrink: 1; /* Allows it to shrink if needed */
+        flex-basis: auto; /* Helps with flexible width */
+        text-align: center; /* Centers text if it's on its own line */
+    }
+
+    .controls{ flex-direction: column; } /* Existing rule for stats section controls (if still in use) */
+    .control-btn{ width: 100%; } /* Existing rule for stats section controls (if still in use) */
+}
+
+        /* Add this new style for your 'X' button */
+    .toggle-btn.end-button { /* Use .toggle-btn to ensure specificity if needed */
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); /* Red background */
+        color: white;
+        font-size: 1.5em; /* Make the 'X' larger */
+        font-weight: bold;
+        line-height: 1; /* Ensures X is vertically centered */
+        padding: 8px 12px; /* Adjust padding if needed to fit 'X' */
+    }
+
+    .toggle-btn.end-button:hover {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); /* Darker red on hover */
+        transform: translateY(-2px); /* Keep consistent hover effect */
     }
     </style>
 </head>
@@ -525,604 +524,960 @@
     </div>
 
     <script>
-    // Audio Player Elements
-    const audioPlayer = document.getElementById('audioPlayer');
-    const playBtn = document.getElementById('playBtn');
-    const progressBar = document.getElementById('progressBar');
-    const loadingSpinner = document.getElementById('loadingSpinner'); // Make sure you have this ID on your spinner element
-
-    // Text Display Elements
-    const currentSentenceElement = document.getElementById('currentSentence');
-    const liveFeedbackElement = document.getElementById('liveFeedback');
-    const sentenceInput = document.getElementById('sentenceInput');
-    const timeDisplay = document.getElementById('timeDisplay'); // Added for time display
-
-    // Control Buttons
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const hintBtn = document.getElementById('hintBtn');
-    const endDictationBtn = document.getElementById('endDictationBtn');
-    const showTranslationBtn = document.getElementById('showTranslationBtn');
-    const showOriginalBtn = document.getElementById('showOriginalBtn');
-    const speedBtn = document.getElementById('speedBtn'); // Assuming you have a speed button
-
-    // Other elements
-    const feedbackModal = document.getElementById('feedbackModal');
-    const statsContainer = document.getElementById('statsContainer');
-    const dictationArea = document.getElementById('dictationArea');
-    const totalWordsSpan = document.getElementById('totalWords');
-    const correctWordsSpan = document.getElementById('correctWords');
-    const accuracySpan = document.getElementById('accuracy');
-    const mistakesContainer = document.getElementById('mistakesContainer');
-    const restartBtn = document.getElementById('restartBtn');
-    const settingsModal = document.getElementById('settingsModal');
-    const openSettingsBtn = document.getElementById('openSettingsBtn');
-    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-    const dictationModeSelect = document.getElementById('dictationMode');
-    const lessonSelect = document.getElementById('lessonSelect');
-    const showSourceTextCheckbox = document.getElementById('showSourceText');
-    const themeToggle = document.getElementById('themeToggle'); // Assuming you have a theme toggle
-    const lessonTitleElement = document.getElementById('lessonTitle');
-
-    // Global Variables
-    let currentLessonIndex = 0;
-    let lessonData = null;
-    let vttCues = [];
-    let currentCueIndex = 0;
-    let playbackTimeout = null;
-    let highlightTimeout = null;
-    let feedbackDisplayed = false;
-    let dictationActive = false; // To control dictation flow
-    let isTranslationVisible = false;
-    let isOriginalVisible = false;
-
-    // --- Configuration ---
-    const CONFIG = {
-        lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
-    };
-
-    // --- Utility Functions ---
-
-    function updateProgressBar() {
-        if (!audioPlayer || !progressBar || isNaN(audioPlayer.duration) || audioPlayer.duration === 0) {
-            progressBar.style.width = '0%';
-            if (timeDisplay) timeDisplay.textContent = '0:00 / 0:00';
-            return;
-        }
-
-        const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-        progressBar.style.width = progress + '%';
-        if (timeDisplay) timeDisplay.textContent = `${formatTime(audioPlayer.currentTime)} / ${formatTime(audioPlayer.duration)}`;
-    }
-
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    function updateSentenceDisplay() {
-        if (vttCues.length === 0) {
-            if (currentSentenceElement) currentSentenceElement.textContent = 'No sentences loaded.';
-            return;
-        }
-
-        const cue = vttCues[currentCueIndex];
-        if (currentSentenceElement) currentSentenceElement.textContent = isOriginalVisible ? cue.text : '...'; // Show original if toggled, otherwise placeholder
-        if (sentenceInput) sentenceInput.value = '';
-        clearFeedback();
-        if (sentenceInput) sentenceInput.focus();
-
-        // Update translation visibility based on user setting
-        if (showTranslationBtn) {
-            if (isTranslationVisible && cue.translation) {
-                showTranslationBtn.textContent = cue.translation;
-            } else {
-                showTranslationBtn.textContent = 'Aa';
-            }
-        }
-        // Update original visibility based on user setting
-        if (showOriginalBtn) {
-            showOriginalBtn.textContent = isOriginalVisible ? cue.text : '100';
-        }
-    }
-
-    function checkAnswer() {
-        if (!dictationActive || vttCues.length === 0 || currentCueIndex < 0 || currentCueIndex >= vttCues.length) return;
-
-        const expected = vttCues[currentCueIndex].text;
-        const actual = sentenceInput.value;
-
-        const {
-            feedbackHtml,
-            isCorrect,
-            correctCount,
-            totalCount
-        } = generateFeedback(expected, actual);
-
-        showFeedback(feedbackHtml);
-
-        if (isCorrect) {
-            setTimeout(() => {
-                nextSentence();
-            }, 1000); // Wait a bit before moving to the next sentence
-        }
-    }
-
-    function generateFeedback(expected, actual) {
-        const expectedWords = expected.split(/\s+/);
-        const actualWords = actual.split(/\s+/);
-        let feedbackHtml = '';
-        let correctCount = 0;
-        let totalCount = expectedWords.length;
-
-        for (let i = 0; i < expectedWords.length; i++) {
-            const expectedWord = expectedWords[i].toLowerCase().replace(/[.,!?;:]/g, '');
-            const actualWord = (actualWords[i] || '').toLowerCase().replace(/[.,!?;:]/g, '');
-
-            if (expectedWord === actualWord) {
-                feedbackHtml += `<span class="correct-word">${expectedWords[i]}</span> `;
-                correctCount++;
-            } else {
-                feedbackHtml += `<span class="wrong-word">${actualWords[i] || '[_]'}</span> `;
+        function sendHeightToParent() {
+            const height = document.body.scrollHeight;
+            if (window.parent !== window) {
+                window.parent.postMessage({ frameHeight: height }, '*');
             }
         }
 
-        return {
-            feedbackHtml,
-            isCorrect: correctCount === totalCount,
-            correctCount,
-            totalCount
+        window.addEventListener('load', sendHeightToParent);
+        window.addEventListener('resize', sendHeightToParent);
+
+        let referenceText = '';
+        let isPlaying = false;
+        let vttCues = [];
+        let currentCueIndex = 0;
+        let allLessons = {}; // Store all lesson data
+        let currentLessonId = '';
+        let hasStartedTyping = false;
+        let sentenceStartTime = null;
+        let totalSessionTime = 0;
+        let sessionResults = [];
+        let ignoreCaseActive = true; // Default state
+        let currentSpeed = 1.0; // Default speed (100%)
+
+        // FIX: Move initialPlaceholderText to global scope
+        const initialPlaceholderText = "Press SHIFT+CTRL/CMD+ENTER to play/pause audio.\nType what you hear here...\n(Use ae for ä, oe for ö, ue for ü, B for ß)";
+
+        const CONFIG = {
+            lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
         };
-    }
 
-    function showFeedback(htmlContent) {
-        if (liveFeedbackElement) {
-            liveFeedbackElement.innerHTML = htmlContent;
-            liveFeedbackElement.classList.remove('hidden');
-            feedbackDisplayed = true;
-        }
-    }
+        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
+        let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
+        let endDictationBtn, resetBtn, ignoreCaseBtn, hintBtn, speedBtn;
+        let prevBtn, nextBtn, sentenceInfo;
 
-    function clearFeedback() {
-        if (liveFeedbackElement) {
-            liveFeedbackElement.innerHTML = '';
-            liveFeedbackElement.classList.add('hidden');
-            feedbackDisplayed = false;
-        }
-    }
-
-    function nextSentence() {
-        if (currentCueIndex < vttCues.length - 1) {
-            currentCueIndex++;
-            updateSentenceDisplay();
-            playCurrentSentence();
-        } else {
-            endDictation();
-        }
-    }
-
-    function previousSentence() {
-        if (currentCueIndex > 0) {
-            currentCueIndex--;
-            updateSentenceDisplay();
-            playCurrentSentence();
-        }
-    }
-
-    function playCurrentSentence() {
-        if (vttCues.length === 0 || currentCueIndex < 0 || currentCueIndex >= vttCues.length) {
-            console.warn("No sentences or invalid cue index to play.");
-            if (playBtn) playBtn.classList.remove('playing');
-            return;
-        }
-        const cue = vttCues[currentCueIndex];
-        audioPlayer.currentTime = cue.start;
-
-        // Attempt to play and handle the promise for mobile compatibility
-        const playPromise = audioPlayer.play();
-
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                // Playback started successfully
-                if (playBtn) playBtn.classList.add('playing');
-                startHighlighting();
-            }).catch(error => {
-                // Playback was prevented (e.g., autoplay policy on mobile)
-                console.error("Audio playback prevented or failed:", error);
-                if (playBtn) playBtn.classList.remove('playing');
-                // Optionally: Provide a more user-friendly message or visual cue
-            });
-        }
-    }
-
-    function pauseAudio() {
-        audioPlayer.pause();
-        if (playBtn) playBtn.classList.remove('playing');
-        stopHighlighting();
-        if (playbackTimeout) clearTimeout(playbackTimeout);
-    }
-
-    function togglePlayback() {
-        if (audioPlayer.paused) {
-            // If the audio source isn't set yet or the current lesson isn't loaded
-            if (!audioPlayer.src || vttCues.length === 0) {
-                // Try to load the current lesson, then play
-                loadLesson(currentLessonIndex).then(() => {
-                    playCurrentSentence();
-                }).catch(error => {
-                    console.error("Failed to load lesson for playback:", error);
-                    // Handle error loading lesson (e.g., show message)
-                });
-            } else {
-                playCurrentSentence();
+        window.addEventListener('load', function() {
+            audioPlayer = document.getElementById('audioPlayer');
+            playBtn = document.getElementById('playBtn');
+            progressBar = document.getElementById('progressBar');
+            timeDisplay = document.getElementById('timeDisplay');
+            referenceTextDiv = document.getElementById('referenceText');
+            loadingSpinner = document.getElementById('loadingSpinner');
+            statsSection = document.getElementById('statsSection');
+            userInput = document.getElementById('userInput');
+            
+            // Set the initial placeholder text when the page loads
+            if (userInput) {
+                userInput.placeholder = initialPlaceholderText;
             }
-        } else {
-            pauseAudio();
-        }
-    }
+            liveFeedback = document.getElementById('liveFeedback');
+            accuracyPercent = document.getElementById('accuracyPercent');
+            correctWords = document.getElementById('correctWords');
+            wrongWords = document.getElementById('wrongWords');
+            endDictationBtn = document.getElementById('endDictationBtn');
+            ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
+            speedBtn = document.getElementById('speedBtn');
+            hintBtn = document.getElementById('hintBtn');
+            prevBtn = document.getElementById('prevBtn');
+            nextBtn = document.getElementById('nextBtn');
+            sentenceInfo = document.getElementById('sentenceInfo');
 
-    function startHighlighting() {
-        stopHighlighting(); // Clear any existing timeout
-        if (vttCues.length === 0 || currentCueIndex < 0 || currentCueIndex >= vttCues.length) return;
-
-        const cue = vttCues[currentCueIndex];
-        // The duration to highlight is until the cue ends
-        const durationUntilCueEnd = (cue.end - audioPlayer.currentTime) * 1000;
-
-        highlightTimeout = setTimeout(() => {
-            // Logic if needed when cue ends, e.g., auto-pause, or just let next timeupdate handle it.
-            // For dictation, typically we let the user interact.
-            // You might want to call pauseAudio() here if you want it to stop exactly at cue.end
-        }, durationUntilCueEnd);
-    }
-
-    function stopHighlighting() {
-        if (highlightTimeout) {
-            clearTimeout(highlightTimeout);
-            highlightTimeout = null;
-        }
-    }
-
-    function loadLesson(index) {
-        dictationActive = false; // Pause dictation flow while loading
-        clearFeedback();
-        if (sentenceInput) sentenceInput.value = '';
-        if (currentSentenceElement) currentSentenceElement.textContent = 'Loading lesson...';
-        if (playBtn) {
-            playBtn.textContent = '⏳'; // Show hourclock icon
-            playBtn.disabled = true;
-            playBtn.classList.remove('playing');
-        }
-        if (loadingSpinner) loadingSpinner.classList.remove('hidden'); // Show spinner
-
-        // Reset progress bar immediately
-        if (progressBar) progressBar.style.width = '0%';
-        audioPlayer.currentTime = 0; // Reset audio position
-        updateProgressBar(); // Update time display as well
-
-        return fetch(CONFIG.lessonsUrl)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                lessonData = data.lessons[index];
-                if (!lessonData) {
-                    throw new Error(`Lesson at index ${index} not found.`);
+            if (playBtn) playBtn.addEventListener('click', togglePlayback);
+            if (prevBtn) prevBtn.addEventListener('click', goToPreviousSentence);
+            if (nextBtn) nextBtn.addEventListener('click', goToNextSentence);
+            if (userInput) {
+                userInput.addEventListener('input', handleUserInput);
+                userInput.addEventListener('keydown', handleKeyDown);
+            }
+            if (endDictationBtn) endDictationBtn.addEventListener('click', showFinalResult);
+            if (ignoreCaseBtn) {
+                ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
+                // Set initial state
+                if (ignoreCaseActive) {
+                    ignoreCaseBtn.classList.add('active');
                 }
-                if (lessonTitleElement) {
-                    lessonTitleElement.textContent = lessonData.title; // Update lesson title
-                } else {
-                    console.warn("Lesson title element not found.");
-                }
-                audioPlayer.src = lessonData.audioUrl;
-                audioPlayer.load(); // Ensure audio element attempts to load
-
-                return fetchVTTFile(lessonData.vttUrl);
-            })
-            .then(vttText => {
-                vttCues = parseVTT(vttText);
-                currentCueIndex = 0;
-                updateSentenceDisplay();
-                dictationActive = true; // Resume dictation flow after loading
-                saveState(); // Save current lesson state
-            })
-            .catch(error => {
-                console.error("Failed to load lesson:", error);
-                if (currentSentenceElement) currentSentenceElement.textContent = 'Error loading lesson.';
-                if (playBtn) {
-                    playBtn.textContent = '❌';
-                    playBtn.disabled = true;
-                }
-                if (loadingSpinner) loadingSpinner.classList.add('hidden'); // Hide spinner
-            });
-    }
-
-    function fetchVTTFile(url) {
-        return fetch(url)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.text();
-            });
-    }
-
-    function parseVTT(vttText) {
-        const lines = vttText.split('\n');
-        const cues = [];
-        let i = 0;
-
-        while (i < lines.length) {
-            if (lines[i].trim() === 'WEBVTT') {
-                i++; // Skip WEBVTT header
-                continue;
             }
-            if (lines[i].trim() === '') {
-                i++; // Skip empty lines
-                continue;
+            if (speedBtn) {
+                speedBtn.addEventListener('click', toggleSpeed);
+                // Set initial green color for 100% speed
+                speedBtn.classList.add('speed-100');
+            }
+            if (hintBtn) {
+                hintBtn.addEventListener('click', showHint);
             }
 
-            // Check if it's a cue ID line (optional)
-            if (!isNaN(parseInt(lines[i].trim(), 10)) && !lines[i].includes('-->')) {
-                i++; // Skip cue ID if present
-                continue;
-            }
-
-            // Time cue line
-            if (lines[i].includes('-->')) {
-                const parts = lines[i].split('-->').map(s => s.trim());
-                const start = parseVTTTime(parts[0]);
-                const end = parseVTTTime(parts[1].split(' ')[0]); // Remove any extra text after time
-
-                i++;
-                let text = '';
-                let translation = '';
-                while (i < lines.length && lines[i].trim() !== '') {
-                    const line = lines[i].trim();
-                    if (line.startsWith('(') && line.endsWith(')')) { // Check for (translation)
-                        translation = line.substring(1, line.length - 1);
-                    } else {
-                        text += line + ' ';
+            if (audioPlayer) {
+                audioPlayer.addEventListener('play', () => {
+                    isPlaying = true;
+                    if (playBtn) {
+                        playBtn.classList.add('playing');
                     }
-                    i++;
-                }
-                cues.push({
-                    start: start,
-                    end: end,
-                    text: text.trim(),
-                    translation: translation.trim()
+                    // Auto-focus input field when audio starts
+                    if (userInput) {
+                        userInput.focus();
+                    }
                 });
+                audioPlayer.addEventListener('pause', () => {
+                    isPlaying = false;
+                    if (playBtn) {
+                        playBtn.classList.remove('playing');
+                    }
+                });
+                audioPlayer.addEventListener('timeupdate', handleTimeUpdate);
+            }
+
+            window.addEventListener('keydown', handleGlobalKeyDown);
+            const lessonId = getLessonIdFromUrl() || 'A1L01';
+            loadAllLessons().then(() => {
+                loadLesson(lessonId);
+            });
+            window.focus();
+            console.log('Main window load event completed, focus attempted.'); // For debugging
+            setTimeout(sendHeightToParent, 500);
+        });
+
+        function toggleSpeed() {
+            // Remove all speed classes first
+            if (speedBtn) {
+                speedBtn.classList.remove('speed-100', 'speed-75', 'speed-50');
+            }
+            
+            // Cycle through speeds: 100% → 75% → 50% → 100%
+            if (currentSpeed === 1.0) {
+                currentSpeed = 0.75;
+                speedBtn.textContent = '75';
+                speedBtn.classList.add('speed-75');
+            } else if (currentSpeed === 0.75) {
+                currentSpeed = 0.5;
+                speedBtn.textContent = '50';
+                speedBtn.classList.add('speed-50');
             } else {
-                i++; // Skip lines that don't match expected patterns
+                currentSpeed = 1.0;
+                speedBtn.textContent = '100';
+                speedBtn.classList.add('speed-100');
+            }
+            
+            // Apply speed to audio player
+            if (audioPlayer) {
+                audioPlayer.playbackRate = currentSpeed;
             }
         }
-        return cues;
-    }
 
-    function parseVTTTime(timeString) {
-        const parts = timeString.split(':');
-        let seconds = 0;
-        if (parts.length === 3) {
-            seconds = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseFloat(parts[2]);
-        } else if (parts.length === 2) {
-            seconds = parseInt(parts[0]) * 60 + parseFloat(parts[1]);
+        function toggleIgnoreCase() {
+            ignoreCaseActive = !ignoreCaseActive;
+            if (ignoreCaseBtn) {
+                if (ignoreCaseActive) {
+                    ignoreCaseBtn.classList.add('active');
+                } else {
+                    ignoreCaseBtn.classList.remove('active');
+                }
+            }
+            updateLiveFeedback();
         }
-        return seconds;
-    }
 
-    // --- State Management (Save/Load) ---
-    function saveState() {
-        const state = {
-            currentLessonIndex: currentLessonIndex,
-            currentCueIndex: currentCueIndex,
-            // Add other state variables you want to preserve
-        };
-        localStorage.setItem('dictationToolState', JSON.stringify(state));
-    }
-
-    function loadState() {
-        const savedState = localStorage.getItem('dictationToolState');
-        if (savedState) {
-            const state = JSON.parse(savedState);
-            currentLessonIndex = state.currentLessonIndex || 0;
-            currentCueIndex = state.currentCueIndex || 0;
+        function handleUserInput(e) {
+            // Hide hint tooltip when user starts typing
+            hideHint();
+            
+            if (!hasStartedTyping && e.target.value.trim().length > 0) {
+                hasStartedTyping = true;
+                sentenceStartTime = Date.now();
+            }
+            
+            const cursorPos = e.target.selectionStart;
+            const convertedText = convertGermanChars(e.target.value);
+            if (convertedText !== e.target.value) {
+                e.target.value = convertedText;
+                e.target.setSelectionRange(cursorPos, cursorPos);
+            }
+            updateLiveFeedback();
+            setTimeout(sendHeightToParent, 100);
         }
-    }
 
-    // --- UI/Lesson Management ---
-    function populateLessonSelect() {
-        if (!lessonSelect) {
-            console.warn("Lesson select element not found.");
-            return;
+        function handleGlobalKeyDown(e) {
+            console.log('Global keydown detected:', e.key, 'Shift:', e.shiftKey, 'Ctrl/Cmd:', (e.ctrlKey || e.metaKey)); // ADD THIS LINE
+            // Shortcuts always enabled, even while typing
+
+            // Hint shortcut: Shift + Ctrl/Cmd + ß (German), / (US), , (French)
+            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'ß') {
+                e.preventDefault();
+                showHint();
+                if (hintBtn) hintBtn.focus();
+                return;
+            }
+            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === '/') {
+                e.preventDefault();
+                showHint();
+                if (hintBtn) hintBtn.focus();
+                return;
+            }
+            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === ',') {
+                e.preventDefault();
+                showHint();
+                if (hintBtn) hintBtn.focus();
+                return;
+            }
+
+            // Play/Pause (start dictation): Shift + Ctrl/Cmd + Enter
+            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                console.log('Shortcut for togglePlayback activated.'); //
+                togglePlayback();
+                return;
+            }
+
+            // Sentence navigation: Shift + Ctrl/Cmd + Arrow keys
+            if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        goToPreviousSentence();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        goToNextSentence();
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        playCurrentSentence();
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        toggleSpeed();
+                        break;
+                }
+            }
         }
-        fetch(CONFIG.lessonsUrl)
-            .then(response => response.json())
-            .then(data => {
-                lessonSelect.innerHTML = ''; // Clear existing options
-                data.lessons.forEach((lesson, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = lesson.title;
-                    lessonSelect.appendChild(option);
+
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                processCurrentSentenceAndAdvance();
+            }
+        }
+
+        function processCurrentSentenceAndAdvance() {
+            if (!userInput.value.trim()) {
+                playCurrentSentence();
+                return;
+            }
+
+            let sentenceTime = 0;
+            if (hasStartedTyping && sentenceStartTime) {
+                sentenceTime = (Date.now() - sentenceStartTime) / 1000;
+                totalSessionTime += sentenceTime;
+            }
+
+            const userText = userInput.value;
+            const comparison = compareTexts(referenceText, userText);
+            const wordStats = calculateWordStats(comparison);
+            
+            sessionResults.push({
+                sentenceIndex: currentCueIndex,
+                reference: referenceText,
+                userInput: userText,
+                stats: wordStats,
+                time: sentenceTime,
+                comparison: comparison
+            });
+
+            if (currentCueIndex < vttCues.length - 1) {
+                goToNextSentence();
+                playCurrentSentence();
+            } else {
+                showFinalResult();
+            }
+        }
+
+        function getLessonIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('lesson');
+        }
+
+        async function loadAllLessons() {
+            try {
+                const response = await fetch(CONFIG.lessonsUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to load lessons: ${response.status}`);
+                }
+                allLessons = await response.json();
+            } catch (error) {
+                console.error('Failed to load lessons:', error);
+                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
+            }
+        }
+
+        function parseVTT(vttText) {
+            const lines = vttText.split('\n');
+            const cues = [];
+            let i = 0;
+
+            while (i < lines.length && !lines[i].includes('-->')) {
+                i++;
+            }
+
+            while (i < lines.length) {
+                const line = lines[i].trim();
+                
+                if (line.includes('-->')) {
+                    const [startTime, endTime] = line.split('-->').map(t => t.trim());
+                    const startSeconds = parseTimeToSeconds(startTime);
+                    const endSeconds = parseTimeToSeconds(endTime);
+                    
+                    i++;
+                    let text = '';
+                    while (i < lines.length && lines[i].trim() !== '') {
+                        if (text) text += ' ';
+                        text += lines[i].trim();
+                        i++;
+                    }
+                    
+                    if (text) {
+                        cues.push({
+                            start: startSeconds,
+                            end: endSeconds,
+                            text: text
+                        });
+                    }
+                }
+                i++;
+            }
+            
+            return cues;
+        }
+
+        function parseTimeToSeconds(timeStr) {
+            const parts = timeStr.split(':');
+            const seconds = parts[parts.length - 1].split('.');
+            const sec = parseInt(seconds[0]);
+            const ms = parseInt(seconds[1] || 0);
+            
+            if (parts.length === 3) {
+                const hours = parseInt(parts[0]);
+                const minutes = parseInt(parts[1]);
+                return hours * 3600 + minutes * 60 + sec + ms / 1000;
+            } else {
+                const minutes = parseInt(parts[0]);
+                return minutes * 60 + sec + ms / 1000;
+            }
+        }
+
+        async function loadVTTFromUrl(vttUrl) {
+            try {
+                const response = await fetch(vttUrl);
+                if (!response.ok) {
+                    throw new Error(`VTT file not found: ${response.status}`);
+                }
+                
+                const vttText = await response.text();
+                const cues = parseVTT(vttText);
+                return cues;
+            } catch (error) {
+                console.error('Failed to load VTT file:', error);
+                return [];
+            }
+        }
+
+        function convertGermanChars(text) {
+            return text
+                .replace(/ae/g, 'ä')
+                .replace(/oe/g, 'ö')
+                .replace(/ue/g, 'ü')
+                .replace(/Ae/g, 'Ä')
+                .replace(/Oe/g, 'Ö')
+                .replace(/Ue/g, 'Ü')
+                .replace(/\B([aeiouäöü])B/g, '$1ß')
+                .replace(/([aeiouäöü])B([aeiouäöü])/g, '$1ß$2')
+                .replace(/([aeiouäöü])B$/g, '$1ß')
+                .replace(/([aeiouäöü])B(\s)/g, '$1ß$2');
+        }
+        
+        function togglePlayback() {
+           console.log(`[DEBUG] Play/Pause button tapped. IsPaused: ${audioPlayer.paused}. Current Network State: ${audioPlayer.networkState}.`);
+            console.log('togglePlayback called.');
+            if (vttCues.length === 0) {
+                // No VTT cues, just play/pause the entire audio
+                if (isPlaying) {
+                    audioPlayer.pause();
+                } else {
+                    audioPlayer.play().catch(error => {
+                        console.log('Audio playback failed:', error);
+                        alert('Audio could not be played. Please check your internet connection.');
+                    });
+                }
+            } else {
+                // VTT cues available, toggle play/pause for current sentence
+                if (isPlaying) {
+                    audioPlayer.pause();
+                } else {
+                    playCurrentSentence();
+                }
+            }
+        }
+
+        function playCurrentSentence() {
+            if (currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
+                const cue = vttCues[currentCueIndex];
+                audioPlayer.currentTime = cue.start;
+                const playPromise = audioPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        console.log('[DEBUG] Playback promise resolved (audio started).');
+                    }).catch(error => {
+                        console.error('Audio Playback Promise Rejected:', {
+                            name: error.name,
+                            message: error.message,
+                            networkState: audioPlayer.networkState,
+                            errorObject: error // Log the full error object
+                        });
+                        // Show user-friendly error message
+                        alert('Audio could not be played. Please check your internet connection.');
+                    });
+                }
+            }
+        }
+
+        function goToPreviousSentence() {
+            if (currentCueIndex > 0) {
+                currentCueIndex--;
+                updateCurrentSentence();
+                if (vttCues[currentCueIndex]) {
+                    audioPlayer.currentTime = vttCues[currentCueIndex].start;
+                }
+            }
+        }
+
+        function goToNextSentence() {
+            if (currentCueIndex < vttCues.length - 1) {
+                currentCueIndex++;
+                updateCurrentSentence();
+                if (vttCues[currentCueIndex]) {
+                    audioPlayer.currentTime = vttCues[currentCueIndex].start;
+                }
+            }
+        }
+
+        function updateCurrentSentence() {
+            updateNavigationButtons();
+            updateSentenceInfo();
+            updateCurrentReferenceText();
+            
+            // Hide any existing hint tooltip
+            hideHint();
+            
+            if (userInput) userInput.value = '';
+            // Handle placeholder visibility based on sentence index
+            if (userInput) {
+                // If it's the 1st or 2nd sentence (currentCueIndex 0 or 1)
+                if (currentCueIndex < 2) {
+                    userInput.placeholder = initialPlaceholderText;
+                } else {
+                    // For the 3rd sentence (index) and onwards, remove the detailed instructions
+                    userInput.placeholder = "Type what you hear here...";
+                }
+            }
+            updateLiveFeedback();
+            
+            sentenceStartTime = null;
+            hasStartedTyping = false;
+            
+            if (statsSection) statsSection.style.display = 'none';
+            
+            setTimeout(sendHeightToParent, 100);
+        }
+
+        function updateNavigationButtons() {
+            if (prevBtn) prevBtn.disabled = (currentCueIndex <= 0);
+            if (nextBtn) nextBtn.disabled = (currentCueIndex >= vttCues.length - 1);
+        }
+
+        function updateSentenceInfo() {
+            if (sentenceInfo && vttCues.length > 0) {
+                sentenceInfo.textContent = `Sentence ${currentCueIndex + 1} of ${vttCues.length}`;
+            }
+        }
+
+        function updateCurrentReferenceText() {
+            if (vttCues.length > 0 && currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
+                referenceText = vttCues[currentCueIndex].text;
+                if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
+            }
+        }
+
+        function handleTimeUpdate() {
+            updateProgress();
+            
+            if (vttCues.length > 0 && isPlaying) {
+                const currentTime = audioPlayer.currentTime;
+                const currentCue = vttCues[currentCueIndex];
+                
+                if (currentCue && currentTime >= currentCue.end) {
+                    audioPlayer.pause();
+                }
+            }
+        }
+
+        async function loadLesson(lessonId) {
+            // FIX: Show loading spinner properly
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'block';
+            }
+            if (playBtn) {
+                // FIX: Don't set textContent, it conflicts with CSS ::before
+                playBtn.classList.add('loading');
+                playBtn.disabled = true;
+            }
+
+            // Check if lesson exists
+            if (!allLessons[lessonId]) {
+                console.error(`Lesson ${lessonId} not found`);
+                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
+                return;
+            }
+
+            currentLessonId = lessonId;
+            const lessonData = allLessons[lessonId];
+            
+            const cues = await loadVTTFromUrl(lessonData.vttUrl);
+            
+            if (cues.length === 0) {
+                console.error(`Failed to load VTT for lesson ${lessonId}`);
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'none';
+                }
+                return;
+            }
+            
+            vttCues = cues;
+            currentCueIndex = 0;
+            
+            referenceText = vttCues[0].text;
+            updateNavigationButtons();
+            
+            if (audioPlayer) {
+                audioPlayer.src = lessonData.audioUrl;
+                console.log(`[DEBUG] Attempting to load audio: ${lessonData.audioUrl.substring(lessonData.audioUrl.lastIndexOf('/') + 1)}. Current Network State: ${audioPlayer.networkState}.`);
+                
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    console.log(`[DEBUG] Metadata loaded. Duration: ${audioPlayer.duration.toFixed(2)}s. Network State: ${audioPlayer.networkState}.`);
+                    if (playBtn) {
+                        // FIX: Remove loading class instead of setting textContent
+                        playBtn.classList.remove('loading', 'playing');
+                        playBtn.disabled = false;
+                    }
+                    // Set the current speed when audio loads
+                    audioPlayer.playbackRate = currentSpeed;
+                    updateProgress();
+                    // FIX: Hide loading spinner properly
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'none';
+                    }
+                }, { once: true });
+                
+                audioPlayer.addEventListener('error', (e) => {
+                    const error = e.target.error;
+                    console.error('Audio Loading Error in Listener:', {
+                        networkState: audioPlayer.networkState,
+                        code: error ? error.code : 'N/A',
+                        message: error ? error.message : 'Unknown Error Object',
+                        event: e
+                    });
+                    if (playBtn) {
+                        // FIX: Show error state without breaking CSS
+                        playBtn.classList.remove('loading');
+                        playBtn.disabled = true;
+                        playBtn.style.opacity = '0.5';
+                    }
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'none';
+                    }
+                    alert('Error loading audio. Please check your internet connection or try refreshing the page.');
+                }, { once: true });
+            }
+            
+            if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
+            if (userInput) userInput.value = '';
+            if (liveFeedback) liveFeedback.innerHTML = 'Live Feedback';
+            if (statsSection) statsSection.style.display = 'none';
+            
+            sentenceStartTime = null;
+            totalSessionTime = 0;
+            hasStartedTyping = false;
+            sessionResults = [];
+            
+            setTimeout(sendHeightToParent, 500);
+        }
+
+        function compareTexts(reference, userText) {
+            userText = convertGermanChars(userText);
+            
+            const ignoreCase = ignoreCaseActive;
+            const ignorePunctuation = true;
+            
+            let refNormalized = reference;
+            let userNormalized = userText;
+            
+            if (ignorePunctuation) {
+                refNormalized = refNormalized.replace(/[.,!?;:""''()]/g, '');
+                userNormalized = userNormalized.replace(/[.,!?;:""''()]/g, '');
+            }
+            
+            if (ignoreCase) {
+                refNormalized = refNormalized.toLowerCase();
+                userNormalized = userNormalized.toLowerCase();
+            }
+            
+            userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
+            
+            const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
+            const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
+            
+            const alignment = alignSequencesWithGaps(refWords, userWords);
+            
+            const result = [];
+            let correct = 0;
+            let wrongPosition = 0;
+            let wrong = 0;
+            let extra = 0;
+            let missing = 0;
+            
+            for (let i = 0; i < alignment.length; i++) {
+                const item = alignment[i];
+                
+                if (i > 0) {
+                    result.push({ char: ' ', status: 'word-boundary' });
+                }
+                
+                if (item.type === 'match') {
+                    for (let char of item.userWord) {
+                        result.push({ char, status: 'correct' });
+                        correct++;
+                    }
+                } else if (item.type === 'substitute') {
+                    const ref = item.refWord;
+                    const user = item.userWord;
+
+                    let missingPrefix = 0;
+                    let missingSuffix = 0;
+
+                    for (let idx = 1; idx <= ref.length; idx++) {
+                        if (ref.slice(-idx) === user) {
+                            missingPrefix = ref.length - idx;
+                            break;
+                        }
+                    }
+                    if (missingPrefix === 0) {
+                        for (let idx = 1; idx <= ref.length; idx++) {
+                            if (ref.slice(0, idx) === user) {
+                                missingSuffix = ref.length - idx;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (missingPrefix > 0) {
+                        for (let k = 0; k < missingPrefix; k++) {
+                            if (k > 0) result.push({ char: ' ', status: 'char-space' });
+                            result.push({ char: '_', status: 'missing' });
+                            missing++;
+                        }
+                    }
+
+                    for (let c = 0; c < user.length; c++) {
+                        result.push({ char: user[c], status: 'wrong' });
+                        wrong++;
+                    }
+
+                    if (missingSuffix > 0) {
+                        for (let k = 0; k < missingSuffix; k++) {
+                            result.push({ char: ' ', status: 'char-space' });
+                            result.push({ char: '_', status: 'missing' });
+                            missing++;
+                        }
+                    }
+
+                } else if (item.type === 'insert') {
+                    for (let char of item.userWord) {
+                        result.push({ char, status: 'extra' });
+                        extra++;
+                    }
+                } else if (item.type === 'delete') {
+                    const wordLength = item.refWord.length;
+                    
+                    for (let k = 0; k < wordLength; k++) {
+                        if (k > 0) {
+                            result.push({ char: ' ', status: 'char-space' });
+                        }
+                        result.push({ char: '_', status: 'missing' });
+                        missing++;
+                    }
+                }
+            }
+            
+            return {
+                chars: result,
+                stats: { 
+                    correct, 
+                    wrongPosition, 
+                    wrong, 
+                    extra,
+                    missing,
+                    total: refNormalized.replace(/\s/g, '').length 
+                }
+            };
+        }
+
+        function alignSequencesWithGaps(refWords, userWords) {
+            const N = refWords.length, M = userWords.length;
+            const dp = Array.from({ length: N + 1 }, () => Array(M + 1).fill(0));
+
+            const COST = { MATCH: 0, SUB: 3, INS: 2, DEL: 2 };
+
+            for (let i = 0; i <= N; i++) dp[i][0] = i * COST.DEL;
+            for (let j = 0; j <= M; j++) dp[0][j] = j * COST.INS;
+
+            for (let i = 1; i <= N; i++) {
+                for (let j = 1; j <= M; j++) {
+                    const matchCost = dp[i - 1][j - 1] +
+                        (refWords[i - 1] === userWords[j - 1] ? COST.MATCH : COST.SUB);
+                    const delCost = dp[i - 1][j] + COST.DEL;
+                    const insCost = dp[i][j - 1] + COST.INS;
+
+                    dp[i][j] = Math.min(matchCost, delCost, insCost);
+                }
+            }
+
+            let i = N, j = M, alignment = [];
+            while (i > 0 || j > 0) {
+                const current = dp[i][j];
+
+                if (i > 0 && j > 0 &&
+                    current === dp[i - 1][j - 1] +
+                               (refWords[i - 1] === userWords[j - 1] ? COST.MATCH : COST.SUB)) {
+                    alignment.unshift({
+                        type: refWords[i - 1] === userWords[j - 1] ? 'match' : 'substitute',
+                        refWord: refWords[i - 1],
+                        userWord: userWords[j - 1]
+                    });
+                    i--; j--;
+                    continue;
+                }
+
+                if (i > 0 && current === dp[i - 1][j] + COST.DEL) {
+                    alignment.unshift({ type: 'delete', refWord: refWords[i - 1], userWord: null });
+                    i--;
+                    continue;
+                }
+
+                alignment.unshift({ type: 'insert', refWord: null, userWord: userWords[j - 1] });
+                j--;
+            }
+
+            return alignment;
+        }
+
+        function updateLiveFeedback() {
+            if (!userInput || !liveFeedback) return;
+            
+            const userText = userInput.value;
+            
+            if (userText.trim() === '') {
+                liveFeedback.innerHTML = 'Live Feedback';
+                return;
+            }
+            
+            const comparison = compareTexts(referenceText, userText);
+            
+            let feedbackHTML = '';
+            
+            comparison.chars.forEach(item => {
+                let char = item.char;
+                
+                if (char === ' ') {
+                    if (item.status === 'word-boundary') {
+                        char = '&nbsp;&nbsp;&nbsp;';
+                    } else if (item.status === 'char-space') {
+                        char = '&nbsp;';
+                    } else {
+                        char = '&nbsp;';
+                    }
+                } else if (char === '\n') {
+                    char = '<br>';
+                }
+                
+                feedbackHTML += `<span class="char-${item.status}">${char}</span>`;
+            });
+            
+            liveFeedback.innerHTML = feedbackHTML;
+        }
+
+        function updateProgress() {
+            if (!audioPlayer || !timeDisplay || !progressBar) return;
+            
+            const currentTime = audioPlayer.currentTime;
+            const duration = audioPlayer.duration;
+            
+            if (duration) {
+                const progress = (currentTime / duration) * 100;
+                progressBar.style.width = progress + '%';
+                
+                const formatTime = (time) => {
+                    const minutes = Math.floor(time / 60);
+                    const seconds = Math.floor(time % 60);
+                    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                };
+                
+                timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+            }
+        }
+
+        function calculateWordStats(comparison) {
+            const ignoreCase = ignoreCaseActive;
+            const ignorePunctuation = true;
+            
+            let refNormalized = referenceText;
+            let userNormalized = userInput.value;
+            
+            if (ignorePunctuation) {
+                refNormalized = refNormalized.replace(/[.,!?;:""''()]/g, '');
+                userNormalized = userNormalized.replace(/[.,!?;:""''()]/g, '');
+            }
+            
+            if (ignoreCase) {
+                refNormalized = refNormalized.toLowerCase();
+                userNormalized = userNormalized.toLowerCase();
+            }
+            
+            userNormalized = userNormalized.replace(/\s+/g, ' ').trim();
+            
+            const refWords = refNormalized.split(/\s+/).filter(w => w.length > 0);
+            const userWords = userNormalized.split(/\s+/).filter(w => w.length > 0);
+            
+            const alignment = alignSequencesWithGaps(refWords, userWords);
+            
+            let correctWords = 0;
+            let wrongWords = 0;
+            let totalWords = refWords.length;
+            
+            alignment.forEach(item => {
+                if (item.type === 'match') {
+                    correctWords++;
+                } else if (item.type === 'substitute' || item.type === 'delete') {
+                    wrongWords++;
+                }
+            });
+            
+            return {
+                correctWords,
+                wrongWords,
+                totalWords
+            };
+        }
+
+        function showFinalResult() {
+            if (!userInput) return;
+            
+            if (userInput.value.trim() && sessionResults.length === currentCueIndex) {
+                let sentenceTime = 0;
+                if (hasStartedTyping && sentenceStartTime) {
+                    sentenceTime = (Date.now() - sentenceStartTime) / 1000;
+                    totalSessionTime += sentenceTime;
+                }
+
+                const userText = userInput.value;
+                const comparison = compareTexts(referenceText, userText);
+                const wordStats = calculateWordStats(comparison);
+                
+                sessionResults.push({
+                    sentenceIndex: currentCueIndex,
+                    reference: referenceText,
+                    userInput: userText,
+                    stats: wordStats,
+                    time: sentenceTime,
+                    comparison: comparison
                 });
-                lessonSelect.value = currentLessonIndex; // Set initial selection
-            })
-            .catch(error => console.error("Failed to load lessons for select:", error));
-    }
-
-    function restartLesson() {
-        currentCueIndex = 0;
-        resetDictation(); // This will clear input/feedback
-        updateSentenceDisplay();
-        pauseAudio();
-        audioPlayer.currentTime = 0;
-        updateProgressBar();
-        dictationActive = true;
-    }
-
-    function resetDictation() {
-        if (sentenceInput) sentenceInput.value = '';
-        clearFeedback();
-        if (sentenceInput) sentenceInput.disabled = false;
-    }
-
-    function endDictation() {
-        dictationActive = false;
-        pauseAudio();
-        // You might want to show final stats here or a completion message
-        // For example, trigger feedbackModal with final stats
-        alert("Dictation ended!"); // Placeholder
-    }
-
-    function toggleTranslation() {
-        isTranslationVisible = !isTranslationVisible;
-        updateSentenceDisplay(); // Re-render to show/hide translation
-        // You might want to update button text/class here too
-        if (showTranslationBtn) {
-            showTranslationBtn.classList.toggle('active', isTranslationVisible);
-        }
-    }
-
-    function toggleOriginal() {
-        isOriginalVisible = !isOriginalVisible;
-        updateSentenceDisplay(); // Re-render to show/hide original
-        // Update button text/class
-        if (showOriginalBtn) {
-            showOriginalBtn.classList.toggle('active', isOriginalVisible);
-        }
-    }
-
-    // Function to navigate to a specific sentence (if you add jump buttons)
-    function navigateToSentence(index) {
-        if (index >= 0 && index < vttCues.length) {
-            currentCueIndex = index;
-            updateSentenceDisplay();
-            playCurrentSentence();
-        }
-    }
-
-    // Function to handle settings changes (e.g., dictation mode, show source text)
-    function applySettings() {
-        // Implement logic for dictationModeSelect, showSourceTextCheckbox, themeToggle
-        // For example:
-        // const selectedMode = dictationModeSelect.value;
-        // const showSource = showSourceTextCheckbox.checked;
-        // Update your UI or dictation logic based on these settings.
-        // Save settings to localStorage if desired.
-    }
-
-    function openSettings() {
-        if (settingsModal) settingsModal.classList.remove('hidden');
-    }
-
-    function closeSettings() {
-        if (settingsModal) settingsModal.classList.add('hidden');
-        applySettings(); // Apply settings when modal is closed
-    }
-
-    // Function to toggle light/dark theme (basic example)
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        // Save theme preference to localStorage
-        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-    }
-
-    // Initialize theme based on saved preference
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
-    }
-
-    // --- Event Listeners ---
-
-    // Audio Player Events
-    if (audioPlayer) {
-        audioPlayer.ontimeupdate = updateProgressBar;
-
-        audioPlayer.onended = function() {
-            if (playBtn) playBtn.classList.remove('playing');
-            stopHighlighting();
-            // For dictation, we typically want to wait for user input or explicit action.
-            // If not dictation mode, could auto-advance: nextSentence();
-        };
-
-        audioPlayer.addEventListener('loadedmetadata', () => {
-            // This fires once the audio file's metadata is loaded
-            if (playBtn) {
-                playBtn.textContent = ''; // Remove loading spinner icon
-                playBtn.disabled = false; // Enable play button
-                playBtn.classList.remove('playing');
             }
-            if (loadingSpinner) loadingSpinner.classList.add('hidden'); // Hide spinner
-            updateProgressBar(); // Update display with total duration
-        }); // Removed { once: true } as metadata can be reloaded
+            
+            let totalCorrectWords = 0;
+            let totalWrongWords = 0;
+            let totalWords = 0;
+            
+            sessionResults.forEach(result => {
+                totalCorrectWords += result.stats.correctWords;
+                totalWrongWords += result.stats.wrongWords;
+                totalWords += result.stats.totalWords;
+            });
+            
+            const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
+            
+            if (accuracyPercent) accuracyPercent.textContent = accuracy + '%';
+            if (correctWords) correctWords.textContent = totalCorrectWords;
+            if (wrongWords) wrongWords.textContent = totalWrongWords;
 
-        audioPlayer.addEventListener('error', (e) => {
-            console.error('Audio Loading Error:', e);
-            if (playBtn) {
-                playBtn.textContent = '❌'; // Show error icon
-                playBtn.disabled = true; // Keep disabled on error
+            const timeElement = document.getElementById('timeTaken');
+            if (timeElement) {
+                timeElement.textContent = formatTime(totalSessionTime);
             }
-            if (loadingSpinner) loadingSpinner.classList.add('hidden'); // Hide spinner
-            alert('Error loading audio. Please check the audio file path or your internet connection.');
-        });
-    } else {
-        console.error("Audio player element not found!");
-    }
-
-
-    // Control Button Event Listeners
-    if (playBtn) playBtn.addEventListener('click', togglePlayback);
-    if (prevBtn) prevBtn.addEventListener('click', previousSentence);
-    if (nextBtn) nextBtn.addEventListener('click', nextSentence);
-    if (hintBtn) hintBtn.addEventListener('click', () => {
-        if (vttCues.length > 0 && currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
-            showFeedback(vttCues[currentCueIndex].text); // Shows the hint directly
+            
+            if (statsSection) statsSection.style.display = 'grid';
+                        
+            setTimeout(sendHeightToParent, 100);
         }
-    });
-    if (endDictationBtn) endDictationBtn.addEventListener('click', endDictation);
-    if (showTranslationBtn) showTranslationBtn.addEventListener('click', toggleTranslation);
-    if (showOriginalBtn) showOriginalBtn.addEventListener('click', toggleOriginal);
-    if (restartBtn) restartBtn.addEventListener('click', restartLesson);
-    if (openSettingsBtn) openSettingsBtn.addEventListener('click', openSettings);
-    if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', closeSettings);
-    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
-    if (speedBtn) speedBtn.addEventListener('click', () => {
-        // Implement speed toggle logic
-        if (audioPlayer) {
-            audioPlayer.playbackRate = audioPlayer.playbackRate === 1.0 ? 0.75 : 1.0;
-            speedBtn.textContent = `${audioPlayer.playbackRate}x`;
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
-    });
 
-
-    // Input Field Event Listener
-    if (sentenceInput) {
-        sentenceInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent new line
-                checkAnswer();
+        function showHint() {
+            if (!referenceText || !hintBtn) return;
+            
+            // Remove any existing tooltip
+            const existingTooltip = hintBtn.querySelector('.hint-tooltip');
+            if (existingTooltip) {
+                existingTooltip.remove();
             }
-        });
-    }
+            
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'hint-tooltip';
+            tooltip.textContent = referenceText;
+            
+            // Add tooltip to hint button
+            hintBtn.appendChild(tooltip);
+            
+            // Show tooltip with animation
+            setTimeout(() => {
+                tooltip.classList.add('show');
+            }, 10);
+        }
 
-    // Lesson Selection Event Listener
-    if (lessonSelect) {
-        lessonSelect.addEventListener('change', (e) => {
-            currentLessonIndex = parseInt(e.target.value);
-            loadLesson(currentLessonIndex);
-        });
-    }
+        function hideHint() {
+            if (!hintBtn) return;
+            
+            const tooltip = hintBtn.querySelector('.hint-tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 200); // Wait for fade out animation
+            }
+        }
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeTheme(); // Apply saved theme
-        loadState(); // Load saved lesson state
-        populateLessonSelect(); // Populate lesson dropdown
-        loadLesson(currentLessonIndex); // Load the initial lesson
-    });
-</script>
+        function showAnswer() {
+            if (referenceTextDiv) {
+                referenceTextDiv.style.display = 'block';
+                setTimeout(() => {
+                    referenceTextDiv.style.display = 'none';
+                    sendHeightToParent();
+                }, 10000);
+                sendHeightToParent();
+            }
+        }
+    </script>
 </body>
 </html>
