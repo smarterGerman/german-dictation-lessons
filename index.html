@@ -57,7 +57,8 @@
         }
 
         .nav-btn,
-        .play-btn { 
+        .play-btn,
+        .toggle-btn { 
             border: none; 
             border-radius: 50%; 
             cursor: pointer; 
@@ -67,7 +68,8 @@
             justify-content: center; 
         }
 
-        .nav-btn {
+        .nav-btn,
+        .toggle-btn {
             width: 52px; 
             height: 52px;
             background: rgba(255, 255, 255, 0.9);
@@ -77,7 +79,8 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
         
-        .nav-btn:hover:not(:disabled) { 
+        .nav-btn:hover:not(:disabled),
+        .toggle-btn:hover { 
             transform: translateY(-2px); 
             background: rgba(255, 255, 255, 1);
             color: #374151;
@@ -87,6 +90,17 @@
         .nav-btn:disabled { 
             opacity:0.3; 
             cursor:not-allowed; 
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3);
+        }
+
+        .toggle-btn.active:hover {
+            background: linear-gradient(135deg, #9333ea 0%, #db2777 100%);
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
         }
 
         .play-btn {
@@ -292,7 +306,7 @@
             .audio-section{ padding: 20px 15px; }
             .input-field, .live-feedback{ padding: 15px; font-size: 15px; }
             .audio-controls{ gap: 8px; }
-            .nav-btn{ width: 44px; height: 44px; font-size: 16px; }
+            .nav-btn, .toggle-btn{ width: 44px; height: 44px; font-size: 16px; }
             .play-btn{ width: 64px; height: 64px; font-size: 24px; }
             .controls{ flex-direction: column; }
             .control-btn{ width: 100%; }
@@ -342,6 +356,7 @@
                     <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
                     <button class="play-btn" id="playBtn"></button>
                     <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
+                    <button class="toggle-btn" id="ignoreCaseBtn" title="Ignore Capitalization">Aa</button>
                     <span id="timeDisplay">0:00 / 0:00</span>
                 </div>
                 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
