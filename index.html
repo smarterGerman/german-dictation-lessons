@@ -56,25 +56,26 @@
             overflow: visible !important;
         }
 
-        /* Main player pill */
+        /* Main player pill - larger on desktop */
         .player-pill {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 50px;
-            padding: 12px 24px;
+            padding: 16px 32px; /* Increased padding from 12px 24px */
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px; /* Increased gap from 16px */
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
 
-        /* Progress and secondary controls row */
+        /* Progress and secondary controls row - centered */
         .progress-controls-row {
             display: flex;
             align-items: center;
+            justify-content: center; /* Center the entire row */
             gap: 12px;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px; /* Increased max-width for better centering */
         }
 
         /* Beautiful gradient-filled buttons without borders */
@@ -545,7 +546,7 @@
     .audio-section{ padding: 15px; }
     /* Mobile placeholder text sizing */
     .input-field::placeholder {
-        font-size: 12px !important; /* Even smaller on mobile */
+        font-size: 14px !important; /* Even smaller on mobile */
         line-height: 1.3;
     }
 
