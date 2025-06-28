@@ -370,10 +370,6 @@
                     <textarea class="input-field" id="userInput" placeholder="Type what you hear here... (Use ae for ä, oe for ö, ue for ü, B for ß)"></textarea>
                 </div>
 
-                <div class="options">
-                    <label class="toggle"><input type="checkbox" id="ignoreCaseToggle" checked> Ignore Capitalization</label>
-                </div>
-
                 <div class="reference-text" id="referenceText"></div>
             </div>
 
@@ -421,7 +417,8 @@
 
         let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, lessonInfo, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let checkBtn, resetBtn, revealBtn, ignoreCaseToggle;
+        let checkBtn, resetBtn, revealBtn, ignoreCaseBtn;
+        let ignoreCaseActive = true;
         let prevBtn, nextBtn, sentenceInfo;
 
         window.addEventListener('load', function() {
@@ -440,7 +437,7 @@
             checkBtn = document.getElementById('checkBtn');
             resetBtn = document.getElementById('resetBtn');
             revealBtn = document.getElementById('revealBtn');
-            ignoreCaseToggle = document.getElementById('ignoreCaseToggle');
+            ignoreCaseBtn = document.getElementById('ignoreCaseBtn');
             prevBtn = document.getElementById('prevBtn');
             nextBtn = document.getElementById('nextBtn');
             sentenceInfo = document.getElementById('sentenceInfo');
@@ -455,8 +452,13 @@
             if (checkBtn) checkBtn.addEventListener('click', showFinalResult);
             if (resetBtn) resetBtn.addEventListener('click', resetDictation);
             if (revealBtn) revealBtn.addEventListener('click', showAnswer);
-            if (ignoreCaseToggle) ignoreCaseToggle.addEventListener('change', updateLiveFeedback);
-
+            if (ignoreCaseBtn) {
+                ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
+                // Set initial state
+                if (ignoreCaseActive) {
+                    ignoreCaseBtn.classList.add('active');
+                }
+            }
             if (audioPlayer) {
                 audioPlayer.addEventListener('play', () => {
                     isPlaying = true;
@@ -502,7 +504,17 @@
                 processCurrentSentenceAndAdvance();
             }
         }
-
+            function toggleIgnoreCase() {
+                ignoreCaseActive = !ignoreCaseActive;
+                if (ignoreCaseBtn) {
+                    if (ignoreCaseActive) {
+                        ignoreCaseBtn.classList.add('active');
+                    } else {
+                        ignoreCaseBtn.classList.remove('active');
+                    }
+                }
+    updateLiveFeedback();
+}
         function processCurrentSentenceAndAdvance() {
             if (!userInput.value.trim()) {
                 playCurrentSentence();
@@ -803,7 +815,7 @@
         function compareTexts(reference, userText) {
             userText = convertGermanChars(userText);
             
-            const ignoreCase = ignoreCaseToggle ? ignoreCaseToggle.checked : true;
+            const ignoreCase = ignoreCaseActive;
             const ignorePunctuation = true;
             
             let refNormalized = reference;
@@ -1023,7 +1035,7 @@
         }
 
         function calculateWordStats(comparison) {
-            const ignoreCase = ignoreCaseToggle ? ignoreCaseToggle.checked : true;
+            const ignoreCase = ignoreCaseActive;
             const ignorePunctuation = true;
             
             let refNormalized = referenceText;
