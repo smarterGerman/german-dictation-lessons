@@ -7,39 +7,24 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        html {
-            height: 100%;
-            overflow: hidden;
-        }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #fdfdfd;
             color: #1f2937;
-            height: 100%;
+            min-height: 100vh;
             padding: 20px;
-            overflow: hidden;
-            margin: 0;
         }
 
         .container {
             max-width: 100%;
             width: 100%;
-            height: calc(100% - 40px);
             margin: 0 auto;
             background: transparent;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
         .content { 
             padding: 0; 
             width: 100%; 
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
         }
 
         /* ----- AUDIO SECTION ---------------------------------------------- */
@@ -51,7 +36,6 @@
             color: #374151;
             width: 100%;
             overflow: visible !important;
-            flex-shrink: 0; /* Don't shrink */
         }
         
         .sentence-info { 
@@ -343,26 +327,16 @@
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
 
-        /* Text section - flexible but controlled */
-        .text-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            min-height: 0; /* Important for flex child */
-        }
-
-        /* Hint display area - normal dynamic sizing */
+        /* Hint display area - pink border to match input field */
         .hint-display {
             margin: 20px 0;
             padding: 16px 20px;
             background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
-            border: 2px solid #e879f9;
+            border: 2px solid #e879f9; /* Same pink as input field */
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1);
-            flex-shrink: 0;
-            transition: all 0.3s ease; /* Smooth transitions */
+            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1); /* Pink shadow to match */
+            animation: hintSlideIn 0.3s ease-out;
         }
 
         .hint-content {
@@ -539,13 +513,10 @@
         }
 
         /* ----- STATS & CONTROLS ------------------------------------------- */
-        .stats-section {
-            margin: 32px 0 0 0;
-            padding-top: 24px;
-            border-top: 1px solid #f3f4f6;
-            flex-shrink: 0; /* Don't shrink */
-            max-height: 50vh; /* Limit height */
-            overflow-y: auto; /* Allow internal scrolling */
+        .stats-section{
+            margin:32px 0 0 0;
+            padding-top:24px;
+            border-top:1px solid #f3f4f6;
         }
         
         .stats{
@@ -858,7 +829,7 @@
 
             <!-- TEXT & FEEDBACK -->
             <div class="text-section">
-                <!-- Hint display area - only appears when needed -->
+                <!-- Hint display area - shows under controls, above feedback -->
                 <div class="hint-display" id="hintDisplay" style="display: none;">
                     <div class="hint-content" id="hintContent"></div>
                 </div>
@@ -902,82 +873,11 @@
     </div>
 
     <script>
-        // MODERN AUTO-RESIZE SYSTEM: ResizeObserver + Fallback
-        let lastReportedHeight = 0;
-        let resizeTimeout = null;
-
         function sendHeightToParent() {
-            // Clear any pending resize calls
-            if (resizeTimeout) {
-                clearTimeout(resizeTimeout);
+            const height = document.body.scrollHeight;
+            if (window.parent !== window) {
+                window.parent.postMessage({ frameHeight: height }, '*');
             }
-            
-            // Use a small delay to ensure DOM is fully updated
-            resizeTimeout = setTimeout(() => {
-                const height = Math.max(
-                    document.body.scrollHeight,
-                    document.body.offsetHeight,
-                    document.documentElement.scrollHeight,
-                    document.documentElement.offsetHeight,
-                    document.documentElement.clientHeight
-                );
-                
-                // Only send if height actually changed (prevent spam)
-                if (height !== lastReportedHeight) {
-                    lastReportedHeight = height;
-                    if (window.parent !== window) {
-                        window.parent.postMessage({ frameHeight: height }, '*');
-                    }
-                    console.log('Sent new height:', height);
-                }
-            }, 50);
-        }
-
-        function initializeAutoResize() {
-            // Method 1: Modern ResizeObserver (preferred)
-            if (window.ResizeObserver) {
-                console.log('Using ResizeObserver (modern)');
-                
-                const resizeObserver = new ResizeObserver(entries => {
-                    sendHeightToParent();
-                });
-                
-                // Observe the main container for size changes
-                const container = document.querySelector('.container');
-                if (container) {
-                    resizeObserver.observe(container);
-                }
-                
-                // Also observe document body for additional safety
-                resizeObserver.observe(document.body);
-                
-            } else {
-                console.log('Using MutationObserver fallback (older browsers)');
-                
-                // Method 2: Fallback for older browsers
-                const mutationObserver = new MutationObserver(() => {
-                    sendHeightToParent();
-                });
-                
-                // Watch for DOM changes that could affect height
-                mutationObserver.observe(document.body, {
-                    childList: true,      // Child elements added/removed
-                    subtree: true,        // Watch all descendants
-                    attributes: true,     // Attribute changes (style, class, etc.)
-                    attributeFilter: ['style', 'class'], // Only watch relevant attributes
-                });
-                
-                // Additional fallback: Window resize events
-                window.addEventListener('resize', sendHeightToParent);
-                
-                // Backup polling for edge cases (very conservative)
-                setInterval(() => {
-                    sendHeightToParent();
-                }, 5000); // Only every 5 seconds as last resort
-            }
-            
-            // Initial height calculation
-            sendHeightToParent();
         }
 
         window.addEventListener('load', sendHeightToParent);
@@ -1083,9 +983,7 @@
             });
             window.focus();
             console.log('Main window load event completed, focus attempted.');
-            
-            // Initialize the modern auto-resize system
-            initializeAutoResize();
+            setTimeout(sendHeightToParent, 500);
         });
 
         function toggleSpeed() {
@@ -2017,38 +1915,64 @@
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        // SMOOTH AUTO-RESIZE HINT SYSTEM - works with ResizeObserver
+        // SIMPLE INLINE HINT SYSTEM - with mobile debugging
         function showHint() {
-            if (!referenceText) return;
+            console.log('showHint called, referenceText:', referenceText);
+            
+            if (!referenceText) {
+                console.log('No referenceText, exiting');
+                return;
+            }
             
             const hintDisplay = document.getElementById('hintDisplay');
             const hintContent = document.getElementById('hintContent');
             
-            if (!hintDisplay || !hintContent) return;
+            console.log('hintDisplay element:', hintDisplay);
+            console.log('hintContent element:', hintContent);
+            
+            if (!hintDisplay || !hintContent) {
+                console.log('Elements not found, exiting');
+                return;
+            }
+            
+            // Hide any existing hint first
+            hideHint();
             
             // Set the hint text
             hintContent.textContent = referenceText;
+            console.log('Set hint content to:', referenceText);
             
             // Show the hint display
             hintDisplay.style.display = 'block';
+            hintDisplay.style.visibility = 'visible';
+            console.log('Set display to block');
             
-            // ResizeObserver will automatically detect the change and resize
-            // No manual sendHeightToParent() needed!
+            // Force reflow for animation on mobile
+            hintDisplay.offsetHeight;
             
-            // Auto-hide after 8 seconds
+            // Auto-hide after 10 seconds (longer for debugging)
             setTimeout(() => {
+                console.log('Auto-hiding hint');
                 hideHint();
-            }, 8000);
+            }, 10000);
+            
+            // Trigger height recalculation for both mobile and desktop
+            setTimeout(() => {
+                sendHeightToParent();
+            }, 50);
+            setTimeout(() => {
+                sendHeightToParent();
+            }, 350);
         }
 
         function hideHint() {
             const hintDisplay = document.getElementById('hintDisplay');
             if (hintDisplay && hintDisplay.style.display !== 'none') {
-                // Hide the hint
+                console.log('Hiding hint');
                 hintDisplay.style.display = 'none';
-                
-                // ResizeObserver will automatically detect the change and resize
-                // No manual sendHeightToParent() needed!
+                setTimeout(() => {
+                    sendHeightToParent();
+                }, 50);
             }
         }
 
