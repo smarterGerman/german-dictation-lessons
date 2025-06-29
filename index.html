@@ -2064,9 +2064,9 @@
                 } else if (item.type === 'insert') {
                     html += `<span class="result-word-extra">${item.userWord}</span>`;
                 } else if (item.type === 'delete') {
-                    const underscoreLength = Math.max(item.refWord.length, 3);
-                    const underscore = '_'.repeat(underscoreLength);
-                    html += `<span class="result-word-missing" data-missing="${item.refWord}">${underscore}</span>`;
+                    // Create individual underscores with spaces between them
+                    const individualUnderscores = item.refWord.split('').map(() => '_').join(' ');
+                    html += `<span class="result-word-missing" data-missing="${item.refWord}">${individualUnderscores}</span>`;
                 }
             });
             
