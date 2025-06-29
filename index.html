@@ -1177,12 +1177,6 @@
                 exportCsvBtn.addEventListener('click', exportCSV);
             }
 
-            // Add restart button event listener
-            const restartBtn = document.getElementById('restartBtn');
-            if (restartBtn) {
-                restartBtn.addEventListener('click', restartDictation);
-            }
-
             if (audioPlayer) {
                 audioPlayer.addEventListener('play', () => {
                     isPlaying = true;
