@@ -413,6 +413,13 @@
             flex-shrink: 0;
             max-height: 50vh;
             overflow-y: auto;
+            transition: margin-top 0.3s ease;
+        }
+
+        .stats-section.active {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
         }
 
         .stats-with-export {
@@ -1817,7 +1824,11 @@
                 inputArea.style.display = 'none';
             }
             
-            // Show stats
+            // Show stats and move them up
+            const statsContainer = document.querySelector('.stats-section');
+            if (statsContainer) {
+                statsContainer.classList.add('active');
+            }
             if (statsSection) statsSection.style.display = 'flex';
             
             showDetailedResults();
@@ -2067,7 +2078,11 @@
                 inputArea.style.display = 'flex';
             }
             
-            // Hide stats
+            // Hide stats and restore normal position
+            const statsContainer = document.querySelector('.stats-section');
+            if (statsContainer) {
+                statsContainer.classList.remove('active');
+            }
             if (statsSection) {
                 statsSection.style.display = 'none';
             }
