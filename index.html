@@ -51,7 +51,7 @@
             color: #374151;
             width: 100%;
             overflow: visible !important;
-            flex-shrink: 0; /* Don't shrink */
+            flex-shrink: 0;
         }
         
         .sentence-info { 
@@ -61,7 +61,6 @@
             font-weight: 500; 
         }
 
-        /* Unified minimalist design for all screen sizes */
         .audio-controls { 
             display: flex; 
             flex-direction: column;
@@ -71,34 +70,31 @@
             overflow: visible !important;
         }
 
-        /* Main player pill - dramatically more visible */
         .player-pill {
-            background: rgba(255, 255, 255, 0.98); /* Fast opak */
-            border: 2px solid rgba(168, 85, 247, 0.4); /* Stärkerer Border */
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(168, 85, 247, 0.4);
             border-radius: 50px;
             padding: 16px 32px;
             display: flex;
             align-items: center;
             gap: 20px;
             box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.25), /* Großer Hauptschatten */
-                0 4px 12px rgba(168, 85, 247, 0.3), /* Farbiger Glow */
-                inset 0 1px 0 rgba(255, 255, 255, 0.6); /* Innerer Highlight */
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                0 4px 12px rgba(168, 85, 247, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
         }
 
-        /* Desktop progress controls - bigger second row */
         .progress-controls-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px; /* Bigger gap */
+            gap: 16px;
             width: 100%;
-            max-width: 600px; /* Bigger max-width */
-            padding: 0 20px; /* Add padding */
+            max-width: 600px;
+            padding: 0 20px;
         }
 
-        /* Beautiful gradient-filled buttons without borders */
         .nav-btn,
         .toggle-btn:not(.active):not([class*="speed-"]) {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
@@ -116,7 +112,6 @@
             transform: translateY(-1px) !important;
         }
 
-        /* Play button and Aa button - pink gradient (when active) */
         .play-btn,
         .toggle-btn.active:not([class*="speed-"]) {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
@@ -132,7 +127,6 @@
             transform: translateY(-1px) !important;
         }
 
-        /* Speed button gradients - traffic light colors */
         .toggle-btn.speed-100 {
             background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
             color: white !important;
@@ -172,7 +166,6 @@
             transform: translateY(-1px) !important;
         }
 
-        /* Secondary buttons (? and X) - gentle gradient that complements pink */
         .secondary-btn {
             background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%) !important;
             border: none !important;
@@ -188,7 +181,6 @@
             transform: translateY(-1px) !important;
         }
 
-        /* Larger desktop buttons */
         .nav-btn,
         .toggle-btn:not(.secondary-btn) {
             width: 56px;
@@ -202,7 +194,6 @@
             font-size: 26px;
         }
 
-        /* Secondary button sizing - keep smaller but proportional */
         .secondary-btn {
             width: 40px !important;
             height: 40px !important;
@@ -210,7 +201,6 @@
             flex-shrink: 0;
         }
 
-        /* Desktop progress bar */
         .progress-container { 
             flex-grow: 0;
             flex-shrink: 0;
@@ -226,23 +216,6 @@
                 inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        /* Desktop player pill */
-        .player-pill {
-            background: rgba(255, 255, 255, 0.98);
-            border: 2px solid rgba(168, 85, 247, 0.4);
-            border-radius: 50px;
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.25),
-                0 4px 12px rgba(168, 85, 247, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Time display */
         .progress-controls-row #timeDisplay {
             flex-shrink: 0;
             font-size: 14px;
@@ -342,50 +315,14 @@
             transform: translateY(-2px);
         }
 
-        /* Speed button colors - Traffic Light */
-        .toggle-btn.speed-100 {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
-        }
-
-        .toggle-btn.speed-100:hover {
-            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
-        }
-
-        .toggle-btn.speed-75 {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: white;
-            box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
-        }
-
-        .toggle-btn.speed-75:hover {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4);
-        }
-
-        .toggle-btn.speed-50 {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
-        }
-
-        .toggle-btn.speed-50:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
-        }
-
-        /* Text section - flexible but controlled */
         .text-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            min-height: 0; /* Important for flex child */
+            min-height: 0;
         }
 
-        /* Hint display area - normal dynamic sizing */
         .hint-display {
             margin: 20px 0;
             padding: 16px 20px;
@@ -395,7 +332,7 @@
             text-align: center;
             box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1);
             flex-shrink: 0;
-            transition: all 0.3s ease; /* Smooth transitions */
+            transition: all 0.3s ease;
         }
 
         .hint-content {
@@ -405,7 +342,6 @@
             line-height: 1.5;
         }
 
-        /* Mobile responsive hint */
         @media(max-width: 768px) {
             .hint-display {
                 margin: 15px 0;
@@ -428,9 +364,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* Remove old tooltip styles */
-        /* Remove old tooltip styles */
 
         .play-btn {
             position: relative;
@@ -482,12 +415,11 @@
             margin-right: 8px;
         }
         
-        /* Clean progress bar styling - dramatically more visible */
         .progress-container { 
             flex-grow: 0;
             flex-shrink: 0;
             width: 150px;
-            height: 12px; /* Dicker */
+            height: 12px;
             background: rgba(255, 255, 255, 0.95);
             border: 2px solid rgba(168, 85, 247, 0.4);
             border-radius: 20px;
@@ -506,7 +438,6 @@
             transition:width .3s ease;
         }
 
-        /* ----- INPUT / FEEDBACK ------------------------------------------- */
         .input-area { 
             display:flex; 
             flex-direction:column; 
@@ -537,10 +468,10 @@
         }
 
         .input-field::placeholder {
-            font-size: 32px !important; /* Much larger to fill the box */
+            font-size: 32px !important;
             color: #9CA3AF;
             opacity: 1;
-            line-height: 1.2; /* Tighter line height for better fill */
+            line-height: 1.2;
             transition: color 0.3s ease;
         }
         
@@ -558,7 +489,6 @@
             box-shadow: 0 4px 16px rgba(167, 139, 250, 0.1);
         }
 
-        /* feedback colors */
         .char-correct{color:#059669;font-weight:500;} 
         .char-wrong-position{color:#d97706;font-weight:500;} 
         .char-wrong{color:#dc2626;text-decoration:underline;font-weight:500;} 
@@ -566,39 +496,19 @@
         .char-extra{color:#2563eb;font-weight:500;} 
         .char-word-boundary,.char-char-space{color:#9ca3af;}
 
-        /* ----- OPTIONS ----------------------------------------------------- */
         .options { 
             display: none;
         }
 
-        /* ----- STATS & CONTROLS ------------------------------------------- */
         .stats-section {
             margin: 32px 0 0 0;
             padding-top: 24px;
             border-top: 1px solid #f3f4f6;
-            flex-shrink: 0; /* Don't shrink */
-            max-height: 50vh; /* Limit height */
-            overflow-y: auto; /* Allow internal scrolling */
+            flex-shrink: 0;
+            max-height: 50vh;
+            overflow-y: auto;
         }
 
-
-        
-        .stats{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-            gap:16px;
-            margin-bottom:24px;
-        }
-
-        /* Stats container with export button */
-        .stats-with-export {
-            display: flex;
-            align-items: flex-start;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        /* Stats container with buttons on the right */
         .stats-with-export {
             display: flex;
             align-items: flex-start;
@@ -621,7 +531,6 @@
             flex-shrink: 0;
         }
 
-        /* Player-style round buttons - match the speed button exactly */
         .export-csv-btn, .restart-btn {
             width: 64px;
             height: 64px;
@@ -663,20 +572,20 @@
         }
         
         .stat-item{
-            background: rgba(255, 255, 255, 0.95); /* More opaque */
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(168, 85, 247, 0.2); /* Add visible border */
+            border: 2px solid rgba(168, 85, 247, 0.2);
             border-radius:16px;
             padding:24px;
             text-align:center;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Stronger shadow */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             transition: all .3s ease;
         }
         
         .stat-item:hover{
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); /* Even stronger on hover */
-            border-color: rgba(168, 85, 247, 0.4); /* More visible border on hover */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            border-color: rgba(168, 85, 247, 0.4);
         }
         
         .stat-value{
@@ -704,7 +613,6 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
-        /* Sentence results styling - more compact */
         .sentence-results {
             margin-top: 32px;
             padding: 24px;
@@ -725,7 +633,6 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
-        /* Word coloring in results */
         .result-word-correct {
             color: #059669;
             font-weight: 500;
@@ -771,7 +678,6 @@
             border-radius: 4px;
         }
 
-        /* Tooltip for wrong words */
         .word-tooltip {
             position: absolute;
             bottom: 100%;
@@ -807,7 +713,6 @@
             pointer-events: auto;
         }
 
-        /* Prevent tooltip cutoff */
         .word-tooltip.adjust-left {
             left: 0;
             transform: translateX(0);
@@ -828,88 +733,105 @@
             right: 20px;
         }
 
-        /* Export controls styling - REMOVED OLD DUPLICATE */
+        .export-controls {
+            text-align: center;
+            margin: 24px 0;
+            padding: 16px;
+        }
 
-       /* ----- RESPONSIVE -------------------------------------------------- */
+        .export-csv-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .export-csv-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+        }
+
        @media(max-width:768px){
-    body { padding: 10px; }
-    .audio-section{ padding: 15px; }
-    
-    /* Mobile placeholder text sizing - fill the mobile input box */
-    .input-field::placeholder {
-        font-size: 20px !important; /* Much larger than 12px to fill mobile box */
-        line-height: 1.2; /* Tighter for better vertical fill */
-    }
+            body { padding: 10px; }
+            .audio-section{ padding: 15px; }
+            
+            .input-field::placeholder {
+                font-size: 20px !important;
+                line-height: 1.2;
+            }
 
-    .input-field, .live-feedback{ padding: 15px; font-size: 24px; }
+            .input-field, .live-feedback{ padding: 15px; font-size: 24px; }
 
-    /* Mobile: apply same dramatic styling to pill */
-    .player-pill {
-        padding: 10px 20px;
-        gap: 14px;
-        background: rgba(255, 255, 255, 0.98); /* Same as desktop */
-        border: 2px solid rgba(168, 85, 247, 0.4); /* Same as desktop */
-        box-shadow: 
-            0 12px 40px rgba(0, 0, 0, 0.25), /* Same dramatic shadow */
-            0 4px 12px rgba(168, 85, 247, 0.3), /* Same glow */
-            inset 0 1px 0 rgba(255, 255, 255, 0.6); /* Same highlight */
-    }
+            .player-pill {
+                padding: 10px 20px;
+                gap: 14px;
+                background: rgba(255, 255, 255, 0.98);
+                border: 2px solid rgba(168, 85, 247, 0.4);
+                box-shadow: 
+                    0 12px 40px rgba(0, 0, 0, 0.25),
+                    0 4px 12px rgba(168, 85, 247, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            }
 
-    /* Mobile: apply same styling to progress bar */
-    .progress-container {
-        width: 120px; /* Slightly smaller for mobile space */
-        height: 12px; /* Keep thick */
-        background: rgba(255, 255, 255, 0.95); /* Same as desktop */
-        border: 2px solid rgba(168, 85, 247, 0.4); /* Same as desktop */
-        box-shadow: 
-            0 4px 16px rgba(0, 0, 0, 0.2), /* Same shadow */
-            inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Same inset */
-    }
+            .progress-container {
+                width: 120px;
+                height: 12px;
+                background: rgba(255, 255, 255, 0.95);
+                border: 2px solid rgba(168, 85, 247, 0.4);
+                box-shadow: 
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
 
-    .progress-controls-row {
-        max-width: 320px;
-        gap: 8px;
-    }
+            .progress-controls-row {
+                max-width: 320px;
+                gap: 8px;
+            }
 
-    /* Smaller buttons on mobile */
-    .nav-btn, .toggle-btn {
-        width: 48px !important;
-        height: 48px !important;
-        font-size: 16px !important;
-    }
+            .nav-btn, .toggle-btn {
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 16px !important;
+            }
 
-    .play-btn {
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 24px !important;
-    }
+            .play-btn {
+                width: 56px !important;
+                height: 56px !important;
+                font-size: 24px !important;
+            }
 
-    .secondary-btn {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 12px !important;
-    }
+            .secondary-btn {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 12px !important;
+            }
 
-    .progress-controls-row #timeDisplay {
-        font-size: 12px;
-        min-width: 70px;
-    }
-}
+            .progress-controls-row #timeDisplay {
+                font-size: 12px;
+                min-width: 70px;
+            }
+        }
 
-        /* Add this new style for your 'X' button */
-    .toggle-btn.end-button {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-        color: white;
-        font-size: 1.5em;
-        font-weight: bold;
-        line-height: 1;
-        padding: 8px 12px;
-    }
+        .toggle-btn.end-button {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            line-height: 1;
+            padding: 8px 12px;
+        }
 
-    .toggle-btn.end-button:hover {
-        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-        transform: translateY(-2px);
-    }
+        .toggle-btn.end-button:hover {
+            background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -918,7 +840,6 @@
             <!-- AUDIO SECTION -->
             <div class="audio-section">
                 <div class="audio-controls">
-                    <!-- Unified pill design for all screen sizes -->
                     <div class="player-pill">
                         <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
                         <button class="play-btn" id="playBtn">
@@ -977,8 +898,6 @@
                         </button>
                     </div>
                 </div>
-
-
 
                 <!-- Detailed sentence results -->
                 <div class="sentence-results" id="sentenceResults" style="display:none;">
@@ -1069,9 +988,13 @@
             sendHeightToParent();
         }
 
-        window.addEventListener('load', sendHeightToParent);
-        window.addEventListener('resize', sendHeightToParent);
+        // DOM ELEMENTS
+        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
+        let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
+        let endDictationBtn, ignoreCaseBtn, hintBtn, speedBtn;
+        let prevBtn, nextBtn, sentenceInfo, exportCsvBtn;
 
+        // GLOBAL STATE
         let referenceText = '';
         let isPlaying = false;
         let vttCues = [];
@@ -1091,12 +1014,22 @@
             lessonsUrl: 'https://raw.githubusercontent.com/smarterGerman/dictation/main/lessons/lessons.json'
         };
 
-        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
-        let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
-        let endDictationBtn, resetBtn, ignoreCaseBtn, hintBtn, speedBtn;
-        let prevBtn, nextBtn, sentenceInfo, exportCsvBtn;
-
+        // INITIALIZATION
         window.addEventListener('load', function() {
+            initializeDOMElements();
+            setupEventListeners();
+            initializeAutoResize();
+            
+            const lessonId = getLessonIdFromUrl() || 'A1L01';
+            loadAllLessons().then(() => {
+                loadLesson(lessonId);
+            });
+            
+            window.focus();
+            console.log('Main window load event completed, focus attempted.');
+        });
+
+        function initializeDOMElements() {
             audioPlayer = document.getElementById('audioPlayer');
             playBtn = document.getElementById('playBtn');
             progressBar = document.getElementById('progressBar');
@@ -1109,6 +1042,7 @@
             if (userInput) {
                 userInput.placeholder = initialPlaceholderText;
             }
+            
             liveFeedback = document.getElementById('liveFeedback');
             accuracyPercent = document.getElementById('accuracyPercent');
             correctWords = document.getElementById('correctWords');
@@ -1121,37 +1055,45 @@
             nextBtn = document.getElementById('nextBtn');
             sentenceInfo = document.getElementById('sentenceInfo');
             exportCsvBtn = document.getElementById('exportCsvBtn');
+        }
 
+        function setupEventListeners() {
+            // Audio controls
             if (playBtn) playBtn.addEventListener('click', togglePlayback);
             if (prevBtn) prevBtn.addEventListener('click', goToPreviousSentence);
             if (nextBtn) nextBtn.addEventListener('click', goToNextSentence);
+            
+            // Input
             if (userInput) {
                 userInput.addEventListener('input', handleUserInput);
                 userInput.addEventListener('keydown', handleKeyDown);
             }
+            
+            // UI controls
             if (endDictationBtn) endDictationBtn.addEventListener('click', showFinalResult);
+            
             if (ignoreCaseBtn) {
                 ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
                 ignoreCaseBtn.classList.remove('active');
                 ignoreCaseBtn.title = "Capitalization checking OFF";
             }
+            
             if (speedBtn) {
                 speedBtn.addEventListener('click', toggleSpeed);
                 speedBtn.classList.add('speed-100');
             }
+            
             if (hintBtn) {
                 hintBtn.addEventListener('click', showHint);
             }
 
-            // Add restart and export button event listeners
+            // Result buttons
             const restartBtn = document.getElementById('restartBtn');
             const exportBtn = document.getElementById('exportCsvBtn');
             
             if (restartBtn) {
                 restartBtn.addEventListener('click', restartDictation);
                 console.log('Restart button listener added');
-            } else {
-                console.log('Restart button not found!');
             }
             
             if (exportBtn) {
@@ -1160,10 +1102,9 @@
                     exportCSV();
                 });
                 console.log('Export button listener added');
-            } else {
-                console.log('Export button not found!');
             }
 
+            // Audio events
             if (audioPlayer) {
                 audioPlayer.addEventListener('play', () => {
                     isPlaying = true;
@@ -1174,27 +1115,54 @@
                         userInput.focus();
                     }
                 });
+                
                 audioPlayer.addEventListener('pause', () => {
                     isPlaying = false;
                     if (playBtn) {
                         playBtn.classList.remove('playing');
                     }
                 });
+                
                 audioPlayer.addEventListener('timeupdate', handleTimeUpdate);
+                
+                audioPlayer.addEventListener('loadedmetadata', () => {
+                    console.log(`[DEBUG] Metadata loaded. Duration: ${audioPlayer.duration.toFixed(2)}s. Network State: ${audioPlayer.networkState}.`);
+                    if (playBtn) {
+                        playBtn.classList.remove('loading', 'playing');
+                        playBtn.disabled = false;
+                    }
+                    audioPlayer.playbackRate = currentSpeed;
+                    updateProgress();
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'none';
+                    }
+                });
+                
+                audioPlayer.addEventListener('error', (e) => {
+                    const error = e.target.error;
+                    console.error('Audio Loading Error:', {
+                        networkState: audioPlayer.networkState,
+                        code: error ? error.code : 'N/A',
+                        message: error ? error.message : 'Unknown Error',
+                        event: e
+                    });
+                    if (playBtn) {
+                        playBtn.classList.remove('loading');
+                        playBtn.disabled = true;
+                        playBtn.style.opacity = '0.5';
+                    }
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'none';
+                    }
+                    alert('Error loading audio. Please check your internet connection or try refreshing the page.');
+                });
             }
 
+            // Global keyboard shortcuts
             window.addEventListener('keydown', handleGlobalKeyDown);
-            const lessonId = getLessonIdFromUrl() || 'A1L01';
-            loadAllLessons().then(() => {
-                loadLesson(lessonId);
-            });
-            window.focus();
-            console.log('Main window load event completed, focus attempted.');
-            
-            // Initialize the modern auto-resize system
-            initializeAutoResize();
-        });
+        }
 
+        // SPEED CONTROL
         function toggleSpeed() {
             if (speedBtn) {
                 speedBtn.classList.remove('speed-100', 'speed-75', 'speed-50');
@@ -1219,6 +1187,7 @@
             }
         }
 
+        // CASE SENSITIVITY TOGGLE
         function toggleIgnoreCase() {
             ignoreCaseActive = !ignoreCaseActive;
             if (ignoreCaseBtn) {
@@ -1233,6 +1202,7 @@
             updateLiveFeedback();
         }
 
+        // INPUT HANDLING
         function handleUserInput(e) {
             hideHint();
             
@@ -1251,30 +1221,19 @@
             setTimeout(sendHeightToParent, 100);
         }
 
+        // KEYBOARD SHORTCUTS
         function handleGlobalKeyDown(e) {
             console.log('Global keydown detected:', e.key, 'Shift:', e.shiftKey, 'Ctrl/Cmd:', (e.ctrlKey || e.metaKey));
 
             // Hint shortcut: Shift + Ctrl/Cmd + ß (German), / (US), , (French)
-            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'ß') {
-                e.preventDefault();
-                showHint();
-                if (hintBtn) hintBtn.focus();
-                return;
-            }
-            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === '/') {
-                e.preventDefault();
-                showHint();
-                if (hintBtn) hintBtn.focus();
-                return;
-            }
-            if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === ',') {
+            if (e.shiftKey && (e.ctrlKey || e.metaKey) && (e.key === 'ß' || e.key === '/' || e.key === ',')) {
                 e.preventDefault();
                 showHint();
                 if (hintBtn) hintBtn.focus();
                 return;
             }
 
-            // Play/Pause (start dictation): Shift + Ctrl/Cmd + Enter
+            // Play/Pause: Shift + Ctrl/Cmd + Enter
             if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
                 console.log('Shortcut for togglePlayback activated.');
@@ -1312,6 +1271,7 @@
             }
         }
 
+        // SENTENCE PROCESSING
         function processCurrentSentenceAndAdvance() {
             if (!userInput.value.trim()) {
                 playCurrentSentence();
@@ -1345,11 +1305,13 @@
             }
         }
 
+        // URL PARSING
         function getLessonIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('lesson');
         }
 
+        // LESSON LOADING
         async function loadAllLessons() {
             try {
                 const response = await fetch(CONFIG.lessonsUrl);
@@ -1359,10 +1321,11 @@
                 allLessons = await response.json();
             } catch (error) {
                 console.error('Failed to load lessons:', error);
-                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
+                if (sentenceInfo) sentenceInfo.textContent = 'Failed to load lessons data';
             }
         }
 
+        // VTT PARSING
         function parseVTT(vttText) {
             const lines = vttText.split('\n');
             const cues = [];
@@ -1434,6 +1397,7 @@
             }
         }
 
+        // GERMAN CHARACTER CONVERSION
         function convertGermanChars(text) {
             return text
                 .replace(/ae/g, 'ä')
@@ -1448,9 +1412,11 @@
                 .replace(/([aeiouäöü])B(\s)/g, '$1ß$2');
         }
         
+        // AUDIO PLAYBACK
         function togglePlayback() {
-           console.log(`[DEBUG] Play/Pause button tapped. IsPaused: ${audioPlayer.paused}. Current Network State: ${audioPlayer.networkState}.`);
+            console.log(`[DEBUG] Play/Pause button tapped. IsPaused: ${audioPlayer.paused}. Current Network State: ${audioPlayer.networkState}.`);
             console.log('togglePlayback called.');
+            
             if (vttCues.length === 0) {
                 if (isPlaying) {
                     audioPlayer.pause();
@@ -1490,6 +1456,7 @@
             }
         }
 
+        // NAVIGATION
         function goToPreviousSentence() {
             if (currentCueIndex > 0) {
                 currentCueIndex--;
@@ -1553,6 +1520,7 @@
             }
         }
 
+        // TIME UPDATE
         function handleTimeUpdate() {
             updateProgress();
             
@@ -1566,6 +1534,7 @@
             }
         }
 
+        // LESSON LOADING
         async function loadLesson(lessonId) {
             if (loadingSpinner) {
                 loadingSpinner.style.display = 'block';
@@ -1577,7 +1546,7 @@
 
             if (!allLessons[lessonId]) {
                 console.error(`Lesson ${lessonId} not found`);
-                if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
+                if (sentenceInfo) sentenceInfo.textContent = 'Failed to load lessons data';
                 return;
             }
 
@@ -1603,38 +1572,6 @@
             if (audioPlayer) {
                 audioPlayer.src = lessonData.audioUrl;
                 console.log(`[DEBUG] Attempting to load audio: ${lessonData.audioUrl.substring(lessonData.audioUrl.lastIndexOf('/') + 1)}. Current Network State: ${audioPlayer.networkState}.`);
-                
-                audioPlayer.addEventListener('loadedmetadata', () => {
-                    console.log(`[DEBUG] Metadata loaded. Duration: ${audioPlayer.duration.toFixed(2)}s. Network State: ${audioPlayer.networkState}.`);
-                    if (playBtn) {
-                        playBtn.classList.remove('loading', 'playing');
-                        playBtn.disabled = false;
-                    }
-                    audioPlayer.playbackRate = currentSpeed;
-                    updateProgress();
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
-                }, { once: true });
-                
-                audioPlayer.addEventListener('error', (e) => {
-                    const error = e.target.error;
-                    console.error('Audio Loading Error in Listener:', {
-                        networkState: audioPlayer.networkState,
-                        code: error ? error.code : 'N/A',
-                        message: error ? error.message : 'Unknown Error Object',
-                        event: e
-                    });
-                    if (playBtn) {
-                        playBtn.classList.remove('loading');
-                        playBtn.disabled = true;
-                        playBtn.style.opacity = '0.5';
-                    }
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
-                    alert('Error loading audio. Please check your internet connection or try refreshing the page.');
-                }, { once: true });
             }
             
             if (referenceTextDiv) referenceTextDiv.textContent = referenceText;
@@ -1650,6 +1587,7 @@
             setTimeout(sendHeightToParent, 500);
         }
 
+        // TEXT COMPARISON
         function compareTexts(reference, userText) {
             userText = convertGermanChars(userText);
             
@@ -1818,6 +1756,7 @@
             return alignment;
         }
 
+        // LIVE FEEDBACK
         function updateLiveFeedback() {
             if (!userInput || !liveFeedback) return;
             
@@ -1853,6 +1792,7 @@
             liveFeedback.innerHTML = feedbackHTML;
         }
 
+        // PROGRESS BAR
         function updateProgress() {
             if (!audioPlayer || !timeDisplay || !progressBar) return;
             
@@ -1873,6 +1813,7 @@
             }
         }
 
+        // WORD STATISTICS
         function calculateWordStats(comparison) {
             const ignoreCase = ignoreCaseActive;
             const ignorePunctuation = true;
@@ -1916,6 +1857,7 @@
             };
         }
 
+        // FINAL RESULTS
         function showFinalResult() {
             if (!userInput) return;
             
@@ -1961,16 +1903,14 @@
                 timeElement.textContent = formatTime(totalSessionTime);
             }
             
-            if (statsSection) statsSection.style.display = 'grid';
-            
-            const exportControls = document.getElementById('exportControls');
-            if (exportControls) exportControls.style.display = 'block';
+            if (statsSection) statsSection.style.display = 'flex';
             
             showDetailedResults();
                         
             setTimeout(sendHeightToParent, 100);
         }
 
+        // CSV EXPORT
         function exportCSV() {
             if (sessionResults.length === 0) return;
             
@@ -2004,6 +1944,7 @@
             URL.revokeObjectURL(url);
         }
 
+        // DETAILED RESULTS
         function showDetailedResults() {
             const sentenceResultsDiv = document.getElementById('sentenceResults');
             const sentencesContainer = document.getElementById('sentencesContainer');
@@ -2124,7 +2065,7 @@
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        // SMOOTH AUTO-RESIZE HINT SYSTEM - works with ResizeObserver
+        // HINT SYSTEM
         function showHint() {
             if (!referenceText) return;
             
@@ -2140,7 +2081,6 @@
             hintDisplay.style.display = 'block';
             
             // ResizeObserver will automatically detect the change and resize
-            // No manual sendHeightToParent() needed!
             
             // Auto-hide after 8 seconds
             setTimeout(() => {
@@ -2151,25 +2091,11 @@
         function hideHint() {
             const hintDisplay = document.getElementById('hintDisplay');
             if (hintDisplay && hintDisplay.style.display !== 'none') {
-                // Hide the hint
                 hintDisplay.style.display = 'none';
-                
-                // ResizeObserver will automatically detect the change and resize
-                // No manual sendHeightToParent() needed!
             }
         }
 
-        function showAnswer() {
-            if (referenceTextDiv) {
-                referenceTextDiv.style.display = 'block';
-                setTimeout(() => {
-                    referenceTextDiv.style.display = 'none';
-                    sendHeightToParent();
-                }, 10000);
-                sendHeightToParent();
-            }
-        }
-
+        // RESTART FUNCTIONALITY
         function restartDictation() {
             console.log('Restart button clicked');
             
@@ -2201,12 +2127,10 @@
             const inputArea = document.querySelector('.input-area');
             if (inputArea) {
                 inputArea.style.display = 'flex';
-                console.log('Input area shown');
             }
             
             if (statsSection) {
                 statsSection.style.display = 'none';
-                console.log('Stats section hidden');
             }
             
             // Hide detailed results
