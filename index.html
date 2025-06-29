@@ -621,7 +621,7 @@
             flex-shrink: 0;
         }
 
-        /* Player-style round buttons */
+        /* Player-style round buttons - match the speed button exactly */
         .export-csv-btn, .restart-btn {
             width: 64px;
             height: 64px;
@@ -1174,10 +1174,15 @@
             if (restartBtn) {
                 restartBtn.addEventListener('click', restartDictation);
                 console.log('Restart button listener added');
+            } else {
+                console.log('Restart button not found!');
             }
             
             if (exportBtn) {
-                exportBtn.addEventListener('click', exportCSV);
+                exportBtn.addEventListener('click', function() {
+                    console.log('Export button clicked');
+                    exportCSV();
+                });
                 console.log('Export button listener added');
             } else {
                 console.log('Export button not found!');
