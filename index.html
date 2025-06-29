@@ -989,6 +989,8 @@
             if (restartBtn) {
                 restartBtn.addEventListener('click', restartDictation);
                 console.log('Restart button listener added');
+            } else {
+                console.log('Restart button not found');
             }
             
             if (exportBtn) {
@@ -997,6 +999,8 @@
                     exportCSV();
                 });
                 console.log('Export button listener added');
+            } else {
+                console.log('Export button not found');
             }
 
             // Audio events
@@ -1812,7 +1816,14 @@
 
         // CSV EXPORT
         function exportCSV() {
-            if (sessionResults.length === 0) return;
+            console.log('exportCSV function called');
+            console.log('sessionResults length:', sessionResults.length);
+            
+            if (sessionResults.length === 0) {
+                console.log('No session results to export');
+                alert('No results to export. Please complete some sentences first.');
+                return;
+            }
             
             let totalCorrectWords = 0;
             let totalWrongWords = 0;
@@ -1831,17 +1842,27 @@
             let csvContent = 'Lesson,Accuracy,Correct Words,Wrong Words,Total Words,Time Taken\n';
             csvContent += `${lessonId},${accuracy},${totalCorrectWords},${totalWrongWords},${totalWords},${formatTime(totalSessionTime)}`;
             
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
+            console.log('CSV Content:', csvContent);
             
-            link.download = `${lessonId}-results.csv`;
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            try {
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${lessonId}-results.csv`;
+                
+                console.log('Creating download link:', link.download);
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                console.log('CSV export completed successfully');
+            } catch (error) {
+                console.error('Error during CSV export:', error);
+                alert('Error exporting CSV file: ' + error.message);
+            }
         }
 
         // DETAILED RESULTS
