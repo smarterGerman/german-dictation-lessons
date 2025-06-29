@@ -362,18 +362,18 @@
             pointer-events: auto;
         }
 
-        /* Mobile tooltip adjustments */
-        @media(max-width: 768px) {
+        /* Mobile tooltip adjustments - only in portrait mode */
+        @media(max-width: 768px) and (orientation: portrait) {
             .hint-tooltip {
-                position: fixed; /* Fixed positioning on mobile */
+                position: absolute; /* Keep absolute but adjust positioning */
                 top: auto;
-                bottom: 120px; /* Position above controls */
+                bottom: calc(100% + 15px); /* Position above the button */
                 left: 50%;
                 transform: translateX(-50%);
-                max-width: calc(100vw - 40px); /* Responsive width with margins */
-                font-size: 13px; /* Slightly smaller on mobile */
+                max-width: calc(100vw - 40px);
+                font-size: 13px;
                 margin-top: 0;
-                z-index: 1001; /* Higher z-index for mobile */
+                z-index: 1001;
             }
 
             .hint-tooltip::after {
@@ -381,6 +381,16 @@
                 bottom: auto;
                 border-bottom-color: transparent;
                 border-top-color: #1f2937;
+            }
+        }
+
+        /* Desktop and mobile landscape - keep normal positioning */
+        @media(min-width: 769px), (orientation: landscape) {
+            .hint-tooltip {
+                /* Use default positioning - below button */
+                position: absolute;
+                top: 100%;
+                bottom: auto;
             }
         }
 
