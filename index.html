@@ -264,6 +264,12 @@
             flex-direction: column;
             overflow: hidden;
             min-height: 0;
+            transition: flex 0.3s ease;
+        }
+
+        .text-section.collapsed {
+            flex: 0;
+            min-height: 0;
         }
 
         .hint-display {
@@ -1818,10 +1824,14 @@
                 timeElement.textContent = formatTime(totalSessionTime);
             }
             
-            // Hide input areas
+            // Hide input areas and collapse text section
             const inputArea = document.querySelector('.input-area');
+            const textSection = document.querySelector('.text-section');
             if (inputArea) {
                 inputArea.style.display = 'none';
+            }
+            if (textSection) {
+                textSection.classList.add('collapsed');
             }
             
             // Show stats and move them up
@@ -2072,10 +2082,14 @@
                 liveFeedback.innerHTML = 'Live Feedback';
             }
             
-            // Show input areas
+            // Show input areas and restore text section
             const inputArea = document.querySelector('.input-area');
+            const textSection = document.querySelector('.text-section');
             if (inputArea) {
                 inputArea.style.display = 'flex';
+            }
+            if (textSection) {
+                textSection.classList.remove('collapsed');
             }
             
             // Hide stats and restore normal position
