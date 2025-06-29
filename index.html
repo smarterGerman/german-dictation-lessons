@@ -55,16 +55,19 @@
             overflow: visible !important;
         }
 
-        /* Main player pill - more visible */
+        /* Main player pill - dramatically more visible */
         .player-pill {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            background: rgba(255, 255, 255, 0.98); /* Fast opak */
+            border: 2px solid rgba(168, 85, 247, 0.4); /* Stärkerer Border */
             border-radius: 50px;
             padding: 16px 32px;
             display: flex;
             align-items: center;
             gap: 20px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25), /* Großer Hauptschatten */
+                0 4px 12px rgba(168, 85, 247, 0.3), /* Farbiger Glow */
+                inset 0 1px 0 rgba(255, 255, 255, 0.6); /* Innerer Highlight */
             backdrop-filter: blur(10px);
         }
 
@@ -324,23 +327,22 @@
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
 
-        /* FIXED HINT TOOLTIP STYLES - Complete overhaul */
+        /* Hint tooltip styles - SIMPLE AND WORKING */
         .hint-tooltip {
-            position: fixed; /* Changed from absolute to fixed for better control */
+            position: absolute;
             background: #1f2937;
             color: white;
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 14px;
-            font-weight: 500;
             white-space: normal;
-            max-width: calc(100vw - 32px); /* Ensure it never exceeds viewport width */
+            max-width: 280px;
             word-wrap: break-word;
-            z-index: 2000; /* Higher z-index to ensure it's above everything */
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
             text-align: left;
             line-height: 1.4;
         }
@@ -350,44 +352,44 @@
             pointer-events: auto;
         }
 
-        /* Arrow for tooltip */
         .hint-tooltip::after {
             content: '';
             position: absolute;
             border: 6px solid transparent;
         }
 
-        /* Arrow positioning based on tooltip placement */
-        .hint-tooltip.above::after {
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-top-color: #1f2937;
-            border-bottom: none;
+        /* Desktop positioning - below button */
+        @media (min-width: 769px) {
+            .hint-tooltip {
+                top: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .hint-tooltip::after {
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border-bottom-color: #1f2937;
+            }
         }
 
-        .hint-tooltip.below::after {
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-bottom-color: #1f2937;
-            border-top: none;
-        }
+        /* Mobile positioning - above button */
+        @media (max-width: 768px) {
+            .hint-tooltip {
+                bottom: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%);
+                max-width: calc(100vw - 40px);
+                font-size: 13px;
+            }
 
-        .hint-tooltip.left::after {
-            right: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-left-color: #1f2937;
-            border-right: none;
-        }
-
-        .hint-tooltip.right::after {
-            left: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-right-color: #1f2937;
-            border-left: none;
+            .hint-tooltip::after {
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border-top-color: #1f2937;
+            }
         }
 
         .play-btn {
@@ -440,18 +442,20 @@
             margin-right: 8px;
         }
         
-        /* Clean progress bar styling */
+        /* Clean progress bar styling - dramatically more visible */
         .progress-container { 
             flex-grow: 0;
             flex-shrink: 0;
             width: 150px;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            height: 12px; /* Dicker */
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(168, 85, 247, 0.4);
             border-radius: 20px;
             overflow: hidden;
             margin: 0 8px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .progress-bar { 
@@ -1907,12 +1911,12 @@
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        // COMPLETELY REWRITTEN HINT SYSTEM
+        // SIMPLE WORKING HINT SYSTEM
         function showHint() {
             if (!referenceText || !hintBtn) return;
             
             // Remove any existing tooltip
-            const existingTooltip = document.querySelector('.hint-tooltip');
+            const existingTooltip = hintBtn.querySelector('.hint-tooltip');
             if (existingTooltip) {
                 existingTooltip.remove();
             }
@@ -1922,102 +1926,29 @@
             tooltip.className = 'hint-tooltip';
             tooltip.textContent = referenceText;
             
-            // Add to body for fixed positioning
-            document.body.appendChild(tooltip);
+            // Add tooltip to hint button (relative positioning)
+            hintBtn.appendChild(tooltip);
             
-            // Get button position
-            const buttonRect = hintBtn.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            const tooltipPadding = 16; // Safety margin from viewport edges
-            
-            // Calculate initial position (centered above button)
-            let left = buttonRect.left + (buttonRect.width / 2);
-            let top = buttonRect.top;
-            
-            // Show tooltip temporarily to measure it
-            tooltip.style.opacity = '0';
-            tooltip.style.visibility = 'hidden';
-            tooltip.classList.add('show');
-            
-            // Get tooltip dimensions
-            const tooltipRect = tooltip.getBoundingClientRect();
-            const tooltipWidth = tooltipRect.width;
-            const tooltipHeight = tooltipRect.height;
-            
-            // Reset visibility
-            tooltip.style.visibility = 'visible';
-            tooltip.classList.remove('show');
-            
-            // Determine best position
-            let placement = 'above'; // Default
-            let finalLeft = left - (tooltipWidth / 2);
-            let finalTop = top - tooltipHeight - 12; // 12px gap for arrow
-            
-            // Check if tooltip fits above the button
-            if (finalTop < tooltipPadding) {
-                // Try below
-                placement = 'below';
-                finalTop = buttonRect.bottom + 12;
-                
-                // Check if it fits below
-                if (finalTop + tooltipHeight > viewportHeight - tooltipPadding) {
-                    // Try left side
-                    placement = 'left';
-                    finalLeft = buttonRect.left - tooltipWidth - 12;
-                    finalTop = buttonRect.top + (buttonRect.height / 2) - (tooltipHeight / 2);
-                    
-                    // Check if it fits on left
-                    if (finalLeft < tooltipPadding) {
-                        // Use right side
-                        placement = 'right';
-                        finalLeft = buttonRect.right + 12;
-                        finalTop = buttonRect.top + (buttonRect.height / 2) - (tooltipHeight / 2);
-                    }
-                }
-            }
-            
-            // Ensure tooltip doesn't go outside viewport horizontally
-            if (placement === 'above' || placement === 'below') {
-                if (finalLeft < tooltipPadding) {
-                    finalLeft = tooltipPadding;
-                } else if (finalLeft + tooltipWidth > viewportWidth - tooltipPadding) {
-                    finalLeft = viewportWidth - tooltipWidth - tooltipPadding;
-                }
-            }
-            
-            // Ensure tooltip doesn't go outside viewport vertically
-            if (placement === 'left' || placement === 'right') {
-                if (finalTop < tooltipPadding) {
-                    finalTop = tooltipPadding;
-                } else if (finalTop + tooltipHeight > viewportHeight - tooltipPadding) {
-                    finalTop = viewportHeight - tooltipHeight - tooltipPadding;
-                }
-            }
-            
-            // Apply final position
-            tooltip.style.left = finalLeft + 'px';
-            tooltip.style.top = finalTop + 'px';
-            tooltip.classList.add(placement);
-            
-            // Show with animation
+            // Show tooltip with animation
             setTimeout(() => {
                 tooltip.classList.add('show');
             }, 10);
             
-            // Auto-hide after 10 seconds
+            // Auto-hide after 8 seconds
             setTimeout(() => {
                 hideHint();
-            }, 10000);
+            }, 8000);
         }
 
         function hideHint() {
-            const tooltip = document.querySelector('.hint-tooltip');
+            if (!hintBtn) return;
+            
+            const tooltip = hintBtn.querySelector('.hint-tooltip');
             if (tooltip) {
                 tooltip.classList.remove('show');
                 setTimeout(() => {
                     tooltip.remove();
-                }, 300); // Wait for fade out animation
+                }, 200); // Wait for fade out animation
             }
         }
 
