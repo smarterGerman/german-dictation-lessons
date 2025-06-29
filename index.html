@@ -352,17 +352,17 @@
             min-height: 0; /* Important for flex child */
         }
 
-        /* Hint display area - pink border to match input field */
+        /* Hint display area - normal dynamic sizing */
         .hint-display {
             margin: 20px 0;
             padding: 16px 20px;
             background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
-            border: 2px solid #e879f9; /* Same pink as input field */
+            border: 2px solid #e879f9;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1); /* Pink shadow to match */
-            animation: hintSlideIn 0.3s ease-out;
-            flex-shrink: 0; /* Don't shrink */
+            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1);
+            flex-shrink: 0;
+            transition: all 0.3s ease; /* Smooth transitions */
         }
 
         .hint-content {
@@ -858,7 +858,7 @@
 
             <!-- TEXT & FEEDBACK -->
             <div class="text-section">
-                <!-- Hint display area - shows under controls, above feedback -->
+                <!-- Hint display area - only appears when needed -->
                 <div class="hint-display" id="hintDisplay" style="display: none;">
                     <div class="hint-content" id="hintContent"></div>
                 </div>
@@ -902,11 +902,82 @@
     </div>
 
     <script>
+        // MODERN AUTO-RESIZE SYSTEM: ResizeObserver + Fallback
+        let lastReportedHeight = 0;
+        let resizeTimeout = null;
+
         function sendHeightToParent() {
-            const height = document.body.scrollHeight;
-            if (window.parent !== window) {
-                window.parent.postMessage({ frameHeight: height }, '*');
+            // Clear any pending resize calls
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
             }
+            
+            // Use a small delay to ensure DOM is fully updated
+            resizeTimeout = setTimeout(() => {
+                const height = Math.max(
+                    document.body.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.scrollHeight,
+                    document.documentElement.offsetHeight,
+                    document.documentElement.clientHeight
+                );
+                
+                // Only send if height actually changed (prevent spam)
+                if (height !== lastReportedHeight) {
+                    lastReportedHeight = height;
+                    if (window.parent !== window) {
+                        window.parent.postMessage({ frameHeight: height }, '*');
+                    }
+                    console.log('Sent new height:', height);
+                }
+            }, 50);
+        }
+
+        function initializeAutoResize() {
+            // Method 1: Modern ResizeObserver (preferred)
+            if (window.ResizeObserver) {
+                console.log('Using ResizeObserver (modern)');
+                
+                const resizeObserver = new ResizeObserver(entries => {
+                    sendHeightToParent();
+                });
+                
+                // Observe the main container for size changes
+                const container = document.querySelector('.container');
+                if (container) {
+                    resizeObserver.observe(container);
+                }
+                
+                // Also observe document body for additional safety
+                resizeObserver.observe(document.body);
+                
+            } else {
+                console.log('Using MutationObserver fallback (older browsers)');
+                
+                // Method 2: Fallback for older browsers
+                const mutationObserver = new MutationObserver(() => {
+                    sendHeightToParent();
+                });
+                
+                // Watch for DOM changes that could affect height
+                mutationObserver.observe(document.body, {
+                    childList: true,      // Child elements added/removed
+                    subtree: true,        // Watch all descendants
+                    attributes: true,     // Attribute changes (style, class, etc.)
+                    attributeFilter: ['style', 'class'], // Only watch relevant attributes
+                });
+                
+                // Additional fallback: Window resize events
+                window.addEventListener('resize', sendHeightToParent);
+                
+                // Backup polling for edge cases (very conservative)
+                setInterval(() => {
+                    sendHeightToParent();
+                }, 5000); // Only every 5 seconds as last resort
+            }
+            
+            // Initial height calculation
+            sendHeightToParent();
         }
 
         window.addEventListener('load', sendHeightToParent);
@@ -1012,7 +1083,9 @@
             });
             window.focus();
             console.log('Main window load event completed, focus attempted.');
-            setTimeout(sendHeightToParent, 500);
+            
+            // Initialize the modern auto-resize system
+            initializeAutoResize();
         });
 
         function toggleSpeed() {
@@ -1944,64 +2017,38 @@
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        // SIMPLE INLINE HINT SYSTEM - with mobile debugging
+        // SMOOTH AUTO-RESIZE HINT SYSTEM - works with ResizeObserver
         function showHint() {
-            console.log('showHint called, referenceText:', referenceText);
-            
-            if (!referenceText) {
-                console.log('No referenceText, exiting');
-                return;
-            }
+            if (!referenceText) return;
             
             const hintDisplay = document.getElementById('hintDisplay');
             const hintContent = document.getElementById('hintContent');
             
-            console.log('hintDisplay element:', hintDisplay);
-            console.log('hintContent element:', hintContent);
-            
-            if (!hintDisplay || !hintContent) {
-                console.log('Elements not found, exiting');
-                return;
-            }
-            
-            // Hide any existing hint first
-            hideHint();
+            if (!hintDisplay || !hintContent) return;
             
             // Set the hint text
             hintContent.textContent = referenceText;
-            console.log('Set hint content to:', referenceText);
             
             // Show the hint display
             hintDisplay.style.display = 'block';
-            hintDisplay.style.visibility = 'visible';
-            console.log('Set display to block');
             
-            // Force reflow for animation on mobile
-            hintDisplay.offsetHeight;
+            // ResizeObserver will automatically detect the change and resize
+            // No manual sendHeightToParent() needed!
             
-            // Auto-hide after 10 seconds (longer for debugging)
+            // Auto-hide after 8 seconds
             setTimeout(() => {
-                console.log('Auto-hiding hint');
                 hideHint();
-            }, 10000);
-            
-            // Trigger height recalculation for both mobile and desktop
-            setTimeout(() => {
-                sendHeightToParent();
-            }, 50);
-            setTimeout(() => {
-                sendHeightToParent();
-            }, 350);
+            }, 8000);
         }
 
         function hideHint() {
             const hintDisplay = document.getElementById('hintDisplay');
             if (hintDisplay && hintDisplay.style.display !== 'none') {
-                console.log('Hiding hint');
+                // Hide the hint
                 hintDisplay.style.display = 'none';
-                setTimeout(() => {
-                    sendHeightToParent();
-                }, 50);
+                
+                // ResizeObserver will automatically detect the change and resize
+                // No manual sendHeightToParent() needed!
             }
         }
 
