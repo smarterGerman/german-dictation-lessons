@@ -63,19 +63,6 @@
             overflow: visible !important;
         }
 
-        /* DEBUG: Visual indicators to see which CSS loads */
-        body::before {
-            content: "DESKTOP MODE - Width: " attr(data-width);
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: green;
-            color: white;
-            padding: 5px 10px;
-            z-index: 9999;
-            font-size: 12px;
-        }
-
         /* FORCE LARGE DESKTOP SIZES - NO MEDIA QUERY DEPENDENCY */
         .player-pill {
             background: rgba(255, 255, 255, 0.98);
@@ -683,11 +670,6 @@
         }
 
        @media (max-width: 600px) {
-            /* DEBUG: Change indicator for mobile */
-            body::before {
-                content: "MOBILE MODE - Width: " attr(data-width) !important;
-                background: red !important;
-            }
             
             body { padding: 10px; }
             .audio-section{ padding: 15px; }
@@ -1056,32 +1038,6 @@
 
         // INITIALIZATION
         window.addEventListener('load', function() {
-            // DEBUG: Log viewport info
-            console.log('=== DEBUGGING INFO ===');
-            console.log('window.innerWidth:', window.innerWidth);
-            console.log('window.outerWidth:', window.outerWidth); 
-            console.log('screen.width:', screen.width);
-            console.log('document.body.clientWidth:', document.body.clientWidth);
-            console.log('container width:', document.querySelector('.container')?.offsetWidth);
-            
-            // Add width to body for CSS debugging
-            document.body.setAttribute('data-width', window.innerWidth + 'px');
-            
-            // Test if media queries work
-            const testDiv = document.createElement('div');
-            testDiv.style.cssText = 'width: 100px; height: 100px; background: red;';
-            testDiv.id = 'media-test';
-            document.body.appendChild(testDiv);
-            
-            // Force log computed styles
-            const playBtn = document.getElementById('playBtn');
-            if (playBtn) {
-                const styles = window.getComputedStyle(playBtn);
-                console.log('Play button computed width:', styles.width);
-                console.log('Play button computed height:', styles.height);
-                console.log('Play button computed font-size:', styles.fontSize);
-            }
-            
             initializeDOMElements();
             setupEventListeners();
             initializeAutoResize();
@@ -1092,7 +1048,6 @@
             });
             
             window.focus();
-            console.log('Main window load event completed, focus attempted.');
         });
 
         function initializeDOMElements() {
