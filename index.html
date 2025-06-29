@@ -418,8 +418,7 @@
             word-break:break-word;
             color: #9ca3af;
             box-shadow: 0 4px 16px rgba(167, 139, 250, 0.1);
-            display: flex;
-            align-items: flex-start;
+            display: block;
             width: 100%;
             box-sizing: border-box;
         }
@@ -1852,7 +1851,7 @@
                     if (item.status === 'word-boundary') {
                         char = '&nbsp;&nbsp;&nbsp;';
                     } else if (item.status === 'char-space') {
-                        char = '&nbsp;';
+                        char = '';
                     } else {
                         char = '&nbsp;';
                     }
