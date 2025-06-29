@@ -778,20 +778,43 @@
 
         /* Desktop override - MUST come after mobile to take precedence */
         @media(min-width: 769px) {
-            .audio-controls .nav-btn,
-            .audio-controls .toggle-btn:not(.secondary-btn) {
+            .player-pill {
+                padding: 20px 60px !important;
+                gap: 28px !important;
+            }
+
+            .progress-controls-row {
+                max-width: 900px !important;
+                gap: 28px !important;
+                padding: 0 32px !important;
+            }
+
+            .progress-container {
+                width: 200px !important;
+                height: 16px !important;
+                margin: 0 12px !important;
+            }
+
+            .progress-controls-row #timeDisplay {
+                font-size: 18px !important;
+                min-width: 110px !important;
+                font-weight: 600 !important;
+            }
+
+            .nav-btn,
+            .toggle-btn:not(.secondary-btn) {
                 width: 76px !important;
                 height: 76px !important;
                 font-size: 24px !important;
             }
 
-            .audio-controls .play-btn {
+            .play-btn {
                 width: 96px !important;
                 height: 96px !important;
                 font-size: 36px !important;
             }
 
-            .audio-controls .secondary-btn {
+            .secondary-btn {
                 width: 60px !important;
                 height: 60px !important;
                 font-size: 22px !important;
