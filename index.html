@@ -730,6 +730,50 @@
                 font-size: 16px;
                 line-height: 1.4;
             }
+
+            /* Mobile stats styling - much smaller */
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat-item {
+                padding: 12px 8px;
+                border-radius: 8px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .stats-section.active {
+                margin-top: 10px !important;
+                padding-top: 10px !important;
+            }
+
+            .export-button-container {
+                gap: 8px;
+            }
+
+            .export-csv-btn, .restart-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+
+            .restart-btn {
+                font-size: 16px;
+            }
+
+            .stats-with-export {
+                gap: 12px;
+                margin-bottom: 16px;
+            }
         }
 
         /* Desktop override - MUST come after mobile to take precedence */
