@@ -1764,8 +1764,11 @@
 
         // FINAL RESULTS
         function showFinalResult() {
+            console.log('showFinalResult called');
+            
             if (!userInput) return;
             
+            // If there's text in the current sentence and it hasn't been processed yet
             if (userInput.value.trim() && sessionResults.length === currentCueIndex) {
                 let sentenceTime = 0;
                 if (hasStartedTyping && sentenceStartTime) {
@@ -1808,6 +1811,13 @@
                 timeElement.textContent = formatTime(totalSessionTime);
             }
             
+            // Hide input areas
+            const inputArea = document.querySelector('.input-area');
+            if (inputArea) {
+                inputArea.style.display = 'none';
+            }
+            
+            // Show stats
             if (statsSection) statsSection.style.display = 'flex';
             
             showDetailedResults();
@@ -2046,19 +2056,18 @@
             if (userInput) {
                 userInput.value = '';
                 userInput.placeholder = initialPlaceholderText;
-                userInput.style.display = 'block';
             }
             if (liveFeedback) {
                 liveFeedback.innerHTML = 'Live Feedback';
-                liveFeedback.style.display = 'block';
             }
             
-            // Show input areas and hide stats
+            // Show input areas
             const inputArea = document.querySelector('.input-area');
             if (inputArea) {
                 inputArea.style.display = 'flex';
             }
             
+            // Hide stats
             if (statsSection) {
                 statsSection.style.display = 'none';
             }
