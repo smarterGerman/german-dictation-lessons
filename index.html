@@ -327,15 +327,15 @@
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
 
-        /* Hint display area - simple and clean */
+        /* Hint display area - pink border to match input field */
         .hint-display {
             margin: 20px 0;
             padding: 16px 20px;
             background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
-            border: 2px solid #a855f7;
+            border: 2px solid #e879f9; /* Same pink as input field */
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.1);
+            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1); /* Pink shadow to match */
             animation: hintSlideIn 0.3s ease-out;
         }
 
@@ -344,6 +344,19 @@
             color: #374151;
             font-weight: 500;
             line-height: 1.5;
+        }
+
+        /* Mobile responsive hint */
+        @media(max-width: 768px) {
+            .hint-display {
+                margin: 15px 0;
+                padding: 12px 16px;
+            }
+            
+            .hint-content {
+                font-size: 16px;
+                line-height: 1.4;
+            }
         }
 
         @keyframes hintSlideIn {
