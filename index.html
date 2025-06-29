@@ -194,24 +194,23 @@
             transform: translateY(-1px) !important;
         }
 
-        /* Desktop button sizes - larger than mobile */
         .nav-btn,
         .toggle-btn:not(.secondary-btn) {
-            width: 76px;
-            height: 76px;
-            font-size: 24px;
+            width: 56px;
+            height: 56px;
+            font-size: 18px;
         }
 
         .play-btn {
-            width: 96px;
-            height: 96px;
-            font-size: 36px;
+            width: 68px;
+            height: 68px;
+            font-size: 26px;
         }
 
         .secondary-btn {
-            width: 60px !important;
-            height: 60px !important;
-            font-size: 22px !important;
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 16px !important;
             flex-shrink: 0;
         }
 
@@ -730,6 +729,28 @@
             .hint-content {
                 font-size: 16px;
                 line-height: 1.4;
+            }
+        }
+
+        /* Desktop override - MUST come after mobile to take precedence */
+        @media(min-width: 769px) {
+            .audio-controls .nav-btn,
+            .audio-controls .toggle-btn:not(.secondary-btn) {
+                width: 76px !important;
+                height: 76px !important;
+                font-size: 24px !important;
+            }
+
+            .audio-controls .play-btn {
+                width: 96px !important;
+                height: 96px !important;
+                font-size: 36px !important;
+            }
+
+            .audio-controls .secondary-btn {
+                width: 60px !important;
+                height: 60px !important;
+                font-size: 22px !important;
             }
         }
 
