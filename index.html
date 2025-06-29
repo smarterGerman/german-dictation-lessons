@@ -31,7 +31,6 @@
         .audio-section {
             padding: 20px;
             margin-bottom: 24px;
-            /* Removed: background gradient, border, box-shadow */
             border-radius: 20px;
             text-align: center;
             color: #374151;
@@ -58,14 +57,14 @@
 
         /* Main player pill - more visible */
         .player-pill {
-            background: rgba(255, 255, 255, 0.95); /* More opaque */
-            border: 1px solid rgba(168, 85, 247, 0.2); /* Add subtle border */
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(168, 85, 247, 0.2);
             border-radius: 50px;
             padding: 16px 32px;
             display: flex;
             align-items: center;
             gap: 20px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(10px);
         }
 
@@ -73,10 +72,10 @@
         .progress-controls-row {
             display: flex;
             align-items: center;
-            justify-content: center; /* Center the entire row */
+            justify-content: center;
             gap: 12px;
             width: 100%;
-            max-width: 500px; /* Increased max-width for better centering */
+            max-width: 500px;
         }
 
         /* Beautiful gradient-filled buttons without borders */
@@ -172,22 +171,22 @@
         /* Larger desktop buttons */
         .nav-btn,
         .toggle-btn:not(.secondary-btn) {
-            width: 56px; /* Increased from default */
+            width: 56px;
             height: 56px;
-            font-size: 18px; /* Increased font size */
+            font-size: 18px;
         }
 
         .play-btn {
-            width: 68px; /* Increased from default */
+            width: 68px;
             height: 68px;
-            font-size: 26px; /* Increased font size */
+            font-size: 26px;
         }
 
         /* Secondary button sizing - keep smaller but proportional */
         .secondary-btn {
-            width: 40px !important; /* Slightly larger */
+            width: 40px !important;
             height: 40px !important;
-            font-size: 16px !important; /* Slightly larger font */
+            font-size: 16px !important;
             flex-shrink: 0;
         }
 
@@ -213,7 +212,7 @@
             top: 50%;
             transform: translate(-50%, -50%);
             z-index: 1;
-            display: none; /* FIX: Start hidden, control via JS */
+            display: none;
         }
 
         @keyframes spin {
@@ -325,37 +324,25 @@
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
 
-        /* Hint tooltip styles */
+        /* FIXED HINT TOOLTIP STYLES - Complete overhaul */
         .hint-tooltip {
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
+            position: fixed; /* Changed from absolute to fixed for better control */
             background: #1f2937;
             color: white;
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 14px;
+            font-weight: 500;
             white-space: normal;
-            max-width: 250px; 
-            text-align: left;
-            word-wrap: break-word; 
-            z-index: 1000;
-            margin-top: 8px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            max-width: calc(100vw - 32px); /* Ensure it never exceeds viewport width */
+            word-wrap: break-word;
+            z-index: 2000; /* Higher z-index to ensure it's above everything */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .hint-tooltip::after {
-            content: '';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-bottom-color: #1f2937;
+            transition: opacity 0.3s ease;
+            text-align: left;
+            line-height: 1.4;
         }
 
         .hint-tooltip.show {
@@ -363,36 +350,44 @@
             pointer-events: auto;
         }
 
-        /* Mobile tooltip adjustments - only in portrait mode */
-        @media(max-width: 768px) and (orientation: portrait) {
-            .hint-tooltip {
-                position: absolute; /* Keep absolute but adjust positioning */
-                top: auto;
-                bottom: calc(100% + 15px); /* Position above the button */
-                left: 50%;
-                transform: translateX(-50%);
-                max-width: calc(100vw - 40px);
-                font-size: 13px;
-                margin-top: 0;
-                z-index: 1001;
-            }
-
-            .hint-tooltip::after {
-                top: 100%; /* Arrow points down */
-                bottom: auto;
-                border-bottom-color: transparent;
-                border-top-color: #1f2937;
-            }
+        /* Arrow for tooltip */
+        .hint-tooltip::after {
+            content: '';
+            position: absolute;
+            border: 6px solid transparent;
         }
 
-        /* Desktop and mobile landscape - keep normal positioning */
-        @media(min-width: 769px), (orientation: landscape) {
-            .hint-tooltip {
-                /* Use default positioning - below button */
-                position: absolute;
-                top: 100%;
-                bottom: auto;
-            }
+        /* Arrow positioning based on tooltip placement */
+        .hint-tooltip.above::after {
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-top-color: #1f2937;
+            border-bottom: none;
+        }
+
+        .hint-tooltip.below::after {
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-color: #1f2937;
+            border-top: none;
+        }
+
+        .hint-tooltip.left::after {
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left-color: #1f2937;
+            border-right: none;
+        }
+
+        .hint-tooltip.right::after {
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-right-color: #1f2937;
+            border-left: none;
         }
 
         .play-btn {
@@ -450,7 +445,7 @@
             flex-grow: 0;
             flex-shrink: 0;
             width: 150px;
-            height: 8px; /* Back to normal height */
+            height: 8px;
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(168, 85, 247, 0.2);
             border-radius: 20px;
@@ -466,8 +461,6 @@
             border-radius:20px; 
             transition:width .3s ease;
         }
-
-        /* Remove CSS ordering - let HTML order control layout */
 
         /* ----- INPUT / FEEDBACK ------------------------------------------- */
         .input-area { 
@@ -485,8 +478,8 @@
             color:#374151;
             border:2px solid #e879f9; 
             border-radius: 16px;
-            font-size:32px; /* Increased from 16px to 32px */
-            line-height:1.4; /* Slightly reduced line height for better fit */
+            font-size:32px;
+            line-height:1.4;
             resize:vertical;
             transition:all .3s ease;
             box-shadow: 0 4px 16px rgba(232, 121, 249, 0.1);
@@ -500,7 +493,7 @@
         }
 
         .input-field::placeholder {
-            font-size: 21px !important; /* Increased from 14px to 21px (50% bigger) */
+            font-size: 21px !important;
             color: #9CA3AF;
             opacity: 1;
             line-height: 1.4;
@@ -508,13 +501,13 @@
         }
         
         .live-feedback {
-            min-height:70px; /* Reduced from 100px to 70px (about one row less) */
+            min-height:70px;
             padding:18px;
             background: linear-gradient(135deg, #ecfdf5 0%, #fef3ff 100%); 
             border: none; 
             border-radius: 16px;
-            font-size:56px; /* Increased from 28px to 56px (2x) */
-            line-height:1.3; /* Reduced line height for better fit with larger text */
+            font-size:56px;
+            line-height:1.3;
             white-space:pre-wrap; 
             word-break:break-word;
             color: #9ca3af;
@@ -601,11 +594,10 @@
         .sentences-container {
             display: flex;
             flex-direction: column;
-            gap: 16px; /* Reduced from 20px */
+            gap: 16px;
         }
 
         .sentence-result {
-            /* Removed padding, background, border, box-shadow for compactness */
             font-size: 18px;
             line-height: 1.6;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -621,15 +613,15 @@
             color: #dc2626;
             font-weight: 500;
             text-decoration: underline;
-            cursor: pointer; /* Indicate clickable */
-            position: relative; /* For tooltip positioning */
+            cursor: pointer;
+            position: relative;
         }
 
         .result-word-wrong:hover {
             background: rgba(220, 38, 38, 0.1);
             border-radius: 4px;
             padding: 2px 4px;
-            margin: -2px -4px; /* Compensate for padding */
+            margin: -2px -4px;
         }
 
         .result-word-missing {
@@ -638,15 +630,15 @@
             border-bottom: 2px dashed #d97706;
             display: inline-block;
             min-width: 1em;
-            cursor: pointer; /* Make clickable */
-            position: relative; /* For tooltip positioning */
+            cursor: pointer;
+            position: relative;
         }
 
         .result-word-missing:hover {
             background: rgba(217, 119, 6, 0.1);
             border-radius: 4px;
             padding: 2px 4px;
-            margin: -2px -4px; /* Compensate for padding */
+            margin: -2px -4px;
         }
 
         .result-word-extra {
@@ -746,11 +738,11 @@
     .audio-section{ padding: 15px; }
     /* Mobile placeholder text sizing */
     .input-field::placeholder {
-        font-size: 12px !important; /* Even smaller on mobile */
+        font-size: 12px !important;
         line-height: 1.3;
     }
 
-    .input-field, .live-feedback{ padding: 15px; font-size: 24px; } /* Keeps typed text large on mobile */
+    .input-field, .live-feedback{ padding: 15px; font-size: 24px; }
 
     /* Mobile: adjust sizing only */
     .player-pill {
@@ -789,18 +781,18 @@
 }
 
         /* Add this new style for your 'X' button */
-    .toggle-btn.end-button { /* Use .toggle-btn to ensure specificity if needed */
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); /* Red background */
+    .toggle-btn.end-button {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
         color: white;
-        font-size: 1.5em; /* Make the 'X' larger */
+        font-size: 1.5em;
         font-weight: bold;
-        line-height: 1; /* Ensures X is vertically centered */
-        padding: 8px 12px; /* Adjust padding if needed to fit 'X' */
+        line-height: 1;
+        padding: 8px 12px;
     }
 
     .toggle-btn.end-button:hover {
-        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); /* Darker red on hover */
-        transform: translateY(-2px); /* Keep consistent hover effect */
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        transform: translateY(-2px);
     }
     </style>
 </head>
@@ -887,16 +879,15 @@
         let isPlaying = false;
         let vttCues = [];
         let currentCueIndex = 0;
-        let allLessons = {}; // Store all lesson data
+        let allLessons = {};
         let currentLessonId = '';
         let hasStartedTyping = false;
         let sentenceStartTime = null;
         let totalSessionTime = 0;
         let sessionResults = [];
-        let ignoreCaseActive = true; // Default: ignore case (white button = checking OFF)
-        let currentSpeed = 1.0; // Default speed (100%)
+        let ignoreCaseActive = true;
+        let currentSpeed = 1.0;
 
-        // ASCII only - clear and readable at all sizes
         const initialPlaceholderText = "Shift+Cmd+Enter = Play/Pause\nae = ä | oe = ö | ue = ü | B = ß\nType here...";
 
         const CONFIG = {
@@ -918,7 +909,6 @@
             statsSection = document.getElementById('statsSection');
             userInput = document.getElementById('userInput');
             
-            // Set the initial placeholder text when the page loads
             if (userInput) {
                 userInput.placeholder = initialPlaceholderText;
             }
@@ -945,13 +935,11 @@
             if (endDictationBtn) endDictationBtn.addEventListener('click', showFinalResult);
             if (ignoreCaseBtn) {
                 ignoreCaseBtn.addEventListener('click', toggleIgnoreCase);
-                // Start white = capitalization checking OFF (ignore case)
                 ignoreCaseBtn.classList.remove('active');
                 ignoreCaseBtn.title = "Capitalization checking OFF";
             }
             if (speedBtn) {
                 speedBtn.addEventListener('click', toggleSpeed);
-                // Set initial green color for 100% speed
                 speedBtn.classList.add('speed-100');
             }
             if (hintBtn) {
@@ -967,7 +955,6 @@
                     if (playBtn) {
                         playBtn.classList.add('playing');
                     }
-                    // Auto-focus input field when audio starts
                     if (userInput) {
                         userInput.focus();
                     }
@@ -987,17 +974,15 @@
                 loadLesson(lessonId);
             });
             window.focus();
-            console.log('Main window load event completed, focus attempted.'); // For debugging
+            console.log('Main window load event completed, focus attempted.');
             setTimeout(sendHeightToParent, 500);
         });
 
         function toggleSpeed() {
-            // Remove all speed classes first
             if (speedBtn) {
                 speedBtn.classList.remove('speed-100', 'speed-75', 'speed-50');
             }
             
-            // Cycle through speeds: 100% → 75% → 50% → 100%
             if (currentSpeed === 1.0) {
                 currentSpeed = 0.75;
                 speedBtn.textContent = '75';
@@ -1012,7 +997,6 @@
                 speedBtn.classList.add('speed-100');
             }
             
-            // Apply speed to audio player
             if (audioPlayer) {
                 audioPlayer.playbackRate = currentSpeed;
             }
@@ -1022,11 +1006,9 @@
             ignoreCaseActive = !ignoreCaseActive;
             if (ignoreCaseBtn) {
                 if (ignoreCaseActive) {
-                    // White button = capitalization checking OFF (ignore case)
                     ignoreCaseBtn.classList.remove('active');
                     ignoreCaseBtn.title = "Capitalization checking OFF";
                 } else {
-                    // Purple button = capitalization checking ON (case matters)
                     ignoreCaseBtn.classList.add('active');
                     ignoreCaseBtn.title = "Capitalization checking ON";
                 }
@@ -1035,7 +1017,6 @@
         }
 
         function handleUserInput(e) {
-            // Hide hint tooltip when user starts typing
             hideHint();
             
             if (!hasStartedTyping && e.target.value.trim().length > 0) {
@@ -1054,8 +1035,7 @@
         }
 
         function handleGlobalKeyDown(e) {
-            console.log('Global keydown detected:', e.key, 'Shift:', e.shiftKey, 'Ctrl/Cmd:', (e.ctrlKey || e.metaKey)); // ADD THIS LINE
-            // Shortcuts always enabled, even while typing
+            console.log('Global keydown detected:', e.key, 'Shift:', e.shiftKey, 'Ctrl/Cmd:', (e.ctrlKey || e.metaKey));
 
             // Hint shortcut: Shift + Ctrl/Cmd + ß (German), / (US), , (French)
             if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'ß') {
@@ -1080,7 +1060,7 @@
             // Play/Pause (start dictation): Shift + Ctrl/Cmd + Enter
             if (e.shiftKey && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 e.preventDefault();
-                console.log('Shortcut for togglePlayback activated.'); //
+                console.log('Shortcut for togglePlayback activated.');
                 togglePlayback();
                 return;
             }
@@ -1255,7 +1235,6 @@
            console.log(`[DEBUG] Play/Pause button tapped. IsPaused: ${audioPlayer.paused}. Current Network State: ${audioPlayer.networkState}.`);
             console.log('togglePlayback called.');
             if (vttCues.length === 0) {
-                // No VTT cues, just play/pause the entire audio
                 if (isPlaying) {
                     audioPlayer.pause();
                 } else {
@@ -1265,7 +1244,6 @@
                     });
                 }
             } else {
-                // VTT cues available, toggle play/pause for current sentence
                 if (isPlaying) {
                     audioPlayer.pause();
                 } else {
@@ -1287,9 +1265,8 @@
                             name: error.name,
                             message: error.message,
                             networkState: audioPlayer.networkState,
-                            errorObject: error // Log the full error object
+                            errorObject: error
                         });
-                        // Show user-friendly error message
                         alert('Audio could not be played. Please check your internet connection.');
                     });
                 }
@@ -1321,17 +1298,13 @@
             updateSentenceInfo();
             updateCurrentReferenceText();
             
-            // Hide any existing hint tooltip
             hideHint();
             
             if (userInput) userInput.value = '';
-            // Handle placeholder visibility based on sentence index
             if (userInput) {
-                // If it's the 1st or 2nd sentence (currentCueIndex 0 or 1)
                 if (currentCueIndex < 2) {
                     userInput.placeholder = initialPlaceholderText;
                 } else {
-                    // For the 3rd sentence (index) and onwards, remove the detailed instructions
                     userInput.placeholder = "Type what you hear here...";
                 }
             }
@@ -1377,17 +1350,14 @@
         }
 
         async function loadLesson(lessonId) {
-            // FIX: Show loading spinner properly
             if (loadingSpinner) {
                 loadingSpinner.style.display = 'block';
             }
             if (playBtn) {
-                // FIX: Don't set textContent, it conflicts with CSS ::before
                 playBtn.classList.add('loading');
                 playBtn.disabled = true;
             }
 
-            // Check if lesson exists
             if (!allLessons[lessonId]) {
                 console.error(`Lesson ${lessonId} not found`);
                 if (lessonInfo) lessonInfo.textContent = 'Failed to load lessons data';
@@ -1420,14 +1390,11 @@
                 audioPlayer.addEventListener('loadedmetadata', () => {
                     console.log(`[DEBUG] Metadata loaded. Duration: ${audioPlayer.duration.toFixed(2)}s. Network State: ${audioPlayer.networkState}.`);
                     if (playBtn) {
-                        // FIX: Remove loading class instead of setting textContent
                         playBtn.classList.remove('loading', 'playing');
                         playBtn.disabled = false;
                     }
-                    // Set the current speed when audio loads
                     audioPlayer.playbackRate = currentSpeed;
                     updateProgress();
-                    // FIX: Hide loading spinner properly
                     if (loadingSpinner) {
                         loadingSpinner.style.display = 'none';
                     }
@@ -1442,7 +1409,6 @@
                         event: e
                     });
                     if (playBtn) {
-                        // FIX: Show error state without breaking CSS
                         playBtn.classList.remove('loading');
                         playBtn.disabled = true;
                         playBtn.style.opacity = '0.5';
@@ -1780,11 +1746,9 @@
             
             if (statsSection) statsSection.style.display = 'grid';
             
-            // Show export controls
             const exportControls = document.getElementById('exportControls');
             if (exportControls) exportControls.style.display = 'block';
             
-            // Show detailed sentence results
             showDetailedResults();
                         
             setTimeout(sendHeightToParent, 100);
@@ -1793,7 +1757,6 @@
         function exportCSV() {
             if (sessionResults.length === 0) return;
             
-            // Calculate totals
             let totalCorrectWords = 0;
             let totalWrongWords = 0;
             let totalWords = 0;
@@ -1806,20 +1769,16 @@
             
             const accuracy = totalWords > 0 ? Math.round((totalCorrectWords / totalWords) * 100) : 0;
             
-            // Extract lesson ID from current lesson (e.g., A1L01)
             const lessonId = currentLessonId || 'Unknown';
             
-            // Create CSV with header row and data row
             let csvContent = 'Lesson,Accuracy,Correct Words,Wrong Words,Total Words,Time Taken\n';
             csvContent += `${lessonId},${accuracy},${totalCorrectWords},${totalWrongWords},${totalWords},${formatTime(totalSessionTime)}`;
             
-            // Download CSV
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             
-            // Simple filename with lesson ID
             link.download = `${lessonId}-results.csv`;
             
             document.body.appendChild(link);
@@ -1834,10 +1793,8 @@
             
             if (!sentenceResultsDiv || !sentencesContainer) return;
             
-            // Clear existing content
             sentencesContainer.innerHTML = '';
             
-            // Create detailed results for each sentence
             sessionResults.forEach((result, index) => {
                 const sentenceDiv = document.createElement('div');
                 sentenceDiv.className = 'sentence-result';
@@ -1846,14 +1803,12 @@
                 sentencesContainer.appendChild(sentenceDiv);
             });
             
-            // Add click listeners for wrong words
             addTooltipListeners();
             
             sentenceResultsDiv.style.display = 'block';
         }
 
         function generateResultHTML(result) {
-            // Use the same case sensitivity settings as the live feedback
             const ignoreCase = ignoreCaseActive;
             const ignorePunctuation = true;
             
@@ -1889,7 +1844,6 @@
                 } else if (item.type === 'insert') {
                     html += `<span class="result-word-extra">${item.userWord}</span>`;
                 } else if (item.type === 'delete') {
-                    // Create underscore with length proportional to missing word
                     const underscoreLength = Math.max(item.refWord.length, 3);
                     const underscore = '_'.repeat(underscoreLength);
                     html += `<span class="result-word-missing" data-missing="${item.refWord}">${underscore}</span>`;
@@ -1903,7 +1857,6 @@
             const wrongWords = document.querySelectorAll('.result-word-wrong');
             const missingWords = document.querySelectorAll('.result-word-missing');
             
-            // Handle wrong words
             wrongWords.forEach(word => {
                 word.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1911,7 +1864,6 @@
                 });
             });
 
-            // Handle missing words
             missingWords.forEach(word => {
                 word.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1921,27 +1873,21 @@
         }
 
         function showTooltip(element, text) {
-            // Remove any existing tooltips
             document.querySelectorAll('.word-tooltip').forEach(tooltip => tooltip.remove());
             
-            // Create tooltip
             const tooltip = document.createElement('div');
             tooltip.className = 'word-tooltip';
             tooltip.textContent = text;
             
-            // Add tooltip to the word
             element.appendChild(tooltip);
             
-            // Position adjustment to prevent cutoff
             setTimeout(() => {
                 const tooltipRect = tooltip.getBoundingClientRect();
                 const containerRect = document.querySelector('.sentences-container').getBoundingClientRect();
                 
-                // Check if tooltip goes outside left edge
                 if (tooltipRect.left < containerRect.left) {
                     tooltip.classList.add('adjust-left');
                 }
-                // Check if tooltip goes outside right edge
                 else if (tooltipRect.right > containerRect.right) {
                     tooltip.classList.add('adjust-right');
                 }
@@ -1949,7 +1895,6 @@
                 tooltip.classList.add('show');
             }, 10);
             
-            // Hide tooltip when clicking elsewhere
             document.addEventListener('click', function hideTooltip() {
                 tooltip.remove();
                 document.removeEventListener('click', hideTooltip);
@@ -1962,11 +1907,12 @@
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
+        // COMPLETELY REWRITTEN HINT SYSTEM
         function showHint() {
             if (!referenceText || !hintBtn) return;
             
             // Remove any existing tooltip
-            const existingTooltip = hintBtn.querySelector('.hint-tooltip');
+            const existingTooltip = document.querySelector('.hint-tooltip');
             if (existingTooltip) {
                 existingTooltip.remove();
             }
@@ -1976,24 +1922,102 @@
             tooltip.className = 'hint-tooltip';
             tooltip.textContent = referenceText;
             
-            // Add tooltip to hint button
-            hintBtn.appendChild(tooltip);
+            // Add to body for fixed positioning
+            document.body.appendChild(tooltip);
             
-            // Show tooltip with animation
+            // Get button position
+            const buttonRect = hintBtn.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const tooltipPadding = 16; // Safety margin from viewport edges
+            
+            // Calculate initial position (centered above button)
+            let left = buttonRect.left + (buttonRect.width / 2);
+            let top = buttonRect.top;
+            
+            // Show tooltip temporarily to measure it
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+            tooltip.classList.add('show');
+            
+            // Get tooltip dimensions
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const tooltipWidth = tooltipRect.width;
+            const tooltipHeight = tooltipRect.height;
+            
+            // Reset visibility
+            tooltip.style.visibility = 'visible';
+            tooltip.classList.remove('show');
+            
+            // Determine best position
+            let placement = 'above'; // Default
+            let finalLeft = left - (tooltipWidth / 2);
+            let finalTop = top - tooltipHeight - 12; // 12px gap for arrow
+            
+            // Check if tooltip fits above the button
+            if (finalTop < tooltipPadding) {
+                // Try below
+                placement = 'below';
+                finalTop = buttonRect.bottom + 12;
+                
+                // Check if it fits below
+                if (finalTop + tooltipHeight > viewportHeight - tooltipPadding) {
+                    // Try left side
+                    placement = 'left';
+                    finalLeft = buttonRect.left - tooltipWidth - 12;
+                    finalTop = buttonRect.top + (buttonRect.height / 2) - (tooltipHeight / 2);
+                    
+                    // Check if it fits on left
+                    if (finalLeft < tooltipPadding) {
+                        // Use right side
+                        placement = 'right';
+                        finalLeft = buttonRect.right + 12;
+                        finalTop = buttonRect.top + (buttonRect.height / 2) - (tooltipHeight / 2);
+                    }
+                }
+            }
+            
+            // Ensure tooltip doesn't go outside viewport horizontally
+            if (placement === 'above' || placement === 'below') {
+                if (finalLeft < tooltipPadding) {
+                    finalLeft = tooltipPadding;
+                } else if (finalLeft + tooltipWidth > viewportWidth - tooltipPadding) {
+                    finalLeft = viewportWidth - tooltipWidth - tooltipPadding;
+                }
+            }
+            
+            // Ensure tooltip doesn't go outside viewport vertically
+            if (placement === 'left' || placement === 'right') {
+                if (finalTop < tooltipPadding) {
+                    finalTop = tooltipPadding;
+                } else if (finalTop + tooltipHeight > viewportHeight - tooltipPadding) {
+                    finalTop = viewportHeight - tooltipHeight - tooltipPadding;
+                }
+            }
+            
+            // Apply final position
+            tooltip.style.left = finalLeft + 'px';
+            tooltip.style.top = finalTop + 'px';
+            tooltip.classList.add(placement);
+            
+            // Show with animation
             setTimeout(() => {
                 tooltip.classList.add('show');
             }, 10);
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                hideHint();
+            }, 10000);
         }
 
         function hideHint() {
-            if (!hintBtn) return;
-            
-            const tooltip = hintBtn.querySelector('.hint-tooltip');
+            const tooltip = document.querySelector('.hint-tooltip');
             if (tooltip) {
                 tooltip.classList.remove('show');
                 setTimeout(() => {
                     tooltip.remove();
-                }, 200); // Wait for fade out animation
+                }, 300); // Wait for fade out animation
             }
         }
 
