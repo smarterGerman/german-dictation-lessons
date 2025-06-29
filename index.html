@@ -53,13 +53,6 @@
             overflow: visible !important;
             flex-shrink: 0;
         }
-        
-        .sentence-info { 
-            margin-bottom: 24px; 
-            font-size: 15px; 
-            color: #6b7280; 
-            font-weight: 500; 
-        }
 
         .audio-controls { 
             display: flex; 
@@ -95,8 +88,8 @@
             padding: 0 20px;
         }
 
-        .nav-btn,
-        .toggle-btn:not(.active):not([class*="speed-"]) {
+        /* Simplified button styling - removed conflicting logic */
+        .nav-btn {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
             border: none !important;
             color: #475569 !important;
@@ -104,24 +97,49 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
         }
 
-        .nav-btn:hover,
-        .toggle-btn:not(.active):not([class*="speed-"]):hover {
+        .nav-btn:hover:not(:disabled) {
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
             color: #334155 !important;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
             transform: translateY(-1px) !important;
         }
 
-        .play-btn,
-        .toggle-btn.active:not([class*="speed-"]) {
+        .play-btn {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
             color: white !important;
             border: none !important;
             box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3) !important;
         }
 
-        .play-btn:hover,
-        .toggle-btn.active:not([class*="speed-"]):hover {
+        .play-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #9333ea 0%, #db2777 100%) !important;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Separate styling for each toggle button type */
+        .toggle-btn {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+            border: none !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .toggle-btn:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+            color: #334155 !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3) !important;
+        }
+
+        .toggle-btn.active:hover {
             background: linear-gradient(135deg, #9333ea 0%, #db2777 100%) !important;
             box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4) !important;
             transform: translateY(-1px) !important;
@@ -130,7 +148,6 @@
         .toggle-btn.speed-100 {
             background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
             color: white !important;
-            border: none !important;
             box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3) !important;
         }
 
@@ -143,7 +160,6 @@
         .toggle-btn.speed-75 {
             background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
             color: white !important;
-            border: none !important;
             box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3) !important;
         }
 
@@ -156,7 +172,6 @@
         .toggle-btn.speed-50 {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
             color: white !important;
-            border: none !important;
             box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3) !important;
         }
 
@@ -168,9 +183,7 @@
 
         .secondary-btn {
             background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%) !important;
-            border: none !important;
             color: #be185d !important;
-            font-weight: 600 !important;
             box-shadow: 0 3px 10px rgba(244, 114, 182, 0.2) !important;
         }
 
@@ -225,43 +238,6 @@
             text-align: center;
         }
 
-        .loading-spinner {
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .play-btn .loading-spinner {
-            display: none;
-        }
-
-        .play-btn.loading .loading-spinner {
-            display: block;
-        }
-
-        .play-btn::before { 
-            content:''; 
-            position:absolute; 
-            left:50%; 
-            top:50%; 
-            transform:translate(-50%,-50%);
-            z-index: 2;
-        }
-
         .nav-btn,
         .play-btn,
         .toggle-btn { 
@@ -276,43 +252,9 @@
             position: relative;
         }
 
-        .nav-btn,
-        .toggle-btn {
-            width: 52px; 
-            height: 52px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            font-size: 18px;
-            color: #6b7280;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-        }
-        
-        .nav-btn:hover:not(:disabled),
-        .toggle-btn:hover { 
-            transform: translateY(-2px); 
-            background: rgba(255, 255, 255, 1);
-            color: #374151;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-        }
-        
         .nav-btn:disabled { 
             opacity:0.3; 
             cursor:not-allowed; 
-        }
-
-        .toggle-btn.active {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-            color: white;
-            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3), 0 0 0 3px rgba(168, 85, 247, 0.4), 0 0 20px rgba(168, 85, 247, 0.6);
-            transform: translateY(-1px);
-        }
-
-        .toggle-btn.active:hover {
-            background: linear-gradient(135deg, #9333ea 0%, #db2777 100%);
-            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4), 0 0 0 3px rgba(168, 85, 247, 0.5), 0 0 25px rgba(168, 85, 247, 0.7);
-            transform: translateY(-2px);
         }
 
         .text-section {
@@ -342,29 +284,6 @@
             line-height: 1.5;
         }
 
-        @media(max-width: 768px) {
-            .hint-display {
-                margin: 15px 0;
-                padding: 12px 16px;
-            }
-            
-            .hint-content {
-                font-size: 16px;
-                line-height: 1.4;
-            }
-        }
-
-        @keyframes hintSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         .play-btn {
             position: relative;
             width: 72px; 
@@ -375,7 +294,7 @@
             color: white;
         }
         
-        .play-btn:hover { 
+        .play-btn:hover:not(:disabled) { 
             transform: translateY(-3px); 
             box-shadow: 0 12px 32px rgba(168, 85, 247, 0.4);
         }
@@ -391,6 +310,7 @@
             left:50%; 
             top:50%; 
             transform:translate(-50%,-50%); 
+            z-index: 2;
         }
         
         .play-btn.playing::before { 
@@ -413,21 +333,6 @@
             font-weight:500; 
             margin-left: 8px; 
             margin-right: 8px;
-        }
-        
-        .progress-container { 
-            flex-grow: 0;
-            flex-shrink: 0;
-            width: 150px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid rgba(168, 85, 247, 0.4);
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 0 8px;
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.2),
-                inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .progress-bar { 
@@ -739,25 +644,6 @@
             padding: 16px;
         }
 
-        .export-csv-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-        }
-
-        .export-csv-btn:hover {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
-        }
-
        @media(max-width:768px){
             body { padding: 10px; }
             .audio-section{ padding: 15px; }
@@ -770,19 +656,21 @@
             .input-field, .live-feedback{ padding: 15px; font-size: 24px; }
 
             .player-pill {
-                padding: 10px 20px;
-                gap: 14px;
+                padding: 8px 12px;
+                gap: 8px;
                 background: rgba(255, 255, 255, 0.98);
                 border: 2px solid rgba(168, 85, 247, 0.4);
                 box-shadow: 
                     0 12px 40px rgba(0, 0, 0, 0.25),
                     0 4px 12px rgba(168, 85, 247, 0.3),
                     inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                max-width: calc(100vw - 40px);
+                overflow: hidden;
             }
 
             .progress-container {
-                width: 120px;
-                height: 12px;
+                width: 80px;
+                height: 10px;
                 background: rgba(255, 255, 255, 0.95);
                 border: 2px solid rgba(168, 85, 247, 0.4);
                 box-shadow: 
@@ -791,31 +679,42 @@
             }
 
             .progress-controls-row {
-                max-width: 320px;
-                gap: 8px;
+                max-width: calc(100vw - 60px);
+                gap: 6px;
+                padding: 0 10px;
             }
 
             .nav-btn, .toggle-btn {
-                width: 48px !important;
-                height: 48px !important;
-                font-size: 16px !important;
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 14px !important;
             }
 
             .play-btn {
-                width: 56px !important;
-                height: 56px !important;
-                font-size: 24px !important;
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 20px !important;
             }
 
             .secondary-btn {
-                width: 32px !important;
-                height: 32px !important;
-                font-size: 12px !important;
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 10px !important;
             }
 
             .progress-controls-row #timeDisplay {
-                font-size: 12px;
-                min-width: 70px;
+                font-size: 10px;
+                min-width: 50px;
+            }
+
+            .hint-display {
+                margin: 15px 0;
+                padding: 12px 16px;
+            }
+            
+            .hint-content {
+                font-size: 16px;
+                line-height: 1.4;
             }
         }
 
@@ -842,9 +741,7 @@
                 <div class="audio-controls">
                     <div class="player-pill">
                         <button class="nav-btn" id="prevBtn" title="Previous sentence">‹</button>
-                        <button class="play-btn" id="playBtn">
-                            <div class="loading-spinner" id="loadingSpinner"></div>
-                        </button>
+                        <button class="play-btn" id="playBtn"></button>
                         <button class="nav-btn" id="nextBtn" title="Next sentence">›</button>
                         <button class="toggle-btn" id="ignoreCaseBtn" title="Capitalization checking OFF">Aa</button>
                         <button class="toggle-btn" id="speedBtn" title="Playback Speed">100</button>
@@ -989,10 +886,10 @@
         }
 
         // DOM ELEMENTS
-        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, loadingSpinner, statsSection;
+        let audioPlayer, playBtn, progressBar, timeDisplay, referenceTextDiv, statsSection;
         let userInput, liveFeedback, accuracyPercent, correctWords, wrongWords;
         let endDictationBtn, ignoreCaseBtn, hintBtn, speedBtn;
-        let prevBtn, nextBtn, sentenceInfo, exportCsvBtn;
+        let prevBtn, nextBtn, exportCsvBtn;
 
         // GLOBAL STATE
         let referenceText = '';
@@ -1035,7 +932,6 @@
             progressBar = document.getElementById('progressBar');
             timeDisplay = document.getElementById('timeDisplay');
             referenceTextDiv = document.getElementById('referenceText');
-            loadingSpinner = document.getElementById('loadingSpinner');
             statsSection = document.getElementById('statsSection');
             userInput = document.getElementById('userInput');
             
@@ -1053,7 +949,6 @@
             hintBtn = document.getElementById('hintBtn');
             prevBtn = document.getElementById('prevBtn');
             nextBtn = document.getElementById('nextBtn');
-            sentenceInfo = document.getElementById('sentenceInfo');
             exportCsvBtn = document.getElementById('exportCsvBtn');
         }
 
@@ -1128,14 +1023,11 @@
                 audioPlayer.addEventListener('loadedmetadata', () => {
                     console.log(`[DEBUG] Metadata loaded. Duration: ${audioPlayer.duration.toFixed(2)}s. Network State: ${audioPlayer.networkState}.`);
                     if (playBtn) {
-                        playBtn.classList.remove('loading', 'playing');
+                        playBtn.classList.remove('playing');
                         playBtn.disabled = false;
                     }
                     audioPlayer.playbackRate = currentSpeed;
                     updateProgress();
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
                 });
                 
                 audioPlayer.addEventListener('error', (e) => {
@@ -1147,12 +1039,8 @@
                         event: e
                     });
                     if (playBtn) {
-                        playBtn.classList.remove('loading');
                         playBtn.disabled = true;
                         playBtn.style.opacity = '0.5';
-                    }
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
                     }
                     alert('Error loading audio. Please check your internet connection or try refreshing the page.');
                 });
@@ -1321,17 +1209,26 @@
                 allLessons = await response.json();
             } catch (error) {
                 console.error('Failed to load lessons:', error);
-                if (sentenceInfo) sentenceInfo.textContent = 'Failed to load lessons data';
             }
         }
 
-        // VTT PARSING
+        // VTT PARSING - Enhanced to handle edge cases
         function parseVTT(vttText) {
             const lines = vttText.split('\n');
             const cues = [];
             let i = 0;
 
-            while (i < lines.length && !lines[i].includes('-->')) {
+            // Skip headers and comments
+            while (i < lines.length) {
+                const line = lines[i].trim();
+                if (line.includes('-->')) {
+                    break;
+                }
+                // Skip WEBVTT headers, NOTE sections, STYLE sections
+                if (line.startsWith('WEBVTT') || line.startsWith('NOTE') || line.startsWith('STYLE')) {
+                    i++;
+                    continue;
+                }
                 i++;
             }
 
@@ -1339,24 +1236,34 @@
                 const line = lines[i].trim();
                 
                 if (line.includes('-->')) {
-                    const [startTime, endTime] = line.split('-->').map(t => t.trim());
-                    const startSeconds = parseTimeToSeconds(startTime);
-                    const endSeconds = parseTimeToSeconds(endTime);
-                    
-                    i++;
-                    let text = '';
-                    while (i < lines.length && lines[i].trim() !== '') {
-                        if (text) text += ' ';
-                        text += lines[i].trim();
-                        i++;
-                    }
-                    
-                    if (text) {
-                        cues.push({
-                            start: startSeconds,
-                            end: endSeconds,
-                            text: text
-                        });
+                    const timeParts = line.split('-->');
+                    if (timeParts.length >= 2) {
+                        const startTime = timeParts[0].trim();
+                        const endTime = timeParts[1].trim().split(' ')[0]; // Remove any positioning info
+                        
+                        const startSeconds = parseTimeToSeconds(startTime);
+                        const endSeconds = parseTimeToSeconds(endTime);
+                        
+                        // Only proceed if we have valid times
+                        if (!isNaN(startSeconds) && !isNaN(endSeconds)) {
+                            i++;
+                            let text = '';
+                            while (i < lines.length && lines[i].trim() !== '') {
+                                if (text) text += ' ';
+                                // Remove any VTT tags like <v Speaker>, <c.classname>, etc.
+                                const cleanLine = lines[i].trim().replace(/<[^>]*>/g, '');
+                                text += cleanLine;
+                                i++;
+                            }
+                            
+                            if (text.trim()) {
+                                cues.push({
+                                    start: startSeconds,
+                                    end: endSeconds,
+                                    text: text.trim()
+                                });
+                            }
+                        }
                     }
                 }
                 i++;
@@ -1366,18 +1273,26 @@
         }
 
         function parseTimeToSeconds(timeStr) {
-            const parts = timeStr.split(':');
-            const seconds = parts[parts.length - 1].split('.');
-            const sec = parseInt(seconds[0]);
-            const ms = parseInt(seconds[1] || 0);
-            
-            if (parts.length === 3) {
-                const hours = parseInt(parts[0]);
-                const minutes = parseInt(parts[1]);
-                return hours * 3600 + minutes * 60 + sec + ms / 1000;
-            } else {
-                const minutes = parseInt(parts[0]);
-                return minutes * 60 + sec + ms / 1000;
+            try {
+                // Handle both mm:ss.mmm and hh:mm:ss.mmm formats
+                const parts = timeStr.split(':');
+                const seconds = parts[parts.length - 1].split(/[.,]/); // Handle both . and , as decimal separator
+                const sec = parseInt(seconds[0]) || 0;
+                const ms = parseInt(seconds[1] || 0);
+                
+                if (parts.length === 3) {
+                    const hours = parseInt(parts[0]) || 0;
+                    const minutes = parseInt(parts[1]) || 0;
+                    return hours * 3600 + minutes * 60 + sec + ms / 1000;
+                } else if (parts.length === 2) {
+                    const minutes = parseInt(parts[0]) || 0;
+                    return minutes * 60 + sec + ms / 1000;
+                } else {
+                    return sec + ms / 1000;
+                }
+            } catch (error) {
+                console.error('Error parsing time:', timeStr, error);
+                return 0;
             }
         }
 
@@ -1479,7 +1394,6 @@
 
         function updateCurrentSentence() {
             updateNavigationButtons();
-            updateSentenceInfo();
             updateCurrentReferenceText();
             
             hideHint();
@@ -1507,12 +1421,6 @@
             if (nextBtn) nextBtn.disabled = (currentCueIndex >= vttCues.length - 1);
         }
 
-        function updateSentenceInfo() {
-            if (sentenceInfo && vttCues.length > 0) {
-                sentenceInfo.textContent = `Sentence ${currentCueIndex + 1} of ${vttCues.length}`;
-            }
-        }
-
         function updateCurrentReferenceText() {
             if (vttCues.length > 0 && currentCueIndex >= 0 && currentCueIndex < vttCues.length) {
                 referenceText = vttCues[currentCueIndex].text;
@@ -1536,17 +1444,12 @@
 
         // LESSON LOADING
         async function loadLesson(lessonId) {
-            if (loadingSpinner) {
-                loadingSpinner.style.display = 'block';
-            }
             if (playBtn) {
-                playBtn.classList.add('loading');
                 playBtn.disabled = true;
             }
 
             if (!allLessons[lessonId]) {
                 console.error(`Lesson ${lessonId} not found`);
-                if (sentenceInfo) sentenceInfo.textContent = 'Failed to load lessons data';
                 return;
             }
 
@@ -1557,9 +1460,6 @@
             
             if (cues.length === 0) {
                 console.error(`Failed to load VTT for lesson ${lessonId}`);
-                if (loadingSpinner) {
-                    loadingSpinner.style.display = 'none';
-                }
                 return;
             }
             
@@ -2031,6 +1931,7 @@
         }
 
         function showTooltip(element, text) {
+            // Clean up existing tooltips
             document.querySelectorAll('.word-tooltip').forEach(tooltip => tooltip.remove());
             
             const tooltip = document.createElement('div');
@@ -2053,10 +1954,17 @@
                 tooltip.classList.add('show');
             }, 10);
             
-            document.addEventListener('click', function hideTooltip() {
-                tooltip.remove();
-                document.removeEventListener('click', hideTooltip);
-            });
+            // Clean up listener properly
+            const cleanup = function(e) {
+                if (!tooltip.contains(e.target) && !element.contains(e.target)) {
+                    tooltip.remove();
+                    document.removeEventListener('click', cleanup);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', cleanup);
+            }, 100);
         }
         
         function formatTime(seconds) {
