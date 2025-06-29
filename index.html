@@ -1178,6 +1178,12 @@
                 exportCsvBtn.addEventListener('click', exportCSV);
             }
 
+            // Add restart button event listener
+            const restartBtn = document.getElementById('restartBtn');
+            if (restartBtn) {
+                restartBtn.addEventListener('click', restartDictation);
+            }
+
             if (audioPlayer) {
                 audioPlayer.addEventListener('play', () => {
                     isPlaying = true;
@@ -2182,6 +2188,62 @@
                 }, 10000);
                 sendHeightToParent();
             }
+        }
+
+        function restartDictation() {
+            console.log('Restart button clicked');
+            
+            // Reset all variables
+            currentCueIndex = 0;
+            hasStartedTyping = false;
+            sentenceStartTime = null;
+            totalSessionTime = 0;
+            sessionResults = [];
+            
+            // Reset audio
+            if (audioPlayer) {
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+            }
+            
+            // Reset UI elements
+            if (userInput) {
+                userInput.value = '';
+                userInput.placeholder = initialPlaceholderText;
+                userInput.style.display = 'block';
+            }
+            if (liveFeedback) {
+                liveFeedback.innerHTML = 'Live Feedback';
+                liveFeedback.style.display = 'block';
+            }
+            
+            // Show input areas and hide stats
+            const inputArea = document.querySelector('.input-area');
+            if (inputArea) {
+                inputArea.style.display = 'flex';
+                console.log('Input area shown');
+            }
+            
+            if (statsSection) {
+                statsSection.style.display = 'none';
+                console.log('Stats section hidden');
+            }
+            
+            // Hide detailed results
+            const sentenceResults = document.getElementById('sentenceResults');
+            if (sentenceResults) {
+                sentenceResults.style.display = 'none';
+            }
+            
+            // Update current sentence
+            updateCurrentSentence();
+            
+            // Focus input
+            if (userInput) {
+                userInput.focus();
+            }
+            
+            console.log('Restart complete');
         }
     </script>
 </body>
