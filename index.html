@@ -7,24 +7,39 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #fdfdfd;
             color: #1f2937;
-            min-height: 100vh;
+            height: 100%;
             padding: 20px;
+            overflow: hidden;
+            margin: 0;
         }
 
         .container {
             max-width: 100%;
             width: 100%;
+            height: calc(100% - 40px);
             margin: 0 auto;
             background: transparent;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .content { 
             padding: 0; 
             width: 100%; 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         /* ----- AUDIO SECTION ---------------------------------------------- */
@@ -36,6 +51,7 @@
             color: #374151;
             width: 100%;
             overflow: visible !important;
+            flex-shrink: 0; /* Don't shrink */
         }
         
         .sentence-info { 
@@ -193,6 +209,38 @@
             flex-shrink: 0;
         }
 
+        /* Desktop progress bar */
+        .progress-container { 
+            flex-grow: 0;
+            flex-shrink: 0;
+            width: 150px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0 8px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Desktop player pill */
+        .player-pill {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 50px;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                0 4px 12px rgba(168, 85, 247, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
         /* Time display */
         .progress-controls-row #timeDisplay {
             flex-shrink: 0;
@@ -327,16 +375,26 @@
             box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
         }
 
-        /* Hint display area - pink border to match input field */
+        /* Text section - flexible but controlled */
+        .text-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0; /* Important for flex child */
+        }
+
+        /* Hint display area - normal dynamic sizing */
         .hint-display {
             margin: 20px 0;
             padding: 16px 20px;
             background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
-            border: 2px solid #e879f9; /* Same pink as input field */
+            border: 2px solid #e879f9;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1); /* Pink shadow to match */
-            animation: hintSlideIn 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.1);
+            flex-shrink: 0;
+            transition: all 0.3s ease; /* Smooth transitions */
         }
 
         .hint-content {
@@ -478,10 +536,10 @@
         }
 
         .input-field::placeholder {
-            font-size: 21px !important;
+            font-size: 32px !important; /* Much larger to fill the box */
             color: #9CA3AF;
             opacity: 1;
-            line-height: 1.4;
+            line-height: 1.2; /* Tighter line height for better fill */
             transition: color 0.3s ease;
         }
         
@@ -513,10 +571,18 @@
         }
 
         /* ----- STATS & CONTROLS ------------------------------------------- */
-        .stats-section{
-            margin:32px 0 0 0;
-            padding-top:24px;
-            border-top:1px solid #f3f4f6;
+        .stats-section {
+            margin: 32px 0 0 0;
+            padding-top: 24px;
+            border-top: 1px solid #f3f4f6;
+            flex-shrink: 0; /* Don't shrink */
+            max-height: 50vh; /* Limit height */
+            overflow-y: auto; /* Allow internal scrolling */
+        }
+
+        /* Remove old export controls */
+        .export-controls {
+            display: none; /* Hide old export controls */
         }
         
         .stats{
@@ -524,6 +590,52 @@
             grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
             gap:16px;
             margin-bottom:24px;
+        }
+
+        /* Stats container with export button */
+        .stats-with-export {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            flex: 1;
+        }
+
+        .export-button-container {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Round export button */
+        .export-csv-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .export-csv-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
         }
         
         .stat-item{
@@ -717,130 +829,86 @@
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
         }
 
-      /* ----- RESPONSIVE -------------------------------------------------- */
-@media(max-width:768px){
-    body { 
-        padding: 10px;
-        height: 100%;
-        overflow: hidden;
-    }
+       /* ----- RESPONSIVE -------------------------------------------------- */
+       @media(max-width:768px){
+    body { padding: 10px; }
+    .audio-section{ padding: 15px; }
     
-    .container {
-        height: calc(100% - 20px);
-    }
-    
-    .audio-section{ 
-        padding: 15px; 
-        margin-bottom: 16px;
-    }
-    
-    /* Mobile placeholder text sizing */
+    /* Mobile placeholder text sizing - fill the mobile input box */
     .input-field::placeholder {
-        font-size: 12px !important;
-        line-height: 1.3;
+        font-size: 20px !important; /* Much larger than 12px to fill mobile box */
+        line-height: 1.2; /* Tighter for better vertical fill */
     }
 
-    .input-field, .live-feedback{ 
-        padding: 15px; 
-        font-size: 24px;
-    }
-    
-    .input-field {
-        min-height: 80px;
-        max-height: 150px;
-    }
-    
-    .live-feedback {
-        min-height: 60px;
-        max-height: 200px;
-        font-size: 28px;
-    }
+    .input-field, .live-feedback{ padding: 15px; font-size: 24px; }
 
-    /* Mobile: much more compact player */
+    /* Mobile: apply same dramatic styling to pill */
     .player-pill {
-        padding: 6px 12px; /* Much smaller padding */
-        gap: 8px; /* Tighter spacing */
-        background: rgba(255, 255, 255, 0.98);
-        border: 2px solid rgba(168, 85, 247, 0.4);
+        padding: 10px 20px;
+        gap: 14px;
+        background: rgba(255, 255, 255, 0.98); /* Same as desktop */
+        border: 2px solid rgba(168, 85, 247, 0.4); /* Same as desktop */
         box-shadow: 
-            0 12px 40px rgba(0, 0, 0, 0.25),
-            0 4px 12px rgba(168, 85, 247, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        max-width: 280px; /* Limit maximum width */
+            0 12px 40px rgba(0, 0, 0, 0.25), /* Same dramatic shadow */
+            0 4px 12px rgba(168, 85, 247, 0.3), /* Same glow */
+            inset 0 1px 0 rgba(255, 255, 255, 0.6); /* Same highlight */
     }
 
-    /* Mobile: smaller progress controls row */
+    /* Mobile: apply same styling to progress bar */
+    .progress-container {
+        width: 120px; /* Slightly smaller for mobile space */
+        height: 12px; /* Keep thick */
+        background: rgba(255, 255, 255, 0.95); /* Same as desktop */
+        border: 2px solid rgba(168, 85, 247, 0.4); /* Same as desktop */
+        box-shadow: 
+            0 4px 16px rgba(0, 0, 0, 0.2), /* Same shadow */
+            inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Same inset */
+    }
+
     .progress-controls-row {
-        max-width: 260px; /* Much smaller */
-        gap: 4px; /* Tighter spacing */
+        max-width: 320px;
+        gap: 8px;
     }
 
-    /* Mobile: much smaller buttons */
+    /* Smaller buttons on mobile */
     .nav-btn, .toggle-btn {
-        width: 36px !important; /* Smaller than before */
-        height: 36px !important;
-        font-size: 14px !important;
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 16px !important;
     }
 
     .play-btn {
-        width: 44px !important; /* Smaller play button */
-        height: 44px !important;
-        font-size: 18px !important;
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 24px !important;
     }
 
     .secondary-btn {
-        width: 24px !important; /* Much smaller secondary buttons */
-        height: 24px !important;
-        font-size: 10px !important;
-    }
-
-    /* Mobile: smaller progress bar */
-    .progress-container {
-        width: 80px; /* Much smaller for mobile */
-        height: 8px; /* Thinner */
-        background: rgba(255, 255, 255, 0.95);
-        border: 2px solid rgba(168, 85, 247, 0.4);
-        box-shadow: 
-            0 4px 16px rgba(0, 0, 0, 0.2),
-            inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 12px !important;
     }
 
     .progress-controls-row #timeDisplay {
-        font-size: 10px;
-        min-width: 50px; /* Smaller time display */
-    }
-    
-    /* Mobile responsive hint */
-    .hint-display {
-        margin: 15px 0;
-        padding: 12px 16px;
-    }
-    
-    .hint-content {
-        font-size: 16px;
-        line-height: 1.4;
-    }
-    
-    .stats-section {
-        margin-top: 20px;
-        max-height: 40vh;
+        font-size: 12px;
+        min-width: 70px;
     }
 }
 
-/* Add this new style for your 'X' button */
-.toggle-btn.end-button {
-    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-    color: white;
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 1;
-    padding: 8px 12px;
-}
+        /* Add this new style for your 'X' button */
+    .toggle-btn.end-button {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        color: white;
+        font-size: 1.5em;
+        font-weight: bold;
+        line-height: 1;
+        padding: 8px 12px;
+    }
 
-.toggle-btn.end-button:hover {
-    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-    transform: translateY(-2px);
-}
+    .toggle-btn.end-button:hover {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+        transform: translateY(-2px);
+    }
     </style>
 </head>
 <body>
@@ -873,7 +941,7 @@
 
             <!-- TEXT & FEEDBACK -->
             <div class="text-section">
-                <!-- Hint display area - shows under controls, above feedback -->
+                <!-- Hint display area - only appears when needed -->
                 <div class="hint-display" id="hintDisplay" style="display: none;">
                     <div class="hint-content" id="hintContent"></div>
                 </div>
@@ -892,16 +960,23 @@
 
             <!-- STATS & CONTROLS -->
             <div class="stats-section">
-                <div class="stats" id="statsSection" style="display:none;">
-                    <div class="stat-item"><span class="stat-label">Accuracy</span><span class="stat-value" id="accuracyPercent">0%</span></div>
-                    <div class="stat-item"><span class="stat-label">Correct Words</span><span class="stat-value" id="correctWords">0</span></div>
-                    <div class="stat-item"><span class="stat-label">Wrong Words</span><span class="stat-value" id="wrongWords">0</span></div>
-                    <div class="stat-item"><span class="stat-label">Time Taken</span><span class="stat-value" id="timeTaken">0:00</span></div>
+                <div class="stats-with-export" id="statsSection" style="display:none;">
+                    <div class="stats">
+                        <div class="stat-item"><span class="stat-label">Accuracy</span><span class="stat-value" id="accuracyPercent">0%</span></div>
+                        <div class="stat-item"><span class="stat-label">Correct Words</span><span class="stat-value" id="correctWords">0</span></div>
+                        <div class="stat-item"><span class="stat-label">Wrong Words</span><span class="stat-value" id="wrongWords">0</span></div>
+                        <div class="stat-item"><span class="stat-label">Time Taken</span><span class="stat-value" id="timeTaken">0:00</span></div>
+                    </div>
+                    <div class="export-button-container">
+                        <button class="export-csv-btn" id="exportCsvBtn" title="Export results as CSV file">
+                            Export CSV
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Export button -->
+                <!-- Export controls - hidden now -->
                 <div class="export-controls" id="exportControls" style="display:none;">
-                    <button class="export-csv-btn" id="exportCsvBtn" title="Export results as CSV file">
+                    <button class="export-csv-btn-old" id="exportCsvBtnOld" title="Export results as CSV file">
                         Export CSV
                     </button>
                 </div>
@@ -917,11 +992,82 @@
     </div>
 
     <script>
+        // MODERN AUTO-RESIZE SYSTEM: ResizeObserver + Fallback
+        let lastReportedHeight = 0;
+        let resizeTimeout = null;
+
         function sendHeightToParent() {
-            const height = document.body.scrollHeight;
-            if (window.parent !== window) {
-                window.parent.postMessage({ frameHeight: height }, '*');
+            // Clear any pending resize calls
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
             }
+            
+            // Use a small delay to ensure DOM is fully updated
+            resizeTimeout = setTimeout(() => {
+                const height = Math.max(
+                    document.body.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.scrollHeight,
+                    document.documentElement.offsetHeight,
+                    document.documentElement.clientHeight
+                );
+                
+                // Only send if height actually changed (prevent spam)
+                if (height !== lastReportedHeight) {
+                    lastReportedHeight = height;
+                    if (window.parent !== window) {
+                        window.parent.postMessage({ frameHeight: height }, '*');
+                    }
+                    console.log('Sent new height:', height);
+                }
+            }, 50);
+        }
+
+        function initializeAutoResize() {
+            // Method 1: Modern ResizeObserver (preferred)
+            if (window.ResizeObserver) {
+                console.log('Using ResizeObserver (modern)');
+                
+                const resizeObserver = new ResizeObserver(entries => {
+                    sendHeightToParent();
+                });
+                
+                // Observe the main container for size changes
+                const container = document.querySelector('.container');
+                if (container) {
+                    resizeObserver.observe(container);
+                }
+                
+                // Also observe document body for additional safety
+                resizeObserver.observe(document.body);
+                
+            } else {
+                console.log('Using MutationObserver fallback (older browsers)');
+                
+                // Method 2: Fallback for older browsers
+                const mutationObserver = new MutationObserver(() => {
+                    sendHeightToParent();
+                });
+                
+                // Watch for DOM changes that could affect height
+                mutationObserver.observe(document.body, {
+                    childList: true,      // Child elements added/removed
+                    subtree: true,        // Watch all descendants
+                    attributes: true,     // Attribute changes (style, class, etc.)
+                    attributeFilter: ['style', 'class'], // Only watch relevant attributes
+                });
+                
+                // Additional fallback: Window resize events
+                window.addEventListener('resize', sendHeightToParent);
+                
+                // Backup polling for edge cases (very conservative)
+                setInterval(() => {
+                    sendHeightToParent();
+                }, 5000); // Only every 5 seconds as last resort
+            }
+            
+            // Initial height calculation
+            sendHeightToParent();
         }
 
         window.addEventListener('load', sendHeightToParent);
@@ -1027,7 +1173,9 @@
             });
             window.focus();
             console.log('Main window load event completed, focus attempted.');
-            setTimeout(sendHeightToParent, 500);
+            
+            // Initialize the modern auto-resize system
+            initializeAutoResize();
         });
 
         function toggleSpeed() {
@@ -1959,64 +2107,38 @@
             return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        // SIMPLE INLINE HINT SYSTEM - with mobile debugging
+        // SMOOTH AUTO-RESIZE HINT SYSTEM - works with ResizeObserver
         function showHint() {
-            console.log('showHint called, referenceText:', referenceText);
-            
-            if (!referenceText) {
-                console.log('No referenceText, exiting');
-                return;
-            }
+            if (!referenceText) return;
             
             const hintDisplay = document.getElementById('hintDisplay');
             const hintContent = document.getElementById('hintContent');
             
-            console.log('hintDisplay element:', hintDisplay);
-            console.log('hintContent element:', hintContent);
-            
-            if (!hintDisplay || !hintContent) {
-                console.log('Elements not found, exiting');
-                return;
-            }
-            
-            // Hide any existing hint first
-            hideHint();
+            if (!hintDisplay || !hintContent) return;
             
             // Set the hint text
             hintContent.textContent = referenceText;
-            console.log('Set hint content to:', referenceText);
             
             // Show the hint display
             hintDisplay.style.display = 'block';
-            hintDisplay.style.visibility = 'visible';
-            console.log('Set display to block');
             
-            // Force reflow for animation on mobile
-            hintDisplay.offsetHeight;
+            // ResizeObserver will automatically detect the change and resize
+            // No manual sendHeightToParent() needed!
             
-            // Auto-hide after 10 seconds (longer for debugging)
+            // Auto-hide after 8 seconds
             setTimeout(() => {
-                console.log('Auto-hiding hint');
                 hideHint();
-            }, 10000);
-            
-            // Trigger height recalculation for both mobile and desktop
-            setTimeout(() => {
-                sendHeightToParent();
-            }, 50);
-            setTimeout(() => {
-                sendHeightToParent();
-            }, 350);
+            }, 8000);
         }
 
         function hideHint() {
             const hintDisplay = document.getElementById('hintDisplay');
             if (hintDisplay && hintDisplay.style.display !== 'none') {
-                console.log('Hiding hint');
+                // Hide the hint
                 hintDisplay.style.display = 'none';
-                setTimeout(() => {
-                    sendHeightToParent();
-                }, 50);
+                
+                // ResizeObserver will automatically detect the change and resize
+                // No manual sendHeightToParent() needed!
             }
         }
 
