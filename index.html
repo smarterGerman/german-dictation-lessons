@@ -7,15 +7,22 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html {
+            height: 100%;
+            overflow: hidden; /* Prevent any scrolling at root level */
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #fdfdfd;
             color: #1f2937;
-            min-height: 100vh;
-            max-height: 100vh; /* Prevent vertical expansion */
+            height: 100vh; /* Exact viewport height */
             padding: 20px;
-            overflow: hidden; /* No scrolling */
-            box-sizing: border-box;
+            overflow: hidden; /* No scrolling ever */
+            position: fixed; /* Lock body position */
+            width: 100vw; /* Full width */
+            top: 0;
+            left: 0;
         }
 
         .container {
