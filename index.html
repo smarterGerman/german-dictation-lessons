@@ -581,10 +581,7 @@
             overflow-y: auto; /* Allow internal scrolling */
         }
 
-        /* Remove old export controls */
-        .export-controls {
-            display: none; /* Hide old export controls */
-        }
+
         
         .stats{
             display:grid;
@@ -1005,12 +1002,7 @@
                     </div>
                 </div>
 
-                <!-- Export controls - hidden now -->
-                <div class="export-controls" id="exportControls" style="display:none;">
-                    <button class="export-csv-btn-old" id="exportCsvBtnOld" title="Export results as CSV file">
-                        Export CSV
-                    </button>
-                </div>
+
 
                 <!-- Detailed sentence results -->
                 <div class="sentence-results" id="sentenceResults" style="display:none;">
@@ -1174,14 +1166,21 @@
             if (hintBtn) {
                 hintBtn.addEventListener('click', showHint);
             }
-            if (exportCsvBtn) {
-                exportCsvBtn.addEventListener('click', exportCSV);
-            }
 
-            // Add restart button event listener
+            // Add restart and export button event listeners
             const restartBtn = document.getElementById('restartBtn');
+            const exportBtn = document.getElementById('exportCsvBtn');
+            
             if (restartBtn) {
                 restartBtn.addEventListener('click', restartDictation);
+                console.log('Restart button listener added');
+            }
+            
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportCSV);
+                console.log('Export button listener added');
+            } else {
+                console.log('Export button not found!');
             }
 
             if (audioPlayer) {
