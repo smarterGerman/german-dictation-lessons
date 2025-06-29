@@ -87,14 +87,15 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Progress and secondary controls row - centered */
+        /* Desktop progress controls - bigger second row */
         .progress-controls-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 16px; /* Bigger gap */
             width: 100%;
-            max-width: 500px;
+            max-width: 600px; /* Bigger max-width */
+            padding: 0 20px; /* Add padding */
         }
 
         /* Beautiful gradient-filled buttons without borders */
@@ -620,7 +621,7 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -637,21 +638,47 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
         }
+
+        /* Round restart button */
+        .restart-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+        }
         
         .stat-item{
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95); /* More opaque */
             backdrop-filter: blur(10px);
-            border:none;
+            border: 2px solid rgba(168, 85, 247, 0.2); /* Add visible border */
             border-radius:16px;
             padding:24px;
             text-align:center;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Stronger shadow */
             transition: all .3s ease;
         }
         
         .stat-item:hover{
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); /* Even stronger on hover */
+            border-color: rgba(168, 85, 247, 0.4); /* More visible border on hover */
         }
         
         .stat-value{
@@ -968,6 +995,9 @@
                         <div class="stat-item"><span class="stat-label">Time Taken</span><span class="stat-value" id="timeTaken">0:00</span></div>
                     </div>
                     <div class="export-button-container">
+                        <button class="restart-btn" id="restartBtn" title="Restart dictation">
+                            ↻
+                        </button>
                         <button class="export-csv-btn" id="exportCsvBtn" title="Export results as CSV file">
                             Export CSV
                         </button>
@@ -1145,6 +1175,12 @@
             }
             if (exportCsvBtn) {
                 exportCsvBtn.addEventListener('click', exportCSV);
+            }
+
+            // Add restart button event listener
+            const restartBtn = document.getElementById('restartBtn');
+            if (restartBtn) {
+                restartBtn.addEventListener('click', restartDictation);
             }
 
             if (audioPlayer) {
